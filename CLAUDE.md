@@ -17,7 +17,7 @@ Everything committed here is, or will be, visible to anyone. Treat every commit 
 - Tests
 
 ## Rules
-- Permissive dependencies only (MIT, Apache-2.0, BSD, ISC).
+- Permissive dependencies only (MIT, Apache-2.0, BSD, ISC, PSF-2.0).
 - Nothing here is specific to Philadelphia. City name, region, areas and languages come from the settings file a city supplies; Philadelphia appears only as the example.
 - Follow the four ground rules in README.md.
 - The spec and the agent team live in the private repo. Work here is assigned by `pv-coordinator` there and reviewed by `pv-gate-scraping-licence` before every merge.

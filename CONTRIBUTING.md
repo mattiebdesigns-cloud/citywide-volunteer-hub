@@ -16,7 +16,7 @@ Source lists, keys, the database, and all code for profiles, points and attendan
 ## Ground rules
 1. Never commit a key, a source list, or anything about a real person.
 2. Follow the four scraper rules in README.md.
-3. Permissive dependencies only (MIT, Apache-2.0, BSD, ISC).
+3. Permissive dependencies only (MIT, Apache-2.0, BSD, ISC, PSF-2.0).
 4. Open an issue before a large change, so work is not wasted.
 5. Be kind. This is a volunteer project about volunteering.
 

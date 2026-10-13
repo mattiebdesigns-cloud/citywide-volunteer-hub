@@ -1,0 +1,53 @@
+# CI for the public repo (PROJECT.md sections 3, 13 and 15 step 4).
+# Runs on every push and pull request: lint, tests, event-schema check,
+# English/Spanish key check,
+# licence check, secret scan, and the check that no private file is here.
+# Uses no secrets. Actions are pinned to full commit ids (tag in the comment).
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint and tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out this repo with its full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the leak check and secret scan read every commit
+          persist-credentials: false
+
+      - name: Fetch pull-request branches, so closed ones are checked too
+        run: git fetch --no-tags --quiet origin '+refs/pull/*/head:refs/remotes/origin/pull/*'
+
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          # The licence test checks every Python version in uv.lock, whichever runs here.
+          python-version: "3.13"
+          version: "0.12.18" # pin uv itself, not only the action
+
+      - name: Install test tools from the lock file
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check --no-cache .
+
+      - name: Tests (schema, uniqueness, leak check, secret scan, licences, workflow pins)
+        run: uv run pytest
+
+      - name: Interface text check (English and Spanish have the same keys)
+        # Owned by pv-languages. Plain Node, no packages; Node comes with the runner.
+        run: node site/src/i18n/check-keys.mjs
