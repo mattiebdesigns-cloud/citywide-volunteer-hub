@@ -15,7 +15,7 @@
     "nav_about": "About our listings",
     "nav_email": "Weekly email",
     "footer_sources": "Listings come from organizations' public calendars.",
-    "footer_open_source": "This site runs on open-source code.",
+    "footer_open_source": "Anyone can see and reuse the code for this site.",
     "footer_code_link": "See the code"
   },
   "filters": {
@@ -106,7 +106,7 @@
     "clearances_required": "Background checks required",
     "group_friendly": "Good for groups",
     "spanish_spoken": "Spanish spoken here",
-    "recurring": "Repeats",
+    "recurring": "Repeats on a schedule",
     "original_language": "Shown in the language the organization used.",
     "translate": "Translate",
     "show_original": "Show original",
@@ -133,6 +133,7 @@
     "details_label": "Details (optional)",
     "privacy_note": "Please do not include anyone's personal details.",
     "submit": "Send report",
+    "cancel": "Cancel",
     "thanks": "Thank you. We received your report.",
     "error": "We could not send your report. Please try again."
   },

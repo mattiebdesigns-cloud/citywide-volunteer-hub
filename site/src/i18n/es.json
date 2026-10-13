@@ -15,7 +15,7 @@
     "nav_about": "Sobre nuestros anuncios",
     "nav_email": "Correo semanal",
     "footer_sources": "Los anuncios vienen de los calendarios públicos de las organizaciones.",
-    "footer_open_source": "Este sitio usa código abierto.",
+    "footer_open_source": "Cualquier persona puede ver y reutilizar el código de este sitio.",
     "footer_code_link": "Ver el código"
   },
   "filters": {
@@ -59,7 +59,7 @@
     },
     "join": {
       "label": "Cómo participar",
-      "all": "Cualquier forma",
+      "all": "Cualquier forma de participar",
       "drop_in": "Llegar sin inscribirse",
       "signup": "Inscribirse antes",
       "application": "Solicitar antes",
@@ -106,7 +106,7 @@
     "clearances_required": "Requiere verificación de antecedentes",
     "group_friendly": "Ideal para grupos",
     "spanish_spoken": "Se habla español",
-    "recurring": "Se repite",
+    "recurring": "Se repite con regularidad",
     "original_language": "Se muestra en el idioma que usó la organización.",
     "translate": "Traducir",
     "show_original": "Ver original",
@@ -133,6 +133,7 @@
     "details_label": "Detalles (opcional)",
     "privacy_note": "Por favor, no incluya datos personales de nadie.",
     "submit": "Enviar reporte",
+    "cancel": "Cancelar",
     "thanks": "Gracias. Recibimos su reporte.",
     "error": "No pudimos enviar su reporte. Inténtelo de nuevo."
   },

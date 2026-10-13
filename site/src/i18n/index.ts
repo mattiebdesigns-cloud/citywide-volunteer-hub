@@ -19,7 +19,7 @@ export interface I18nSettings {
     name: LocalizedText;
     region: LocalizedText;
     /** IANA time zone, e.g. "America/New_York". Needed to show dates and times. */
-    time_zone?: string;
+    timezone?: string;
     [key: string]: unknown;
   };
   languages: {
@@ -163,8 +163,8 @@ export function createI18n(settings: I18nSettings, catalogs: Record<string, Mess
     const pluralRules = new Intl.PluralRules(lang);
     const numbers = new Intl.NumberFormat(lang);
     const zone = (): string => {
-      const tz = settings.site.time_zone;
-      if (!tz) throw new Error("site.time_zone is missing from the settings file; dates cannot be shown");
+      const tz = settings.site.timezone;
+      if (!tz) throw new Error("site.timezone is missing from the settings file; dates cannot be shown");
       return tz;
     };
     // Clock style (6:30 PM or 18:30) follows the city's default language, so
