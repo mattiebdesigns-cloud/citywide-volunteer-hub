@@ -68,6 +68,17 @@
     "no_training": "No requiere capacitación",
     "spanish_spoken": "Se habla español"
   },
+  "causes": {
+    "food": "Alimentos",
+    "parks-and-trees": "Parques y árboles",
+    "animals": "Animales",
+    "youth": "Jóvenes",
+    "housing": "Vivienda",
+    "elders": "Personas mayores",
+    "civic-action": "Acción cívica",
+    "education": "Educación",
+    "health": "Salud"
+  },
   "results": {
     "count": {
       "one": "{count} turno",

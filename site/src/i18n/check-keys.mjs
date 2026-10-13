@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 // Key-parity check for the interface text (PROJECT.md section 5).
 // No dependencies. Run: node site/src/i18n/check-keys.mjs
+// Optional settings check: pass a city's settings file as JSON, either
+//   node site/src/i18n/check-keys.mjs --settings path/to/site.json
+// or with the environment variable I18N_SETTINGS=path/to/site.json.
+// Then every language in languages.available needs a file here, every cause id
+// needs a "causes.<id>" name, and every area needs a name in every language.
+// With no settings file (as in the public repo) that part is skipped.
 // Exits 1, with a plain list of problems, when any language file:
 //   - is missing a key that en.json has, or has a key en.json does not have
 //   - has an empty value or a value that is not text
@@ -10,7 +16,11 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const dir = process.argv[2] ?? dirname(fileURLToPath(import.meta.url));
+const args = process.argv.slice(2);
+const at = args.indexOf("--settings");
+const settingsPath = at >= 0 ? args[at + 1] : process.env.I18N_SETTINGS || null;
+const positional = args.filter((_, n) => at < 0 || (n !== at && n !== at + 1));
+const dir = positional[0] ?? dirname(fileURLToPath(import.meta.url));
 const REFERENCE = "en";
 const PLURALS = new Set(["zero", "one", "two", "few", "many", "other"]);
 const problems = [];
@@ -102,6 +112,44 @@ for (const file of files.filter((f) => f !== `${REFERENCE}.json`)) {
   }
   for (const key of Object.keys(cur.plural))
     if (!(key in ref.plural)) problems.push(`${file}: plural group "${key}" is not in en.json`);
+}
+
+if (settingsPath) checkSettings(settingsPath);
+else console.log("No settings file given: skipping the cause and area name check.");
+
+function checkSettings(path) {
+  const where = `settings (${path})`;
+  if (!path.endsWith(".json")) {
+    problems.push(`${where}: give the settings as JSON (convert site.yml first)`);
+    return;
+  }
+  let settings;
+  try {
+    settings = JSON.parse(readFileSync(path, "utf8"));
+  } catch (err) {
+    problems.push(`${where}: cannot read it (${err.message})`);
+    return;
+  }
+  const available = settings?.languages?.available ?? [];
+  const texts = {};
+  for (const lang of available) {
+    if (!files.includes(`${lang}.json`)) problems.push(`${where}: languages.available lists "${lang}" but there is no ${lang}.json`);
+    else texts[lang] = load(`${lang}.json`);
+  }
+  for (const id of settings?.causes ?? [])
+    for (const [lang, flat] of Object.entries(texts))
+      if (!flat[`causes.${id}`]) problems.push(`${lang}.json: no name for cause "${id}" (add "causes.${id}")`);
+  for (const area of settings?.areas ?? []) {
+    const name = area?.name;
+    if (typeof name === "string" && name.trim()) continue;
+    if (!name || typeof name !== "object") {
+      problems.push(`${where}: area "${area?.id}" has no name`);
+      continue;
+    }
+    for (const lang of available)
+      if (typeof name[lang] !== "string" || !name[lang].trim())
+        problems.push(`${where}: area "${area?.id}" has no ${lang} name`);
+  }
 }
 
 if (problems.length) {

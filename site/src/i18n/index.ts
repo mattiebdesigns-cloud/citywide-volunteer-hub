@@ -22,6 +22,10 @@ export interface I18nSettings {
     timezone?: string;
     [key: string]: unknown;
   };
+  /** Areas for the area filter. `id` matches `area` in each listing. */
+  areas?: Array<{ id: string; name: LocalizedText; live?: boolean }>;
+  /** Cause ids. `id` matches `cause` in each listing; names live in `causes.<id>` in the language files. */
+  causes?: string[];
   languages: {
     default: string;
     available: string[];
@@ -105,6 +109,10 @@ export interface Translator {
   plural(key: string, count: number, vars?: Vars): string;
   /** A settings value (such as the region) in this language. */
   setting(value: LocalizedText): string;
+  /** An area's name in this language, from the settings file. Empty for null or an unknown id, so the page can skip it. */
+  areaName(id: string | null | undefined): string;
+  /** A cause's name in this language, from `causes.<id>` in the language files. Empty for null or an unknown id, so the page can skip it. */
+  causeName(id: string | null | undefined): string;
   /** A date with the month written out, so it cannot be misread. */
   formatDate(date: Date | string): string;
   /** A clock time, such as 6:30 PM or 6:30 p. m. */
@@ -183,6 +191,11 @@ export function createI18n(settings: I18nSettings, catalogs: Record<string, Mess
         return t(`${key}.other`, full);
       },
       setting: (value) => localize(value, lang, defaultLanguage),
+      areaName: (id) => {
+        const area = id ? settings.areas?.find((a) => a.id === id) : undefined;
+        return area ? localize(area.name, lang, defaultLanguage) : "";
+      },
+      causeName: (id) => (id && lookup(`causes.${id}`) !== undefined ? t(`causes.${id}`) : ""),
       formatDate: (d) =>
         new Intl.DateTimeFormat(lang, {
           weekday: "long",

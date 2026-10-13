@@ -68,6 +68,17 @@
     "no_training": "No training needed",
     "spanish_spoken": "Spanish spoken here"
   },
+  "causes": {
+    "food": "Food",
+    "parks-and-trees": "Parks and trees",
+    "animals": "Animals",
+    "youth": "Youth",
+    "housing": "Housing",
+    "elders": "Older adults",
+    "civic-action": "Civic action",
+    "education": "Education",
+    "health": "Health"
+  },
   "results": {
     "count": {
       "one": "{count} shift",
