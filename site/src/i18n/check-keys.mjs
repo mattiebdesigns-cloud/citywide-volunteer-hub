@@ -18,7 +18,19 @@ import { fileURLToPath } from "node:url";
 
 const args = process.argv.slice(2);
 const at = args.indexOf("--settings");
-const settingsPath = at >= 0 ? args[at + 1] : process.env.I18N_SETTINGS || null;
+// Skip the settings check only when no settings option is given at all. A
+// `--settings` with no value, or an I18N_SETTINGS that is set but empty,
+// usually means a CI variable is missing, so it fails instead of passing quietly.
+const settingsGiven = at >= 0 || "I18N_SETTINGS" in process.env;
+const settingsPath = at >= 0 ? args[at + 1] : process.env.I18N_SETTINGS;
+if (settingsGiven && (!settingsPath || !settingsPath.trim() || settingsPath.startsWith("--"))) {
+  console.error(
+    at >= 0
+      ? "--settings needs a path to the settings file (JSON). It was given with no value."
+      : "I18N_SETTINGS is set but empty. Give it a path to the settings file (JSON), or unset it to skip the settings check.",
+  );
+  process.exit(1);
+}
 const positional = args.filter((_, n) => at < 0 || (n !== at && n !== at + 1));
 const dir = positional[0] ?? dirname(fileURLToPath(import.meta.url));
 const REFERENCE = "en";
