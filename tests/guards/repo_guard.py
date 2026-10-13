@@ -189,10 +189,7 @@ def find_leaks(public_repo: Path, private_repo: Path | None = None) -> list[str]
         reason = forbidden_reason(path)
         if reason:
             problems.append(f"{path}: {reason} (in the current files)")
-    try:
-        history = history_files(public_repo)
-    except subprocess.CalledProcessError:
-        history = set()
+    history = history_files(public_repo) if has_commits(public_repo) else set()
     for path in sorted(history):
         reason = forbidden_reason(path)
         if reason:
@@ -345,18 +342,36 @@ def scan_tree(repo: Path) -> list[Finding]:
     return findings
 
 
+class GitError(RuntimeError):
+    """A git command failed, so the scan could not be completed."""
+
+
+def _git_bytes(repo: Path, *args: str) -> bytes:
+    """Run git and return its output. Any failure raises GitError: a scan that
+    could not run must fail, never pass as clean."""
+    result = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, check=False)
+    if result.returncode != 0:
+        error = result.stderr.decode("utf-8", errors="replace").strip().splitlines()
+        raise GitError(f"git {args[0]} failed in {repo}: {error[-1] if error else 'no message'}")
+    return result.stdout
+
+
+def has_commits(repo: Path) -> bool:
+    """False only for a repo with no commits at all (the one case history may be skipped)."""
+    return bool(_git_bytes(repo, "rev-list", "--all", "--max-count=1").strip())
+
+
 def scan_history(repo: Path) -> list[Finding]:
-    """Scan every line ever added in any commit on any branch."""
-    proc = subprocess.run(
-        ["git", "-C", str(repo), "log", "--all", "-p", "--no-color", "--no-ext-diff",
-         "--format=commit %h", "--unified=0"],
-        capture_output=True,
-        check=True,
-    )
+    """Scan every line ever added in any commit on any branch, every commit
+    message, and everything reachable from a tag."""
+    # --diff-merges=first-parent: without it git log shows no diff for merge
+    # commits, so a key added while resolving a merge would never be seen.
+    out = _git_bytes(repo, "log", "--all", "-p", "--diff-merges=first-parent", "--no-color",
+                     "--no-ext-diff", "--format=commit %h", "--unified=0")
     findings: list[Finding] = []
     commit = "?"
     path = "?"
-    for raw in proc.stdout.decode("utf-8", errors="replace").splitlines():
+    for raw in out.decode("utf-8", errors="replace").splitlines():
         if raw.startswith("commit "):
             commit = raw.split(" ", 1)[1]
         elif raw.startswith("+++ "):
@@ -364,47 +379,77 @@ def scan_history(repo: Path) -> list[Finding]:
         elif raw.startswith("+") and not raw.startswith("+++"):
             for _, rule in scan_text(raw[1:]):
                 findings.append(Finding(f"commit {commit} {path}", rule))
-    return findings + scan_commit_messages(repo) + scan_tag_messages(repo)
+    return findings + scan_commit_messages(repo) + scan_tags(repo)
 
 
 def scan_commit_messages(repo: Path) -> list[Finding]:
     """Scan the full message of every commit on any branch or fetched ref."""
-    proc = subprocess.run(
-        ["git", "-C", str(repo), "log", "--all", "--format=%x00%h%x00%B"],
-        capture_output=True,
-        check=True,
-    )
+    out = _git_bytes(repo, "log", "--all", "--format=%x00%h%x00%B")
     findings: list[Finding] = []
-    records = proc.stdout.decode("utf-8", errors="replace").split("\0")[1:]
+    records = out.decode("utf-8", errors="replace").split("\0")[1:]
     for commit, message in zip(records[0::2], records[1::2], strict=False):
         for _, rule in scan_text(message):
             findings.append(Finding(f"commit {commit} message", rule))
     return findings
 
 
-def scan_tag_messages(repo: Path) -> list[Finding]:
-    """Scan the message of every tag (annotated tags carry their own text)."""
-    proc = subprocess.run(
-        ["git", "-C", str(repo), "for-each-ref", "refs/tags",
-         "--format=%00%(refname:short)%00%(contents)"],
-        capture_output=True,
-        check=True,
-    )
+def _scan_object_text(repo: Path, object_id: str, where: str) -> list[Finding]:
+    text = _git_bytes(repo, "cat-file", "-p", object_id)
+    if b"\0" in text[:8192]:
+        return []  # binary
+    return [Finding(where, rule) for _, rule in scan_text(text.decode("utf-8", errors="replace"))]
+
+
+def scan_tags(repo: Path) -> list[Finding]:
+    """Follow every tag to what it points at and scan along the way.
+
+    - A tag object (annotated tag): its whole text, including the message. A
+      tag can point to another tag; every tag in the chain is read.
+    - A blob (a file stored without a commit): its contents.
+    - A tree (a folder stored without a commit): every file in it.
+    - A commit: already covered by the commit scans above.
+    """
+    out = _git_bytes(repo, "for-each-ref", "refs/tags", "--format=%(refname:short)%00%(objectname)")
     findings: list[Finding] = []
-    records = proc.stdout.decode("utf-8", errors="replace").split("\0")[1:]
-    for tag, message in zip(records[0::2], records[1::2], strict=False):
-        for _, rule in scan_text(message):
-            findings.append(Finding(f"tag {tag} message", rule))
+    for line in out.decode("utf-8", errors="replace").splitlines():
+        if not line:
+            continue
+        tag, object_id = line.split("\0", 1)
+        seen: set[str] = set()
+        label = f"tag {tag}"
+        while object_id and object_id not in seen:
+            seen.add(object_id)
+            kind = _git_bytes(repo, "cat-file", "-t", object_id).decode().strip()
+            if kind == "tag":
+                findings += _scan_object_text(repo, object_id, f"{label} message")
+                body = _git_bytes(repo, "cat-file", "-p", object_id).decode("utf-8", "replace")
+                target = re.search(r"^object ([0-9a-f]{40,64})$", body, re.MULTILINE)
+                object_id = target.group(1) if target else ""
+                label = f"tag {tag} (inner tag {object_id[:7]})"
+            elif kind == "blob":
+                findings += _scan_object_text(repo, object_id, f"tag {tag} file {object_id[:7]}")
+                break
+            elif kind == "tree":
+                listing = _git_bytes(repo, "ls-tree", "-r", "-z", object_id)
+                for entry in listing.decode("utf-8", "replace").split("\0"):
+                    if not entry:
+                        continue
+                    meta, path = entry.split("\t", 1)
+                    entry_kind, entry_id = meta.split()[1:3]
+                    if entry_kind == "blob":
+                        findings += _scan_object_text(repo, entry_id, f"tag {tag} folder file {path}")
+                break
+            else:
+                break  # commit: covered by scan_history and scan_commit_messages
     return findings
 
 
 def find_secrets(repo: Path, history: bool = True) -> list[Finding]:
+    """Scan files, and the history unless history=False. Raises GitError if
+    any git command fails; a repo with no commits yet has no history to scan."""
     findings = scan_tree(repo)
-    if history:
-        try:
-            findings += scan_history(repo)
-        except subprocess.CalledProcessError:
-            pass  # no commits yet
+    if history and has_commits(repo):
+        findings += scan_history(repo)
     return sorted(set(findings), key=str)
 
 

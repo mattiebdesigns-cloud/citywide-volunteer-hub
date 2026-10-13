@@ -167,3 +167,104 @@ def test_secret_scan_reads_tag_messages(tmp_path):
     findings = [str(f) for f in repo_guard.find_secrets(tmp_path, history=True)]
     assert any(f.startswith("tag v0.0.1 message: ") for f in findings), findings
     assert all(key not in f and FAKE not in f for f in findings)
+
+
+def _new_repo(tmp_path, with_commit=True):
+    import subprocess
+
+    git = ["git", "-C", str(tmp_path), "-c", "user.name=Test", "-c", "user.email=test@example.org"]
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+    if with_commit:
+        (tmp_path / "notes.txt").write_text("nothing secret here\n")
+        subprocess.run([*git, "add", "notes.txt"], check=True)
+        subprocess.run([*git, "commit", "-q", "-m", "Add notes"], check=True)
+    return git
+
+
+def test_empty_repo_scans_clean(tmp_path):
+    _new_repo(tmp_path, with_commit=False)
+    assert repo_guard.find_secrets(tmp_path, history=True) == []
+
+
+def test_git_failure_fails_the_scan(tmp_path, monkeypatch):
+    _new_repo(tmp_path)
+    real = repo_guard._git_bytes
+
+    def broken(repo, *args):
+        if args[0] == "log":
+            return real(repo, "log", "--no-such-option")
+        return real(repo, *args)
+
+    monkeypatch.setattr(repo_guard, "_git_bytes", broken)
+    with pytest.raises(repo_guard.GitError):
+        repo_guard.find_secrets(tmp_path, history=True)
+
+
+def test_not_a_repo_fails_the_scan(tmp_path):
+    with pytest.raises(Exception):  # noqa: B017 (any failure is right; passing clean is wrong)
+        repo_guard.find_secrets(tmp_path, history=True)
+
+
+def test_secret_scan_follows_nested_tags(tmp_path):
+    import subprocess
+
+    key = "sk-" + "ant-" + FAKE
+    git = _new_repo(tmp_path)
+    subprocess.run([*git, "tag", "-a", "inner", "-m", "key " + key], check=True)
+    subprocess.run([*git, "tag", "-a", "outer", "-m", "Outer tag", "inner"], check=True,
+                   capture_output=True)
+    subprocess.run([*git, "tag", "-d", "inner"], check=True, capture_output=True)
+    findings = [str(f) for f in repo_guard.find_secrets(tmp_path, history=True)]
+    assert any(f.startswith("tag outer (inner tag ") for f in findings), findings
+    assert all(FAKE not in f for f in findings)
+
+
+def test_secret_scan_reads_tagged_file_and_folder(tmp_path):
+    import subprocess
+
+    key = "sk-" + "ant-" + FAKE
+    git = _new_repo(tmp_path)
+    blob = subprocess.run([*git, "hash-object", "-w", "--stdin"], input="KEY=" + key + "\n",
+                          capture_output=True, text=True, check=True).stdout.strip()
+    tree = subprocess.run([*git, "mktree"], input=f"100644 blob {blob}\tsecret.env\n",
+                          capture_output=True, text=True, check=True).stdout.strip()
+    subprocess.run([*git, "tag", "just-a-file", blob], check=True)
+    subprocess.run([*git, "tag", "just-a-folder", tree], check=True)
+    findings = [str(f) for f in repo_guard.find_secrets(tmp_path, history=True)]
+    assert any(f.startswith("tag just-a-file file ") for f in findings), findings
+    assert any(f.startswith("tag just-a-folder folder file secret.env") for f in findings), findings
+    assert all(FAKE not in f for f in findings)
+
+
+def test_secret_scan_reads_merge_commits(tmp_path):
+    import subprocess
+
+    key = "sk-" + "ant-" + FAKE
+    git = _new_repo(tmp_path)
+
+    def run(*args):
+        subprocess.run([*git, *args], check=True, capture_output=True)
+
+    base = subprocess.run([*git, "rev-parse", "--abbrev-ref", "HEAD"], check=True,
+                          capture_output=True, text=True).stdout.strip()
+    run("checkout", "-q", "-b", "side")
+    (tmp_path / "side.txt").write_text("side branch work\n")
+    run("add", "side.txt")
+    run("commit", "-q", "-m", "Side work")
+    run("checkout", "-q", base)
+    (tmp_path / "main.txt").write_text("main branch work\n")
+    run("add", "main.txt")
+    run("commit", "-q", "-m", "Main work")
+    # Merge, and slip a key into the merge commit itself.
+    run("merge", "--no-commit", "--no-ff", "side")
+    (tmp_path / "config.txt").write_text("KEY=" + key + "\n")
+    run("add", "config.txt")
+    run("commit", "-q", "-m", "Merge side")
+    # Remove it in the next commit, so only the history still has it.
+    (tmp_path / "config.txt").write_text("KEY=\n")
+    run("add", "config.txt")
+    run("commit", "-q", "-m", "Remove key")
+    findings = [str(f) for f in repo_guard.find_secrets(tmp_path, history=True)]
+    assert len(findings) == 1, findings
+    assert findings[0].startswith("commit ") and "config.txt" in findings[0]
+    assert FAKE not in findings[0]
