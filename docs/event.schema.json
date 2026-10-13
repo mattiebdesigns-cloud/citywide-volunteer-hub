@@ -74,7 +74,7 @@
       "minLength": 1
     },
     "cause": {
-      "description": "What the work is for, for example food or environment. null when not known.",
+      "description": "Cause id from the city's own settings file (its cause list), the same way area is an id from its area list. null when not known. Each city has its own list, so the shared format does not fix the values.",
       "type": ["string", "null"],
       "minLength": 1
     },
