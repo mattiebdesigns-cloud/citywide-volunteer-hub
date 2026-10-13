@@ -35,7 +35,7 @@ Every field below must be present in every listing, even when its value is unkno
 | address | text or null | |
 | area | area id | An `id` from the city's settings file, for example `philadelphia` (an example city, as in the sample). Lowercase letters, digits and hyphens. Never a place name typed by the scraper |
 | neighborhood_or_town | text or null | |
-| cause | cause id, or null | An id from the city's cause list in its settings file, for example `food`. The listing-quality step maps the source's own words ("Hunger", "Food Access") to an id. null when unknown. Each city has its own list, so the schema does not fix the values |
+| cause | cause id, or null | An id from the city's cause list in its settings file, for example `food` or `parks-and-trees`. Same id rules as `area`. The listing-quality step maps the source's own words ("Hunger", "Food Access") to an id. null when unknown. Each city has its own list, so the schema does not fix the values |
 | type | `service`, `training`, `campaign`, `protest_action` | |
 | sensitive | true or false | Always true for `protest_action`. Also true for anything immigration-related or flagged sensitive. When unsure, true |
 | photos_allowed | true or false | false when the listing says "no photos". Write true when the source says nothing |
@@ -74,7 +74,7 @@ If the source does not say, record that it does not say. Each field has exactly 
 - A `protest_action` listing must have `sensitive: true`.
 - A listing with a `recurrence_rule` must have `recurring: true`.
 - Dates must include a UTC offset (`Z` or `-04:00`).
-- `area` must look like an id. Whether it is one of the city's areas, and whether `cause` is one of the city's causes, is checked against the city's settings file, not here.
+- `area`, and `cause` when it is not null, must look like an id: lowercase letters, digits and hyphens. Whether it is one of the city's areas or causes is checked against the city's settings file, not here.
 
 ## Nothing city-specific
 

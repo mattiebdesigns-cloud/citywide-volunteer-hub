@@ -75,8 +75,10 @@
     },
     "cause": {
       "description": "Cause id from the city's own settings file (its cause list), the same way area is an id from its area list. null when not known. Each city has its own list, so the shared format does not fix the values.",
-      "type": ["string", "null"],
-      "minLength": 1
+      "oneOf": [
+        { "$ref": "#/$defs/slug" },
+        { "type": "null" }
+      ]
     },
     "type": {
       "description": "Kind of listing.",

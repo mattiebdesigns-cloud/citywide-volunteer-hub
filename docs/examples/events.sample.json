@@ -37,7 +37,7 @@
       "address": null,
       "area": "philadelphia",
       "neighborhood_or_town": null,
-      "cause": "parks_and_trees",
+      "cause": "parks-and-trees",
       "type": "service",
       "sensitive": false,
       "photos_allowed": true,
