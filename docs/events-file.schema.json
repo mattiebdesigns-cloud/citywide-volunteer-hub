@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:citywide-volunteer-hub:schema:events-file",
+  "title": "events.json",
+  "description": "The file the pipeline writes and the calendar site reads: when it was made, and every listing. Each listing follows docs/event.schema.json. Plain-language guide: docs/EVENT-FORMAT.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["generated_at", "events"],
+  "properties": {
+    "generated_at": {
+      "description": "When the pipeline wrote this file, ISO 8601 with a UTC offset.",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "events": {
+      "description": "Every listing. Ids must be unique; the pipeline and tests check this, because JSON Schema cannot.",
+      "type": "array",
+      "items": { "$ref": "urn:citywide-volunteer-hub:schema:event" }
+    }
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:citywide-volunteer-hub:schema:event",
+  "title": "Volunteer listing",
+  "description": "One volunteer shift or event in the shared event format. Plain-language guide: docs/EVENT-FORMAT.md. Unknown values: join_method and spanish_spoken use the string \"unknown\"; every other field that may be unknown uses null. A field never has two ways to say unknown.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "org_name",
+    "title",
+    "start",
+    "end",
+    "address",
+    "area",
+    "neighborhood_or_town",
+    "cause",
+    "type",
+    "sensitive",
+    "photos_allowed",
+    "signup_url",
+    "join_method",
+    "min_age",
+    "listing_language",
+    "spanish_spoken",
+    "training_required",
+    "clearances_required",
+    "group_friendly",
+    "recurring",
+    "recurrence_rule",
+    "source_url",
+    "source_id",
+    "last_seen_at"
+  ],
+  "properties": {
+    "id": {
+      "description": "Stable across runs: a hash of source_id and the source's own event id.",
+      "type": "string",
+      "minLength": 1
+    },
+    "org_name": {
+      "description": "The organization's name, as the organization writes it.",
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "description": "Title of the shift or event, in the language the organization wrote it.",
+      "type": "string",
+      "minLength": 1
+    },
+    "start": {
+      "description": "Start date and time, ISO 8601 with a UTC offset.",
+      "$ref": "#/$defs/datetime_with_offset"
+    },
+    "end": {
+      "description": "End date and time, ISO 8601 with a UTC offset. null when the source gives no end time.",
+      "oneOf": [
+        { "$ref": "#/$defs/datetime_with_offset" },
+        { "type": "null" }
+      ]
+    },
+    "address": {
+      "description": "Street address as published by the organization. null when not given.",
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "area": {
+      "description": "Area id from the city's own settings file (areas[].id). Never a free-typed place name.",
+      "$ref": "#/$defs/slug"
+    },
+    "neighborhood_or_town": {
+      "description": "Neighborhood or town, finer than area. null when not known.",
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "cause": {
+      "description": "What the work is for, for example food or environment. null when not known.",
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "type": {
+      "description": "Kind of listing.",
+      "enum": ["service", "training", "campaign", "protest_action"]
+    },
+    "sensitive": {
+      "description": "true for every protest_action listing, anything immigration-related, and anything flagged sensitive. When unsure, true.",
+      "type": "boolean"
+    },
+    "photos_allowed": {
+      "description": "false when the listing is marked \"no photos\". Write true when the source says nothing.",
+      "type": "boolean",
+      "default": true
+    },
+    "signup_url": {
+      "description": "The organization's own page for joining. Sign-ups never happen on the hub.",
+      "$ref": "#/$defs/web_url"
+    },
+    "join_method": {
+      "description": "What a volunteer must do before turning up. drop_in: just show up. signup: reserve a place, no reply needed. application: apply and wait for an answer. unknown: the source does not say; shown as \"check with the organizer\". Never guess.",
+      "enum": ["drop_in", "signup", "application", "unknown"]
+    },
+    "min_age": {
+      "description": "Youngest age allowed, in whole years. null when the source does not say.",
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "listing_language": {
+      "description": "BCP 47 language tag of the language the organization wrote the listing in, for example en or es.",
+      "type": "string",
+      "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$"
+    },
+    "spanish_spoken": {
+      "description": "Whether Spanish is spoken at the shift. \"unknown\" when the source does not say. Never guess.",
+      "oneOf": [
+        { "type": "boolean" },
+        { "const": "unknown" }
+      ]
+    },
+    "training_required": {
+      "description": "Whether training is needed before the shift. null when the source does not say.",
+      "type": ["boolean", "null"]
+    },
+    "clearances_required": {
+      "description": "Whether background checks or clearances are needed. null when the source does not say.",
+      "type": ["boolean", "null"]
+    },
+    "group_friendly": {
+      "description": "Whether groups are welcome. null when the source does not say.",
+      "type": ["boolean", "null"]
+    },
+    "recurring": {
+      "description": "true when the shift repeats on a schedule.",
+      "type": "boolean"
+    },
+    "recurrence_rule": {
+      "description": "iCalendar RRULE (RFC 5545), without the \"RRULE:\" prefix, for example FREQ=MONTHLY;BYDAY=3TH. Set only when the source or the poster gives the schedule. null otherwise.",
+      "oneOf": [
+        { "type": "string", "pattern": "^FREQ=(SECONDLY|MINUTELY|HOURLY|DAILY|WEEKLY|MONTHLY|YEARLY)(;[A-Z]+=[^;]+)*$" },
+        { "type": "null" }
+      ]
+    },
+    "source_url": {
+      "description": "The public page the facts came from.",
+      "$ref": "#/$defs/web_url"
+    },
+    "source_id": {
+      "description": "Id of the source entry in the city's source list.",
+      "type": "string",
+      "minLength": 1
+    },
+    "last_seen_at": {
+      "description": "When the pipeline last saw this listing on its source. Shown as \"last checked\".",
+      "$ref": "#/$defs/datetime_with_offset"
+    }
+  },
+  "allOf": [
+    {
+      "description": "Every protest_action listing is sensitive.",
+      "if": { "properties": { "type": { "const": "protest_action" } } },
+      "then": { "properties": { "sensitive": { "const": true } } }
+    },
+    {
+      "description": "A schedule can only be given for a recurring listing.",
+      "if": { "properties": { "recurrence_rule": { "type": "string" } } },
+      "then": { "properties": { "recurring": { "const": true } } }
+    }
+  ],
+  "$defs": {
+    "datetime_with_offset": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "web_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https?://"
+    }
+  }
+}
