@@ -1,0 +1,166 @@
+{
+  "language": {
+    "name": "Español",
+    "choose": "Elegir idioma",
+    "current": "Idioma actual: {language}",
+    "beta": "beta",
+    "beta_note": "Esta traducción es nueva. Todavía la estamos revisando."
+  },
+  "site": {
+    "tagline": "Turnos de voluntariado en {region}, de día o de noche.",
+    "description": "Encuentre un turno de voluntariado en {region} esta semana. Cada anuncio lleva a la página de inscripción de la organización.",
+    "skip_to_content": "Saltar al contenido principal",
+    "nav_label": "Menú principal",
+    "nav_calendar": "Calendario",
+    "nav_about": "Sobre nuestros anuncios",
+    "nav_email": "Correo semanal",
+    "footer_sources": "Los anuncios vienen de los calendarios públicos de las organizaciones.",
+    "footer_open_source": "Este sitio usa código abierto.",
+    "footer_code_link": "Ver el código"
+  },
+  "filters": {
+    "heading": "Buscar un turno",
+    "open": "Filtros",
+    "close": "Cerrar filtros",
+    "apply": "Mostrar turnos",
+    "clear": "Borrar todos los filtros",
+    "any": "Cualquiera",
+    "day": {
+      "label": "Día",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "this_week": "Esta semana",
+      "this_weekend": "Este fin de semana",
+      "pick_date": "Elegir una fecha"
+    },
+    "time_of_day": {
+      "label": "Hora del día",
+      "morning": "Por la mañana",
+      "afternoon": "Por la tarde",
+      "evening": "Por la noche",
+      "overnight": "Toda la noche",
+      "range": "Hora de inicio: de {from} a {to}"
+    },
+    "area": {
+      "label": "Zona",
+      "all": "Todas las zonas"
+    },
+    "cause": {
+      "label": "Causa",
+      "all": "Todas las causas"
+    },
+    "type": {
+      "label": "Tipo de anuncio",
+      "all": "Todos los tipos",
+      "service": "Servicio",
+      "training": "Capacitación",
+      "campaign": "Campaña",
+      "protest_action": "Protesta o acción"
+    },
+    "join": {
+      "label": "Cómo participar",
+      "all": "Cualquier forma",
+      "drop_in": "Llegar sin inscribirse",
+      "signup": "Inscribirse antes",
+      "application": "Solicitar antes",
+      "unknown": "Consultar con el organizador"
+    },
+    "no_training": "No requiere capacitación",
+    "spanish_spoken": "Se habla español"
+  },
+  "results": {
+    "count": {
+      "one": "{count} turno",
+      "other": "{count} turnos"
+    },
+    "none": "Ningún turno coincide con estos filtros.",
+    "none_hint": "Pruebe otro día o quite un filtro."
+  },
+  "listing": {
+    "hosted_by": "Organiza: {org}",
+    "when": "Cuándo",
+    "where": "Dónde",
+    "time_range": "De {start} a {end}",
+    "starts_at": "Inicio: {start}",
+    "ends_next_day": "Termina al día siguiente",
+    "address_missing": "La dirección no aparece en el anuncio. Consulte la página de la organización.",
+    "about_heading": "Sobre este turno",
+    "last_checked": "Última revisión: {date}",
+    "last_checked_hint": "La última fecha en que comparamos este anuncio con la página de la organización.",
+    "join_hint": {
+      "drop_in": "No necesita inscribirse. Llegue a la hora de inicio.",
+      "signup": "Reserve su lugar en la página de la organización antes de ir.",
+      "application": "Presente su solicitud en la página de la organización. Espere su respuesta antes de ir.",
+      "unknown": "No pudimos saber cómo participar. Consulte la página de la organización o comuníquese con ella."
+    },
+    "go_button": {
+      "drop_in": "Ver detalles en la página de la organización",
+      "signup": "Inscribirse en la página de la organización",
+      "application": "Solicitar en la página de la organización",
+      "unknown": "Ir a la página de la organización"
+    },
+    "external_note": "La inscripción se hace en el sitio web de la organización, no en este sitio.",
+    "min_age": "Desde los {age} años",
+    "training_required": "Requiere capacitación",
+    "no_training": "No requiere capacitación",
+    "clearances_required": "Requiere verificación de antecedentes",
+    "group_friendly": "Ideal para grupos",
+    "spanish_spoken": "Se habla español",
+    "recurring": "Se repite",
+    "original_language": "Se muestra en el idioma que usó la organización.",
+    "translate": "Traducir",
+    "show_original": "Ver original",
+    "translated_automatically": "Traducido automáticamente",
+    "translated_note": "Una computadora tradujo este texto y puede tener errores. Consulte la página de la organización para ver los detalles exactos.",
+    "back": "Volver a todos los turnos",
+    "gone": "Este anuncio ya no está en el calendario.",
+    "add_to_calendar": "Agregar a mi calendario",
+    "add_to_calendar_hint": "Descarga un archivo de calendario para este turno."
+  },
+  "report": {
+    "button": "Reportar un problema con este anuncio",
+    "heading": "Reportar un problema con este anuncio",
+    "intro": "Díganos qué está mal. Usamos los reportes para corregir o quitar anuncios.",
+    "reason_label": "¿Qué está mal?",
+    "reason": {
+      "wrong_time": "La fecha o la hora no es correcta",
+      "wrong_place": "El lugar no es correcto",
+      "cancelled": "El evento se canceló",
+      "broken_link": "El enlace de inscripción no funciona",
+      "not_volunteering": "Esto no es un turno de voluntariado",
+      "other": "Otra cosa"
+    },
+    "details_label": "Detalles (opcional)",
+    "privacy_note": "Por favor, no incluya datos personales de nadie.",
+    "submit": "Enviar reporte",
+    "thanks": "Gracias. Recibimos su reporte.",
+    "error": "No pudimos enviar su reporte. Inténtelo de nuevo."
+  },
+  "about": {
+    "title": "Sobre nuestros anuncios",
+    "what_we_list": "Qué publicamos",
+    "never_listed": "Qué nunca publicamos",
+    "where_from": "De dónde vienen nuestros anuncios",
+    "kept_current": "Cómo mantenemos los anuncios al día",
+    "campaigns": "Anuncios de campañas",
+    "protests": "Protestas y acciones",
+    "change_or_remove": "Pídanos cambiar o quitar un anuncio",
+    "not_collected": "Lo que nunca recopilamos"
+  },
+  "email_signup": {
+    "heading": "Esta semana en el voluntariado",
+    "intro": "Reciba un correo cada semana con turnos de voluntariado en {region}.",
+    "email_label": "Correo electrónico",
+    "submit": "Suscribirse",
+    "privacy_note": "Solo le pedimos su correo electrónico. Puede cancelar la suscripción cuando quiera.",
+    "success": "Gracias. Su suscripción está activa.",
+    "success_confirm": "Gracias. Revise su correo para confirmar su suscripción.",
+    "invalid": "Escriba un correo electrónico como nombre@ejemplo.com.",
+    "error": "Algo salió mal. Inténtelo de nuevo."
+  },
+  "not_found": {
+    "title": "Página no encontrada",
+    "body": "No encontramos esa página.",
+    "link": "Ir al calendario"
+  }
+}

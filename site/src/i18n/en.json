@@ -1,0 +1,166 @@
+{
+  "language": {
+    "name": "English",
+    "choose": "Choose a language",
+    "current": "Current language: {language}",
+    "beta": "beta",
+    "beta_note": "This translation is new. We are still checking it."
+  },
+  "site": {
+    "tagline": "Volunteer shifts in {region}, any day or night.",
+    "description": "Find a volunteer shift in {region} this week. Every listing links to the organization's own sign-up page.",
+    "skip_to_content": "Skip to main content",
+    "nav_label": "Main menu",
+    "nav_calendar": "Calendar",
+    "nav_about": "About our listings",
+    "nav_email": "Weekly email",
+    "footer_sources": "Listings come from organizations' public calendars.",
+    "footer_open_source": "This site runs on open-source code.",
+    "footer_code_link": "See the code"
+  },
+  "filters": {
+    "heading": "Find a shift",
+    "open": "Filters",
+    "close": "Close filters",
+    "apply": "Show shifts",
+    "clear": "Clear all filters",
+    "any": "Any",
+    "day": {
+      "label": "Day",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "this_week": "This week",
+      "this_weekend": "This weekend",
+      "pick_date": "Pick a date"
+    },
+    "time_of_day": {
+      "label": "Time of day",
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening",
+      "overnight": "Overnight",
+      "range": "Starts between {from} and {to}"
+    },
+    "area": {
+      "label": "Area",
+      "all": "All areas"
+    },
+    "cause": {
+      "label": "Cause",
+      "all": "All causes"
+    },
+    "type": {
+      "label": "Listing type",
+      "all": "All types",
+      "service": "Service",
+      "training": "Training",
+      "campaign": "Campaign",
+      "protest_action": "Protest or action"
+    },
+    "join": {
+      "label": "How to join",
+      "all": "Any way to join",
+      "drop_in": "Just show up",
+      "signup": "Sign up first",
+      "application": "Apply first",
+      "unknown": "Check with the organizer"
+    },
+    "no_training": "No training needed",
+    "spanish_spoken": "Spanish spoken here"
+  },
+  "results": {
+    "count": {
+      "one": "{count} shift",
+      "other": "{count} shifts"
+    },
+    "none": "No shifts match these filters.",
+    "none_hint": "Try another day, or remove a filter."
+  },
+  "listing": {
+    "hosted_by": "Hosted by {org}",
+    "when": "When",
+    "where": "Where",
+    "time_range": "{start} to {end}",
+    "starts_at": "Starts {start}",
+    "ends_next_day": "Ends the next day",
+    "address_missing": "The address is not listed. Check the organization's page.",
+    "about_heading": "About this shift",
+    "last_checked": "Last checked {date}",
+    "last_checked_hint": "The date we last compared this listing with the organization's own page.",
+    "join_hint": {
+      "drop_in": "You do not need to sign up. Arrive at the start time.",
+      "signup": "Save a spot on the organization's page before you go.",
+      "application": "Apply on the organization's page. Wait for their answer before you go.",
+      "unknown": "We could not tell how to join. Check the organization's page or contact them."
+    },
+    "go_button": {
+      "drop_in": "See details on the organization's page",
+      "signup": "Sign up on the organization's page",
+      "application": "Apply on the organization's page",
+      "unknown": "Go to the organization's page"
+    },
+    "external_note": "Sign-up happens on the organization's website, not on this site.",
+    "min_age": "Ages {age} and up",
+    "training_required": "Training required",
+    "no_training": "No training needed",
+    "clearances_required": "Background checks required",
+    "group_friendly": "Good for groups",
+    "spanish_spoken": "Spanish spoken here",
+    "recurring": "Repeats",
+    "original_language": "Shown in the language the organization used.",
+    "translate": "Translate",
+    "show_original": "Show original",
+    "translated_automatically": "Translated automatically",
+    "translated_note": "A computer translated this text, and it may have mistakes. Check the organization's page for exact details.",
+    "back": "Back to all shifts",
+    "gone": "This listing is no longer on the calendar.",
+    "add_to_calendar": "Add to my calendar",
+    "add_to_calendar_hint": "Downloads a calendar file for this shift."
+  },
+  "report": {
+    "button": "Report a problem with this listing",
+    "heading": "Report a problem with this listing",
+    "intro": "Tell us what is wrong. We use reports to fix or remove listings.",
+    "reason_label": "What is wrong?",
+    "reason": {
+      "wrong_time": "The date or time is wrong",
+      "wrong_place": "The place is wrong",
+      "cancelled": "The event is cancelled",
+      "broken_link": "The sign-up link does not work",
+      "not_volunteering": "This is not a volunteer shift",
+      "other": "Something else"
+    },
+    "details_label": "Details (optional)",
+    "privacy_note": "Please do not include anyone's personal details.",
+    "submit": "Send report",
+    "thanks": "Thank you. We received your report.",
+    "error": "We could not send your report. Please try again."
+  },
+  "about": {
+    "title": "About our listings",
+    "what_we_list": "What we list",
+    "never_listed": "What we never list",
+    "where_from": "Where our listings come from",
+    "kept_current": "How we keep listings current",
+    "campaigns": "Campaign listings",
+    "protests": "Protests and actions",
+    "change_or_remove": "Ask us to change or remove a listing",
+    "not_collected": "What we never collect"
+  },
+  "email_signup": {
+    "heading": "This week in volunteering",
+    "intro": "Get one email each week with volunteer shifts in {region}.",
+    "email_label": "Email address",
+    "submit": "Sign up",
+    "privacy_note": "We ask only for your email address. You can unsubscribe at any time.",
+    "success": "Thank you. You are signed up.",
+    "success_confirm": "Thank you. Check your email to confirm your sign-up.",
+    "invalid": "Enter an email address like name@example.com.",
+    "error": "Something went wrong. Please try again."
+  },
+  "not_found": {
+    "title": "Page not found",
+    "body": "We could not find that page.",
+    "link": "Go to the calendar"
+  }
+}
