@@ -56,5 +56,6 @@ The aim is plain, neutral Spanish for Latin American readers in the region, with
 - **Cause names.** *Alimentos* (food), *Parques y árboles*, *Animales*, *Jóvenes* (youth), *Vivienda* (housing), *Personas mayores* (older adults), *Acción cívica*, *Educación*, *Salud*, *Ropa* (clothing), *Reparación* (repair, as in fixing items; would *Reparaciones* read more naturally?).
 - **Region and area names** are in the city's settings file, not here. The Spanish reviewer checks them there.
 - **Recurring events.** *Se repite con regularidad* for "Repeats on a schedule".
+- **Rewards notice** (`site.rewards_coming`). *Las recompensas por hacer voluntariado llegan pronto. Por ahora, busque un turno en el que pueda participar.* Is *recompensas* the right word for the rewards?
 - **Weekly email name.** *Esta semana en el voluntariado*.
 - **`filters.join.unknown`.** *Consultar con el organizador* uses the masculine form for a generic organizer.
