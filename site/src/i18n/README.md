@@ -53,7 +53,7 @@ The aim is plain, neutral Spanish for Latin American readers in the region, with
 - **How to join.** *Llegar sin inscribirse*, *Inscribirse antes*, *Solicitar antes*, *Consultar con el organizador*. Is *Solicitar antes* clear for "apply and wait for an answer"?
 - **Words for the same thing everywhere.** listing = *anuncio*, shift = *turno*, sign up = *inscribirse*, report = *reportar / reporte* (common in the US and Latin America; Spain uses *informar*), training = *capacitación*, add = *agregar*.
 - **Background checks.** *Requiere verificación de antecedentes* for "clearances" (a Pennsylvania term).
-- **Cause names.** *Alimentos* (food), *Parques y árboles*, *Animales*, *Jóvenes* (youth), *Vivienda* (housing), *Personas mayores* (older adults), *Acción cívica*, *Educación*, *Salud*.
+- **Cause names.** *Alimentos* (food), *Parques y árboles*, *Animales*, *Jóvenes* (youth), *Vivienda* (housing), *Personas mayores* (older adults), *Acción cívica*, *Educación*, *Salud*, *Ropa* (clothing), *Reparación* (repair, as in fixing items; would *Reparaciones* read more naturally?).
 - **Region and area names** are in the city's settings file, not here. The Spanish reviewer checks them there.
 - **Recurring events.** *Se repite con regularidad* for "Repeats on a schedule".
 - **Weekly email name.** *Esta semana en el voluntariado*.

@@ -77,7 +77,9 @@
     "elders": "Personas mayores",
     "civic-action": "Acción cívica",
     "education": "Educación",
-    "health": "Salud"
+    "health": "Salud",
+    "clothing": "Ropa",
+    "repair": "Reparación"
   },
   "results": {
     "count": {
