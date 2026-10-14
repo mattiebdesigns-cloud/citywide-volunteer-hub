@@ -40,6 +40,35 @@ Each scraper gets a folder `tests/fixtures/<scraper>/` with:
 
 A test runs each scraper on its recorded page with the network off and checks that the output matches the schema and `expected.json`, has no field outside the schema (so no attendee or sign-up data), and is not empty.
 
+## Recording a fixture (added by pv-scrapers)
+
+`tests/record_fixture.py` records one public calendar page as a fixture. It fetches the page once
+through the scraper package's polite fetcher (`Fetcher.fetch_source`): robots.txt first, the named
+bot with the city's contact address, and the longer of the site's Crawl-delay and the source's own
+`crawl_delay_seconds`. It then removes descriptions, images, and organizer, attendee and contact
+fields, and writes `page.<ext>` and `fetched.json` (the fetch date and what was removed; never the
+source's address or the contact address).
+
+```sh
+PV_CONTACT_EMAIL=<city contact> uv run python tests/record_fixture.py \
+    --source /path/outside/this/repo/entry.json --out tests/fixtures/<scraper>/<case>
+```
+
+- `entry.json` is the real source entry as JSON. Keep it outside this repo.
+- Write an invented `source.json` in the case folder first and the tool also writes `expected.json`
+  and `dropped.json` (the events the scraper drops, with the reason). Read both before committing.
+- It refuses any source not marked `sensitive: false`, and every campaign or protest source:
+  those fixtures are invented by hand, never recorded.
+- It never records over an existing page unless you pass `--replace`.
+- After recording, check by eye that no person's name remains.
+- Recorded pages are copies of public calendars, not covered by the MIT licence. The event
+  titles, places, times and links in `expected.json` and `dropped.json` are the publisher's too;
+  only our field names and structure are MIT. On a publisher's request the whole case folder is
+  deleted. See `tests/fixtures/NOTICE.md`.
+
+Each case folder can therefore also hold `dropped.json` and `fetched.json`.
+`test_scraper_fixtures.py` runs every case with the network off.
+
 ## Rules
 
 - Invented data only. Never put a real person's name or details in a fixture.

@@ -3,7 +3,7 @@
 Thank you for looking. This is open code for a city's calendar of volunteer shifts. The first city is Philadelphia, where it runs as Philly Volunteers.
 
 ## Who runs it
-The project is run by Cedar Water LLC, a small Philadelphia business owned by Mr. Bennett. It may later be handed to a nonprofit or to the city. Everything in this repository is MIT licensed, so whatever happens to the project, the code you contribute here stays open for anyone to use.
+The project is run by Cedar Water LLC, a small Philadelphia business owned by Mr. Bennett. It may later be handed to a nonprofit or to the city. The code and documentation in this repository are MIT licensed, so whatever happens to the project, the code you contribute here stays open for anyone to use. Recorded copies of public calendars under `tests/fixtures/` are the exception: they belong to their publishers and are kept only for testing (see `tests/fixtures/NOTICE.md`).
 
 ## What you can work on
 - **Scrapers** (`pvscrapers/`): reading one more public volunteer calendar into the shared event format.

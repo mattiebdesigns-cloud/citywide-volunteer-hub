@@ -1,0 +1,7 @@
+{
+  "fetched_at": "2026-10-14T14:14:09-04:00",
+  "how": "Fetched once with pvscrapers.fetch.Fetcher (CitywideVolunteerHubBot/0.1.0, contact address from the city's settings), robots.txt read first. The site's robots.txt allows the feed.",
+  "changed_after_fetch": "Every DESCRIPTION replaced with a placeholder and every ATTACH (image) line removed: the scraper never reads them, and the hub stores facts and a link only. The feed had no ORGANIZER, ATTENDEE or CONTACT lines. No person's name remains.",
+  "source_json": "Invented. Only the feed itself is a recorded copy.",
+  "crawl_delay_note": "The site's 10-second Crawl-delay was not honoured on this fetch: the feed was requested about 1 second after robots.txt. The fetcher was fixed afterwards."
+}

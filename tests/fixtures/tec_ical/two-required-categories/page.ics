@@ -1,0 +1,155 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//The Schuylkill Center - ECPv6.17.3//NONSGML v1.0//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:The Schuylkill Center
+X-ORIGINAL-URL:https://schuylkillcenter.org
+X-WR-CALDESC:Events for The Schuylkill Center
+REFRESH-INTERVAL;VALUE=DURATION:PT1H
+X-Robots-Tag:noindex
+X-PUBLISHED-TTL:PT1H
+BEGIN:VTIMEZONE
+TZID:America/New_York
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+DTSTART:20250309T070000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+DTSTART:20251102T060000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+DTSTART:20260308T070000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+DTSTART:20261101T060000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+DTSTART:20270314T070000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+DTSTART:20271107T060000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261015T100000
+DTEND;TZID=America/New_York:20261015T120000
+DTSTAMP:20260320T153535Z
+CREATED:20260320T153236Z
+LAST-MODIFIED:20260320T153535Z
+UID:284070-1792058400-1792065600@schuylkillcenter.org
+SUMMARY:Native Planters
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://schuylkillcenter.org/event/native-planters-52/
+LOCATION:The Schuylkill Center for Environmental Education\, 8480 Hagy's Mill Road\, Philadelphia\, PA\, 19128\, United States
+CATEGORIES:Free,Volunteer
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261017T100000
+DTEND;TZID=America/New_York:20261017T130000
+DTSTAMP:20261012T173844Z
+CREATED:20251201T192324Z
+LAST-MODIFIED:20261012T173844Z
+UID:283108-1792231200-1792242000@schuylkillcenter.org
+SUMMARY:Volunteer Tree Planting
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://schuylkillcenter.org/event/volunteertreeplanting/
+LOCATION:The Schuylkill Center for Environmental Education\, 8480 Hagy's Mill Road\, Philadelphia\, PA\, 19128\, United States
+CATEGORIES:Free,Volunteer
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261020T100000
+DTEND;TZID=America/New_York:20261020T130000
+DTSTAMP:20260804T145437Z
+CREATED:20260804T144838Z
+LAST-MODIFIED:20260804T145437Z
+UID:285394-1792490400-1792501200@schuylkillcenter.org
+SUMMARY:Fall Fun Makers
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://schuylkillcenter.org/event/fall-fun-makers2006/
+LOCATION:The Schuylkill Center for Environmental Education\, 8480 Hagy's Mill Road\, Philadelphia\, PA\, 19128\, United States
+CATEGORIES:Free,Volunteer
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261022T100000
+DTEND;TZID=America/New_York:20261022T120000
+DTSTAMP:20260320T153745Z
+CREATED:20260320T153735Z
+LAST-MODIFIED:20260320T153745Z
+UID:284074-1792663200-1792670400@schuylkillcenter.org
+SUMMARY:Native Planters
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://schuylkillcenter.org/event/native-planters-54/
+LOCATION:The Schuylkill Center for Environmental Education\, 8480 Hagy's Mill Road\, Philadelphia\, PA\, 19128\, United States
+CATEGORIES:Free,Volunteer
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261029T100000
+DTEND;TZID=America/New_York:20261029T120000
+DTSTAMP:20260318T205157Z
+CREATED:20260318T205157Z
+LAST-MODIFIED:20260318T205157Z
+UID:284003-1793268000-1793275200@schuylkillcenter.org
+SUMMARY:Native Planters
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://schuylkillcenter.org/event/nativeplantersoct2926/
+LOCATION:The Schuylkill Center for Environmental Education\, 8480 Hagy's Mill Road\, Philadelphia\, PA\, 19128\, United States
+CATEGORIES:Free,Volunteer
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261107T100000
+DTEND;TZID=America/New_York:20261107T120000
+DTSTAMP:20260106T154727Z
+CREATED:20260106T154727Z
+LAST-MODIFIED:20260106T154727Z
+UID:283409-1794045600-1794052800@schuylkillcenter.org
+SUMMARY:Clinic Cleaners
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://schuylkillcenter.org/event/cliniccleanersnov2026/
+LOCATION:Schuylkill Center Wildlife Clinic\, 304 Port Royal Avenue\, Philadelphia\, PA\, 19128  \, United States
+CATEGORIES:Free,Volunteer
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261121T100000
+DTEND;TZID=America/New_York:20261121T120000
+DTSTAMP:20251209T205557Z
+CREATED:20251201T192436Z
+LAST-MODIFIED:20251209T205557Z
+UID:283110-1795255200-1795262400@schuylkillcenter.org
+SUMMARY:Restoration Workday
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://schuylkillcenter.org/event/restorationworkdaynov2026/
+LOCATION:The Schuylkill Center for Environmental Education\, 8480 Hagy's Mill Road\, Philadelphia\, PA\, 19128\, United States
+CATEGORIES:Free,Volunteer
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261121T130000
+DTEND;TZID=America/New_York:20261121T160000
+DTSTAMP:20261001T165520Z
+CREATED:20260924T144910Z
+LAST-MODIFIED:20261001T165520Z
+UID:285795-1795266000-1795276800@schuylkillcenter.org
+SUMMARY:Service Oriented Singles
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://schuylkillcenter.org/event/service-oriented-singles/
+LOCATION:The Schuylkill Center for Environmental Education\, 8480 Hagy's Mill Road\, Philadelphia\, PA\, 19128\, United States
+CATEGORIES:21+,Volunteer
+END:VEVENT
+END:VCALENDAR

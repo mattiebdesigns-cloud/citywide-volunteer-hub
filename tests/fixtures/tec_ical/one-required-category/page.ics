@@ -1,0 +1,442 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Bartram&#039;s Garden - ECPv6.15.16//NONSGML v1.0//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Bartram&#039;s Garden
+X-ORIGINAL-URL:https://www.bartramsgarden.org
+X-WR-CALDESC:Events for Bartram&#039;s Garden
+REFRESH-INTERVAL;VALUE=DURATION:PT1H
+X-Robots-Tag:noindex
+X-PUBLISHED-TTL:PT1H
+BEGIN:VTIMEZONE
+TZID:America/New_York
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+DTSTART:20250309T070000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+DTSTART:20251102T060000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+DTSTART:20260308T070000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+DTSTART:20261101T060000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+DTSTART:20270314T070000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+DTSTART:20271107T060000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261015T143000
+DTEND;TZID=America/New_York:20261015T163000
+DTSTAMP:20261014T141409
+CREATED:20260626T200804Z
+LAST-MODIFIED:20260626T200805Z
+UID:10013413-1792074600-1792081800@www.bartramsgarden.org
+SUMMARY:Sankofa Farm Stand at the Welcome Center
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/clarkparkfarmstand2026-2-2-2/2026-10-15/
+LOCATION:Bartram’s Garden\, 5400 Lindbergh Blvd.\, Philadelphia\, 19143\, United States
+CATEGORIES:Sankofa Community Farm,Seasonal
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261015T170000
+DTEND;TZID=America/New_York:20261015T180000
+DTSTAMP:20261014T141409
+CREATED:20260909T195457Z
+LAST-MODIFIED:20260909T195457Z
+UID:10013798-1792083600-1792087200@www.bartramsgarden.org
+SUMMARY:WeWalk PHL Thursday Walking Group
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/wewalk-phl-thursday-walking-group-2/2026-10-15/
+CATEGORIES:---On the Trail,Free Community Events,Recreation & Health,Seasonal
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261015T180000
+DTEND;TZID=America/New_York:20261015T193000
+DTSTAMP:20261014T141409
+CREATED:20260327T185339Z
+LAST-MODIFIED:20260626T184535Z
+UID:10013198-1792087200-1792092600@www.bartramsgarden.org
+SUMMARY:Flow at Bartram’s Garden: Community Yoga in the Garden
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/hthtflowoct26/
+CATEGORIES:---Yoga & Meditation,Arts & Performance,Classes & Workshops,Family Activities,Free Community Events,Series
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261017T090000
+DTEND;TZID=America/New_York:20261017T133000
+DTSTAMP:20261014T141409
+CREATED:20260522T194513Z
+LAST-MODIFIED:20260922T200057Z
+UID:10013467-1792227600-1792243800@www.bartramsgarden.org
+SUMMARY:Sankofa Farm Stand at Clark Park
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/clarkparkfarmstand2026-3-2/2026-10-17/
+LOCATION:Clark Park\, 4300-4398 Baltimore Avenue\, Philadelphia\, 19104
+CATEGORIES:Sankofa Community Farm,Seasonal
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261017T093000
+DTEND;TZID=America/New_York:20261017T120000
+DTSTAMP:20261014T141409
+CREATED:20260223T185225Z
+LAST-MODIFIED:20260728T192631Z
+UID:10013105-1792229400-1792238400@www.bartramsgarden.org
+SUMMARY:Horticulture Volunteer Day
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/horticulture-volunteer-october-17/
+LOCATION:Bartram’s Garden\, 5400 Lindbergh Blvd.\, Philadelphia\, 19143\, United States
+CATEGORIES:Volunteer
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261017T100000
+DTEND;TZID=America/New_York:20261017T120000
+DTSTAMP:20261014T141409
+CREATED:20260902T143458Z
+LAST-MODIFIED:20260902T143458Z
+UID:10013639-1792231200-1792238400@www.bartramsgarden.org
+SUMMARY:Biking Level 1: Adults' Learn-to-Ride (16+)
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/adultsbiking101726/
+LOCATION:Bike Container
+CATEGORIES:---Biking,---On the Trail,Recreation & Health
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261017T120000
+DTEND;TZID=America/New_York:20261017T140000
+DTSTAMP:20261014T141409
+CREATED:20260806T152139Z
+LAST-MODIFIED:20260817T175352Z
+UID:10013624-1792238400-1792245600@www.bartramsgarden.org
+SUMMARY:SWWAG Workshop: Fire Cider Making at Mill Creek
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/swwagfirecider26/
+LOCATION:Mill Creek Farm\, 4901 Brown St\, Philadelphia\, PA\, 19139
+CATEGORIES:Classes & Workshops,Free Community Events,Gardening,Recreation & Health,Sankofa Community Farm,Series
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261017T120000
+DTEND;TZID=America/New_York:20261017T140000
+DTSTAMP:20261014T141409
+CREATED:20260902T154522Z
+LAST-MODIFIED:20260902T154522Z
+UID:10013662-1792238400-1792245600@www.bartramsgarden.org
+SUMMARY:Free Bike Rentals
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/fbr101726/
+LOCATION:Bike Container
+CATEGORIES:---Biking,---On the Trail,Free Community Events,Series
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261018T100000
+DTEND;TZID=America/New_York:20261018T120000
+DTSTAMP:20261014T141409
+CREATED:20260902T152025Z
+LAST-MODIFIED:20260902T152025Z
+UID:10013648-1792317600-1792324800@www.bartramsgarden.org
+SUMMARY:Kids' Learn-to-Ride Biking (Ages 4–16)
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/kl2r101826/
+LOCATION:Bike Container
+CATEGORIES:---Biking,---On the Trail,Free Community Events
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261018T103000
+DTEND;TZID=America/New_York:20261018T163000
+DTSTAMP:20261014T141409
+CREATED:20261007T180101Z
+LAST-MODIFIED:20261007T180650Z
+UID:10013811-1792319400-1792341000@www.bartramsgarden.org
+SUMMARY:Indigenous People's Day Volunteering (2026)
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/indigenous-peoples-day-volunteering-2/
+CATEGORIES:Free Community Events,Support Bartram's Garden,Volunteer
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261018T120000
+DTEND;TZID=America/New_York:20261018T140000
+DTSTAMP:20261014T141409
+CREATED:20260902T154637Z
+LAST-MODIFIED:20260902T154637Z
+UID:10013663-1792324800-1792332000@www.bartramsgarden.org
+SUMMARY:Free Bike Rentals
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/fbr101826/
+LOCATION:Bike Container
+CATEGORIES:---Biking,---On the Trail,Free Community Events,Series
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261018T120000
+DTEND;TZID=America/New_York:20261018T170000
+DTSTAMP:20261014T141409
+CREATED:20260728T152037Z
+LAST-MODIFIED:20260728T152128Z
+UID:10013483-1792324800-1792342800@www.bartramsgarden.org
+SUMMARY:Indigenous People's Day Celebration
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/ipdc2026/
+CATEGORIES:Classes & Workshops,Family Activities,Free Community Events,History
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261021T100000
+DTEND;TZID=America/New_York:20261021T113000
+DTSTAMP:20261014T141409
+CREATED:20260227T202721Z
+LAST-MODIFIED:20260227T202721Z
+UID:10013127-1792576800-1792582200@www.bartramsgarden.org
+SUMMARY:Little Explorers: What’s Buzzing and Blooming?
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/2026little-explorers-buzz-10/
+LOCATION:Bartram’s Garden Courtyard\, Coach House and Barn\, 5400 Lindbergh Blvd.\, Philadelphia\, 19143\, United States
+CATEGORIES:---Birding,---Little Explorers,Classes & Workshops,Eligible for SW/ACCESS Discount,Family Activities,Series
+GEO:39.9325627;-75.2161397
+X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-ADDRESS=Bartram’s Garden Courtyard Coach House and Barn 5400 Lindbergh Blvd. Philadelphia 19143 United States;X-APPLE-RADIUS=500;X-TITLE=5400 Lindbergh Blvd.:geo:-75.2161397,39.9325627
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261022T143000
+DTEND;TZID=America/New_York:20261022T163000
+DTSTAMP:20261014T141409
+CREATED:20260626T200804Z
+LAST-MODIFIED:20260626T200805Z
+UID:10013414-1792679400-1792686600@www.bartramsgarden.org
+SUMMARY:Sankofa Farm Stand at the Welcome Center
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/clarkparkfarmstand2026-2-2-2/2026-10-22/
+LOCATION:Bartram’s Garden\, 5400 Lindbergh Blvd.\, Philadelphia\, 19143\, United States
+CATEGORIES:Sankofa Community Farm,Seasonal
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261022T170000
+DTEND;TZID=America/New_York:20261022T180000
+DTSTAMP:20261014T141409
+CREATED:20260909T195457Z
+LAST-MODIFIED:20260909T195457Z
+UID:10013799-1792688400-1792692000@www.bartramsgarden.org
+SUMMARY:WeWalk PHL Thursday Walking Group
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/wewalk-phl-thursday-walking-group-2/2026-10-22/
+CATEGORIES:---On the Trail,Free Community Events,Recreation & Health,Seasonal
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261024T093000
+DTEND;TZID=America/New_York:20261024T120000
+DTSTAMP:20261014T141409
+CREATED:20260223T183938Z
+LAST-MODIFIED:20260728T192521Z
+UID:10013101-1792834200-1792843200@www.bartramsgarden.org
+SUMMARY:Sankofa Community Farm Volunteer Day
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/sankofa-community-farm-volunteer-october-24/
+LOCATION:Sankofa Community Farm at Bartram’s Garden\, 5400 Lindbergh Blvd\, Philadelphia\, PA\, 19143
+CATEGORIES:Volunteer
+GEO:39.931402315;-75.2130313
+X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-ADDRESS=Sankofa Community Farm at Bartram’s Garden 5400 Lindbergh Blvd Philadelphia PA 19143;X-APPLE-RADIUS=500;X-TITLE=5400 Lindbergh Blvd:geo:-75.2130313,39.931402315
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261024T100000
+DTEND;TZID=America/New_York:20261024T120000
+DTSTAMP:20261014T141409
+CREATED:20260902T152245Z
+LAST-MODIFIED:20260902T152245Z
+UID:10013649-1792836000-1792843200@www.bartramsgarden.org
+SUMMARY:Kids' Learn-to-Ride Biking (Ages 4–16)
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/kl2r102426/
+LOCATION:Bike Container
+CATEGORIES:---Biking,---On the Trail,Free Community Events
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261024T100000
+DTEND;TZID=America/New_York:20261024T120000
+DTSTAMP:20261014T141409
+CREATED:20261013T160835Z
+LAST-MODIFIED:20261013T162426Z
+UID:10013813-1792836000-1792843200@www.bartramsgarden.org
+SUMMARY:Morning of Storytelling & Meaning-Making
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/morning-of-storytelling-meaning-making/
+CATEGORIES:Special Tour
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261024T110000
+DTEND;TZID=America/New_York:20261024T140000
+DTSTAMP:20261014T141409
+CREATED:20260522T193235Z
+LAST-MODIFIED:20260522T193354Z
+UID:10013377-1792839600-1792850400@www.bartramsgarden.org
+SUMMARY:Sankofa Farm Stand at the Black Farmer's Market
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/clarkparkfarmstand2026-2-3/2026-10-24/
+LOCATION:Freedom Greens & Gardens\, 5200 Pine Street\, Philadelphia
+CATEGORIES:Sankofa Community Farm,Seasonal
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261024T120000
+DTEND;TZID=America/New_York:20261024T140000
+DTSTAMP:20261014T141409
+CREATED:20260902T154757Z
+LAST-MODIFIED:20260902T154757Z
+UID:10013664-1792843200-1792850400@www.bartramsgarden.org
+SUMMARY:Free Bike Rentals
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/fbr102426/
+LOCATION:Bike Container
+CATEGORIES:---Biking,---On the Trail,Free Community Events,Series
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261025T100000
+DTEND;TZID=America/New_York:20261025T120000
+DTSTAMP:20261014T141409
+CREATED:20260902T143740Z
+LAST-MODIFIED:20260902T143740Z
+UID:10013640-1792922400-1792929600@www.bartramsgarden.org
+SUMMARY:Biking Level 1: Adults' Learn-to-Ride (16+)
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/adultsbiking102526/
+LOCATION:Bike Container
+CATEGORIES:---Biking,---On the Trail,Recreation & Health
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261025T120000
+DTEND;TZID=America/New_York:20261025T140000
+DTSTAMP:20261014T141409
+CREATED:20260902T154921Z
+LAST-MODIFIED:20260902T154921Z
+UID:10013665-1792929600-1792936800@www.bartramsgarden.org
+SUMMARY:Free Bike Rentals
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/fbr102526/
+LOCATION:Bike Container
+CATEGORIES:---Biking,---On the Trail,Free Community Events,Series
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261029T143000
+DTEND;TZID=America/New_York:20261029T163000
+DTSTAMP:20261014T141409
+CREATED:20260626T200804Z
+LAST-MODIFIED:20260626T200805Z
+UID:10013415-1793284200-1793291400@www.bartramsgarden.org
+SUMMARY:Sankofa Farm Stand at the Welcome Center
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/clarkparkfarmstand2026-2-2-2/2026-10-29/
+LOCATION:Bartram’s Garden\, 5400 Lindbergh Blvd.\, Philadelphia\, 19143\, United States
+CATEGORIES:Sankofa Community Farm,Seasonal
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261029T170000
+DTEND;TZID=America/New_York:20261029T180000
+DTSTAMP:20261014T141409
+CREATED:20260909T195457Z
+LAST-MODIFIED:20260909T195457Z
+UID:10013800-1793293200-1793296800@www.bartramsgarden.org
+SUMMARY:WeWalk PHL Thursday Walking Group
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/wewalk-phl-thursday-walking-group-2/2026-10-29/
+CATEGORIES:---On the Trail,Free Community Events,Recreation & Health,Seasonal
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261031T093000
+DTEND;TZID=America/New_York:20261031T120000
+DTSTAMP:20261014T141409
+CREATED:20260223T185305Z
+LAST-MODIFIED:20260728T192735Z
+UID:10013106-1793439000-1793448000@www.bartramsgarden.org
+SUMMARY:Horticulture Volunteer Day
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/horticulture-volunteer-october-31/
+LOCATION:Bartram’s Garden\, 5400 Lindbergh Blvd.\, Philadelphia\, 19143\, United States
+CATEGORIES:Volunteer
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261031T100000
+DTEND;TZID=America/New_York:20261031T120000
+DTSTAMP:20261014T141409
+CREATED:20260902T143933Z
+LAST-MODIFIED:20260902T143933Z
+UID:10013641-1793440800-1793448000@www.bartramsgarden.org
+SUMMARY:Biking Level 1: Adults' Learn-to-Ride (16+)
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/adultsbiking103126/
+LOCATION:Bike Container
+CATEGORIES:---Biking,---On the Trail,Recreation & Health
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261031T120000
+DTEND;TZID=America/New_York:20261031T140000
+DTSTAMP:20261014T141409
+CREATED:20260902T155040Z
+LAST-MODIFIED:20260902T155040Z
+UID:10013666-1793448000-1793455200@www.bartramsgarden.org
+SUMMARY:Free Bike Rentals
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/fbr103126/
+LOCATION:Bike Container
+CATEGORIES:---Biking,---On the Trail,Free Community Events,Series
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261104T100000
+DTEND;TZID=America/New_York:20261104T113000
+DTSTAMP:20261014T141409
+CREATED:20260227T202922Z
+LAST-MODIFIED:20260227T202922Z
+UID:10013128-1793786400-1793791800@www.bartramsgarden.org
+SUMMARY:Little Explorers: Colorful Leaves
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/2026colorfulleaves/
+LOCATION:Bartram’s Garden Courtyard\, Coach House and Barn\, 5400 Lindbergh Blvd.\, Philadelphia\, 19143\, United States
+CATEGORIES:---Birding,---Little Explorers,Classes & Workshops,Eligible for SW/ACCESS Discount,Family Activities,Series
+GEO:39.9325627;-75.2161397
+X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-ADDRESS=Bartram’s Garden Courtyard Coach House and Barn 5400 Lindbergh Blvd. Philadelphia 19143 United States;X-APPLE-RADIUS=500;X-TITLE=5400 Lindbergh Blvd.:geo:-75.2161397,39.9325627
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261104T163000
+DTEND;TZID=America/New_York:20261104T180000
+DTSTAMP:20261014T141409
+CREATED:20260806T154156Z
+LAST-MODIFIED:20260806T154156Z
+UID:10013625-1793809800-1793815200@www.bartramsgarden.org
+SUMMARY:SWWAG Workshop: Putting the Farm to Bed to Prepare Your Winter Garden
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/swwag26wintergarden/
+LOCATION:Sankofa Community Farm at Bartram’s Garden\, 5400 Lindbergh Blvd\, Philadelphia\, PA\, 19143
+CATEGORIES:Classes & Workshops,Family Activities,Free Community Events,Gardening,Sankofa Community Farm,Series
+GEO:39.931402315;-75.2130313
+X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-ADDRESS=Sankofa Community Farm at Bartram’s Garden 5400 Lindbergh Blvd Philadelphia PA 19143;X-APPLE-RADIUS=500;X-TITLE=5400 Lindbergh Blvd:geo:-75.2130313,39.931402315
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20261105T143000
+DTEND;TZID=America/New_York:20261105T163000
+DTSTAMP:20261014T141409
+CREATED:20260626T200804Z
+LAST-MODIFIED:20260626T200805Z
+UID:10013416-1793889000-1793896200@www.bartramsgarden.org
+SUMMARY:Sankofa Farm Stand at the Welcome Center
+DESCRIPTION:(removed from this fixture; the scraper never reads descriptions)
+URL:https://www.bartramsgarden.org/event/clarkparkfarmstand2026-2-2-2/2026-11-05/
+LOCATION:Bartram’s Garden\, 5400 Lindbergh Blvd.\, Philadelphia\, 19143\, United States
+CATEGORIES:Sankofa Community Farm,Seasonal
+END:VEVENT
+END:VCALENDAR

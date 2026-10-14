@@ -1,0 +1,14 @@
+{
+  "id": "example-nature-center",
+  "org_name": "Example Nature Center",
+  "scraper": "tec_ical",
+  "url": "https://nature.example.org/events/category/volunteer/list/?ical=1",
+  "area": "example-city",
+  "listing_language": "en",
+  "default_type": "service",
+  "default_cause": "parks-and-trees",
+  "default_join_method": "signup",
+  "sensitive": false,
+  "require_categories": ["Volunteer", "Free"],
+  "crawl_delay_seconds": 5
+}
