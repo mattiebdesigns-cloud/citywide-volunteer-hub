@@ -6,3 +6,6 @@ __pycache__/
 *.pyc
 .venv/
 .DS_Store
+node_modules/
+site/dist/
+site/.astro/

@@ -22,7 +22,7 @@ CI (`.github/workflows/ci.yml`) runs all four on every push and pull request.
 | `test_licences.py` | Every Python package used is MIT, Apache-2.0, BSD, ISC or PSF-2.0. |
 | `test_workflows.py` | Every GitHub Action is pinned to a fixed version; no workflow runs fork code with this repo's permissions, grants write access, or reads a secret. |
 
-Paths in this repo must be on an allow list: `pvscrapers/`, `site/`, `tests/`, `.github/`, `docs/examples/`, `docs/EVENT-FORMAT.md`, `docs/*.schema.json`, and the root files `README.md`, `LICENSE`, `CONTRIBUTING.md`, `CLAUDE.md`, `pyproject.toml`, `uv.lock`, `.gitignore`. Some names are blocked even inside those folders, including `site.yml`, `sources.yml` and any `.env` file. A sample settings file must therefore have another name, for example `site/site.example.yml`.
+Paths in this repo must be on an allow list: `pvscrapers/`, `site/`, `tests/`, `.github/`, `docs/examples/`, `docs/EVENT-FORMAT.md`, `docs/design.md`, `docs/*.schema.json`, and the root files `README.md`, `LICENSE`, `CONTRIBUTING.md`, `CLAUDE.md`, `pyproject.toml`, `uv.lock`, `.gitignore`. Some names are blocked even inside those folders, including `site.yml`, `sources.yml` and any `.env` file. A sample settings file must therefore have another name, for example `site/site.example.yml`.
 
 The licence test checks every package in `uv.lock`, for every platform and Python version, by reading its licence from pypi.org. It needs the network.
 

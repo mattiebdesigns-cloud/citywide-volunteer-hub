@@ -34,7 +34,8 @@ def events_files() -> list[Path]:
     site = ROOT / "site"
     if site.is_dir():
         found += [
-            p for p in site.rglob("events*.json")
+            p
+            for p in site.rglob("events*.json")
             if "node_modules" not in p.parts and "dist" not in p.parts
         ]
     return sorted(found)
@@ -86,7 +87,9 @@ BAD_LISTINGS = {
     "start not a real date": lambda e: e.update(start="2026-13-45T09:00:00-05:00"),
     "signup_url not a web link": lambda e: e.update(signup_url="mailto:someone@example.org"),
     "spanish_spoken null instead of unknown": lambda e: e.update(spanish_spoken=None),
-    "protest_action not marked sensitive": lambda e: e.update(type="protest_action", sensitive=False),
+    "protest_action not marked sensitive": lambda e: e.update(
+        type="protest_action", sensitive=False
+    ),
     "schedule on a one-off listing": lambda e: e.update(
         recurring=False, recurrence_rule="FREQ=WEEKLY;BYDAY=TU"
     ),

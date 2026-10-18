@@ -24,7 +24,10 @@
     "recurrence_rule": null,
     "source_url": "https://schuylkillcenter.org/event/native-planters-52/",
     "source_id": "example-nature-center",
-    "last_seen_at": "2026-10-14T14:14:16-04:00"
+    "last_seen_at": "2026-10-14T14:14:16-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   },
   {
     "id": "example-nature-center-faa650cdf18709ca",
@@ -51,7 +54,10 @@
     "recurrence_rule": null,
     "source_url": "https://schuylkillcenter.org/event/volunteertreeplanting/",
     "source_id": "example-nature-center",
-    "last_seen_at": "2026-10-14T14:14:16-04:00"
+    "last_seen_at": "2026-10-14T14:14:16-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   },
   {
     "id": "example-nature-center-f50d374dca99ae40",
@@ -78,7 +84,10 @@
     "recurrence_rule": null,
     "source_url": "https://schuylkillcenter.org/event/fall-fun-makers2006/",
     "source_id": "example-nature-center",
-    "last_seen_at": "2026-10-14T14:14:16-04:00"
+    "last_seen_at": "2026-10-14T14:14:16-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   },
   {
     "id": "example-nature-center-bc0a945dc7e726a7",
@@ -105,7 +114,10 @@
     "recurrence_rule": null,
     "source_url": "https://schuylkillcenter.org/event/native-planters-54/",
     "source_id": "example-nature-center",
-    "last_seen_at": "2026-10-14T14:14:16-04:00"
+    "last_seen_at": "2026-10-14T14:14:16-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   },
   {
     "id": "example-nature-center-0028116a59bc3e95",
@@ -132,7 +144,10 @@
     "recurrence_rule": null,
     "source_url": "https://schuylkillcenter.org/event/nativeplantersoct2926/",
     "source_id": "example-nature-center",
-    "last_seen_at": "2026-10-14T14:14:16-04:00"
+    "last_seen_at": "2026-10-14T14:14:16-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   },
   {
     "id": "example-nature-center-7acd49fe4d698229",
@@ -159,7 +174,10 @@
     "recurrence_rule": null,
     "source_url": "https://schuylkillcenter.org/event/cliniccleanersnov2026/",
     "source_id": "example-nature-center",
-    "last_seen_at": "2026-10-14T14:14:16-04:00"
+    "last_seen_at": "2026-10-14T14:14:16-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   },
   {
     "id": "example-nature-center-298060868b2d5028",
@@ -186,6 +204,9 @@
     "recurrence_rule": null,
     "source_url": "https://schuylkillcenter.org/event/restorationworkdaynov2026/",
     "source_id": "example-nature-center",
-    "last_seen_at": "2026-10-14T14:14:16-04:00"
+    "last_seen_at": "2026-10-14T14:14:16-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   }
 ]

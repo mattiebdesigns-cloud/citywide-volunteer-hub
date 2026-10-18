@@ -39,7 +39,8 @@ def test_there_are_workflows():
 @pytest.mark.parametrize("path", WORKFLOWS, ids=lambda p: p.name)
 def test_actions_are_pinned_to_a_commit(path: Path):
     loose = [
-        u for u in USES.findall(_code(path))
+        u
+        for u in USES.findall(_code(path))
         if not u.startswith(("./", "docker://")) and not PINNED.match(u)
     ]
     assert not loose, f"actions not pinned to a full commit id: {loose}"

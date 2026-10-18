@@ -1,0 +1,32 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Invented//Example Repair Group//EN
+X-WR-CALNAME:Example Repair Group
+X-WR-TIMEZONE:America/New_York
+BEGIN:VEVENT
+UID:10001-1794866400-1794873600@repair.example.org
+SUMMARY:Repair Fair 2026NOV
+DTSTART;TZID=America/New_York:20261112T180000
+DTEND;TZID=America/New_York:20261112T200000
+URL:https://repair.example.org/event/repair-fair-2026nov/
+LOCATION:Example Makerspace\, 100 Example St\, Example City\, PA
+CATEGORIES:Repair Fair
+DESCRIPTION:Invented placeholder text.
+END:VEVENT
+BEGIN:VEVENT
+UID:10002-1797285600-1797292800@repair.example.org
+SUMMARY:Repair Fair 2026DEC
+DTSTART;TZID=America/New_York:20261210T180000
+DTEND;TZID=America/New_York:20261210T200000
+URL:https://repair.example.org/event/repair-fair-2026dec/
+LOCATION:Example Makerspace\, 100 Example St\, Example City\, PA
+CATEGORIES:Repair Fair
+END:VEVENT
+BEGIN:VEVENT
+UID:10003@repair.example.org
+SUMMARY:Repair Fair 2026JAN
+DTSTART;TZID=America/New_York:20270114T180000
+STATUS:CANCELLED
+URL:https://repair.example.org/event/repair-fair-2027jan/
+END:VEVENT
+END:VCALENDAR

@@ -65,6 +65,7 @@ def test_leak_check_flags_private_paths(path: str):
         "site/src/config/filters.ts",
         "site/src/i18n/en.json",
         "docs/EVENT-FORMAT.md",
+        "docs/design.md",
         "docs/event.schema.json",
         "docs/examples/events.sample.json",
         "tests/fixtures/example/page.html",
@@ -98,7 +99,9 @@ FAKE = "Ab3dE5gH7jK9mN1pQ2rS4tU6vW8xY0zA"
         "eyJ" + "hbGciOiJIUzI1NiJ9.eyJ" + "yb2xlIjoic2VydmljZSJ9." + FAKE,
         "SUPABASE_SERVICE_ROLE_KEY=" + FAKE,
         'password = "' + FAKE + '"',
-        "DATABASE_URL=postgresql://postgres:" + "Tr0ub4dor-" + "horse@db.invented.supabase.co:5432/db",
+        "DATABASE_URL=postgresql://postgres:"
+        + "Tr0ub4dor-"
+        + "horse@db.invented.supabase.co:5432/db",
         "git clone https://bot:" + FAKE[:12] + "@github.com/owner/repo",
         "REDIS_URL=redis://:" + FAKE[:14] + "@cache.invented.org:6379",
     ],
@@ -211,8 +214,9 @@ def test_secret_scan_follows_nested_tags(tmp_path):
     key = "sk-" + "ant-" + FAKE
     git = _new_repo(tmp_path)
     subprocess.run([*git, "tag", "-a", "inner", "-m", "key " + key], check=True)
-    subprocess.run([*git, "tag", "-a", "outer", "-m", "Outer tag", "inner"], check=True,
-                   capture_output=True)
+    subprocess.run(
+        [*git, "tag", "-a", "outer", "-m", "Outer tag", "inner"], check=True, capture_output=True
+    )
     subprocess.run([*git, "tag", "-d", "inner"], check=True, capture_output=True)
     findings = [str(f) for f in repo_guard.find_secrets(tmp_path, history=True)]
     assert any(f.startswith("tag outer (inner tag ") for f in findings), findings
@@ -224,10 +228,20 @@ def test_secret_scan_reads_tagged_file_and_folder(tmp_path):
 
     key = "sk-" + "ant-" + FAKE
     git = _new_repo(tmp_path)
-    blob = subprocess.run([*git, "hash-object", "-w", "--stdin"], input="KEY=" + key + "\n",
-                          capture_output=True, text=True, check=True).stdout.strip()
-    tree = subprocess.run([*git, "mktree"], input=f"100644 blob {blob}\tsecret.env\n",
-                          capture_output=True, text=True, check=True).stdout.strip()
+    blob = subprocess.run(
+        [*git, "hash-object", "-w", "--stdin"],
+        input="KEY=" + key + "\n",
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    tree = subprocess.run(
+        [*git, "mktree"],
+        input=f"100644 blob {blob}\tsecret.env\n",
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
     subprocess.run([*git, "tag", "just-a-file", blob], check=True)
     subprocess.run([*git, "tag", "just-a-folder", tree], check=True)
     findings = [str(f) for f in repo_guard.find_secrets(tmp_path, history=True)]
@@ -245,8 +259,9 @@ def test_secret_scan_reads_merge_commits(tmp_path):
     def run(*args):
         subprocess.run([*git, *args], check=True, capture_output=True)
 
-    base = subprocess.run([*git, "rev-parse", "--abbrev-ref", "HEAD"], check=True,
-                          capture_output=True, text=True).stdout.strip()
+    base = subprocess.run(
+        [*git, "rev-parse", "--abbrev-ref", "HEAD"], check=True, capture_output=True, text=True
+    ).stdout.strip()
     run("checkout", "-q", "-b", "side")
     (tmp_path / "side.txt").write_text("side branch work\n")
     run("add", "side.txt")
@@ -268,3 +283,19 @@ def test_secret_scan_reads_merge_commits(tmp_path):
     assert len(findings) == 1, findings
     assert findings[0].startswith("commit ") and "config.txt" in findings[0]
     assert FAKE not in findings[0]
+
+
+def test_secret_scan_skips_ignored_files_but_not_committed_ones(tmp_path):
+    import subprocess
+
+    key = "sk-" + "ant-" + FAKE
+    git = _new_repo(tmp_path)
+    (tmp_path / ".gitignore").write_text("node_modules/\n")
+    (tmp_path / "node_modules").mkdir()
+    (tmp_path / "node_modules" / "package.js").write_text("key = '" + key + "'\n")
+    assert repo_guard.find_secrets(tmp_path, history=False) == []
+    # A file forced into git despite the ignore rule is still scanned.
+    (tmp_path / "node_modules" / "forced.js").write_text("key = '" + key + "'\n")
+    subprocess.run([*git, "add", "-f", "node_modules/forced.js"], check=True)
+    findings = [str(f) for f in repo_guard.find_secrets(tmp_path, history=False)]
+    assert findings == ["node_modules/forced.js:1: possible Anthropic API key"], findings

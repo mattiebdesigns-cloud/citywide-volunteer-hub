@@ -1,0 +1,6 @@
+{
+  "fetched_at": "2026-10-18T03:00:00-04:00",
+  "how": "Not fetched. The whole feed is invented, shaped like a The Events Calendar iCal export, to test the listing_title and signup_url_always source keys.",
+  "changed_after_fetch": "Nothing: invented. No person's name, organizer, attendee or contact line.",
+  "source_json": "Invented."
+}

@@ -13,7 +13,9 @@ for the source's filter rule), and a repeat rule (RRULE) if one is given.
 What it never takes: the description, images or attachments (facts and a
 link only), and the organizer, attendee or contact fields (nothing about
 people). Everything else comes from the source entry or stays unknown; see
-`pvscrapers.core`.
+`pvscrapers.core`. A source entry may also set `listing_title` and
+`signup_url_always` (see `pvscrapers.core`) when each public event on its
+calendar is a volunteer shift with its own title and sign-up page.
 
 Events it drops, each reported with a reason: no title; no readable start;
 an all-day event (the export gives no start time, and we never guess one);

@@ -45,6 +45,9 @@ jobs:
       - name: Lint
         run: uv run ruff check --no-cache .
 
+      - name: Formatting
+        run: uv run ruff format --check --no-cache .
+
       - name: Tests (schema, uniqueness, leak check, secret scan, licences, workflow pins)
         run: uv run pytest
 

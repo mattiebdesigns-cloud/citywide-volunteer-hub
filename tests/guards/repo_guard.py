@@ -53,6 +53,7 @@ PUBLIC_ALLOWED_FILES = {
     "uv.lock",
     ".gitignore",
     "docs/EVENT-FORMAT.md",
+    "docs/design.md",  # pv-design's guide to the site's look; no city or private data
 }
 PUBLIC_ALLOWED_PATTERNS = (re.compile(r"^docs/[^/]+\.schema\.json$"),)
 
@@ -253,8 +254,21 @@ RULES = (
 
 # Stand-in passwords in documentation, never real ones.
 PLACEHOLDER_PASSWORDS = {
-    "password", "pass", "passwd", "pw", "pwd", "secret", "token", "user", "username",
-    "x", "xxx", "***", "...", "changeme", "example",
+    "password",
+    "pass",
+    "passwd",
+    "pw",
+    "pwd",
+    "secret",
+    "token",
+    "user",
+    "username",
+    "x",
+    "xxx",
+    "***",
+    "...",
+    "changeme",
+    "example",
 }
 
 PLACEHOLDER_WORDS = ("example", "placeholder", "changeme", "your", "xxxx", "dummy", "redacted")
@@ -366,8 +380,17 @@ def scan_history(repo: Path) -> list[Finding]:
     message, and everything reachable from a tag."""
     # --diff-merges=first-parent: without it git log shows no diff for merge
     # commits, so a key added while resolving a merge would never be seen.
-    out = _git_bytes(repo, "log", "--all", "-p", "--diff-merges=first-parent", "--no-color",
-                     "--no-ext-diff", "--format=commit %h", "--unified=0")
+    out = _git_bytes(
+        repo,
+        "log",
+        "--all",
+        "-p",
+        "--diff-merges=first-parent",
+        "--no-color",
+        "--no-ext-diff",
+        "--format=commit %h",
+        "--unified=0",
+    )
     findings: list[Finding] = []
     commit = "?"
     path = "?"
@@ -437,7 +460,9 @@ def scan_tags(repo: Path) -> list[Finding]:
                     meta, path = entry.split("\t", 1)
                     entry_kind, entry_id = meta.split()[1:3]
                     if entry_kind == "blob":
-                        findings += _scan_object_text(repo, entry_id, f"tag {tag} folder file {path}")
+                        findings += _scan_object_text(
+                            repo, entry_id, f"tag {tag} folder file {path}"
+                        )
                 break
             else:
                 break  # commit: covered by scan_history and scan_commit_messages
@@ -463,7 +488,9 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     leaks = sub.add_parser("leaks", help="check the public repo for private files")
     leaks.add_argument("public_repo", type=Path)
-    leaks.add_argument("--private", type=Path, default=None, help="private repo, for content checks")
+    leaks.add_argument(
+        "--private", type=Path, default=None, help="private repo, for content checks"
+    )
     secrets = sub.add_parser("secrets", help="scan a repo for key-shaped text")
     secrets.add_argument("repo", type=Path)
     secrets.add_argument("--no-history", action="store_true")

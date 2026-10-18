@@ -1,0 +1,15 @@
+{
+  "id": "example-repair-group",
+  "org_name": "Example Repair Group",
+  "scraper": "tec_ical",
+  "url": "https://repair.example.org/calendar/list/?ical=1",
+  "area": "example-city",
+  "listing_language": "en",
+  "default_type": "service",
+  "default_cause": "repair",
+  "default_join_method": "application",
+  "sensitive": false,
+  "signup_url": "https://repair.example.org/volunteer/",
+  "signup_url_always": true,
+  "listing_title": "Volunteer fixer or helper at a Repair Fair"
+}

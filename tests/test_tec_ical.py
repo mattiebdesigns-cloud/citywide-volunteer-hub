@@ -258,3 +258,53 @@ def test_fetch_time_needs_a_zone():
 def test_not_a_calendar_is_an_error(text):
     with pytest.raises(ical.ICalError):
         tec_ical.parse(text, SOURCE, FETCHED)
+
+
+# Listing overrides (source keys listing_title, signup_url_always), for a calendar of public
+# events that each need volunteers (PROJECT.md 4; docs/sources page of the source).
+
+VOLUNTEER_PAGE = "https://org.example.org/volunteer/"
+
+
+def test_listing_title_replaces_every_title():
+    two = feed(event(), event(uid="2@example.org", summary="Repair Fair 2026DEC"))
+    result = run(two, listing_title="  Volunteer fixer or helper  at a Repair Fair ")
+    assert [e["title"] for e in result.events] == ["Volunteer fixer or helper at a Repair Fair"] * 2
+
+
+def test_signup_url_always_links_the_volunteer_page_and_keeps_the_link_back():
+    (listing,) = run(feed(event()), signup_url=VOLUNTEER_PAGE, signup_url_always=True).events
+    assert listing["signup_url"] == VOLUNTEER_PAGE
+    assert listing["source_url"] == "https://org.example.org/event/cleanup/"
+
+
+def test_without_overrides_nothing_changes():
+    (listing,) = run(feed(event()), signup_url=VOLUNTEER_PAGE).events
+    assert listing["title"] == "Park cleanup"
+    assert listing["signup_url"] == "https://org.example.org/event/cleanup/"
+
+
+def test_overrides_do_not_change_ids_or_drop_reports():
+    plain = run(feed(event(), event(uid="", summary="")))
+    changed = run(
+        feed(event(), event(uid="", summary="")),
+        listing_title="Volunteer at the fair",
+        signup_url=VOLUNTEER_PAGE,
+        signup_url_always=True,
+    )
+    assert [e["id"] for e in changed.events] == [e["id"] for e in plain.events]
+    assert changed.dropped == plain.dropped  # an event with no title is still dropped
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"signup_url_always": True},
+        {"signup_url_always": "yes", "signup_url": VOLUNTEER_PAGE},
+        {"listing_title": ""},
+        {"listing_title": 5},
+    ],
+)
+def test_bad_override_keys_are_refused(changes):
+    with pytest.raises(SourceError):
+        run(feed(event()), **changes)

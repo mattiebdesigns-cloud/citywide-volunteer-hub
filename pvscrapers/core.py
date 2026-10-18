@@ -33,8 +33,17 @@ Optional (used when the page does not say):
     spanish_spoken        true or false, else "unknown"
     training_required, clearances_required, group_friendly: true or false, else null
     neighborhood_or_town  text, else null
-    signup_url            used only when an event has no link of its own
+    signup_url            used only when an event has no link of its own,
+                          unless signup_url_always is true
     timezone              IANA zone, used only for a feed time with no zone
+
+Listing overrides (optional, for a source whose calendar lists public events
+that each need volunteers, as its terms-check page records):
+    listing_title         text used as the title of every listing from this
+                          source, instead of the event's own title
+    signup_url_always     true: every listing's signup_url is the source's
+                          signup_url (required then), not the event's own page.
+                          source_url stays the event's own page, the link back.
 
 Filter rules (optional, generic, checked before a listing is kept):
     require_categories    list of category names. An event is kept only if
@@ -132,6 +141,8 @@ class SourceDefaults:
     signup_url: str | None
     timezone: str | None
     require_categories: tuple[str, ...]
+    listing_title: str | None = None
+    signup_url_always: bool = False
 
     @classmethod
     def from_source(cls, source: dict[str, Any]) -> SourceDefaults:
@@ -181,6 +192,13 @@ class SourceDefaults:
         if tz is not None and not isinstance(tz, str):
             raise SourceError(f"{bad}: timezone must be an IANA zone name")
 
+        title = source.get("listing_title")
+        if title is not None and (not isinstance(title, str) or not title.strip()):
+            raise SourceError(f"{bad}: listing_title must be text")
+        always = _optional_bool(source, "signup_url_always") or False
+        if always and signup is None:
+            raise SourceError(f"{bad}: signup_url_always needs a signup_url")
+
         required = source.get("require_categories") or []
         if not isinstance(required, list) or not all(
             isinstance(c, str) and c.strip() for c in required
@@ -206,6 +224,8 @@ class SourceDefaults:
             signup_url=signup,
             timezone=tz,
             require_categories=tuple(c.strip() for c in required),
+            listing_title=" ".join(title.split()) if title else None,
+            signup_url_always=always,
         )
 
     def missing_categories(self, categories: list[str]) -> list[str]:
@@ -224,12 +244,22 @@ class SourceDefaults:
         link: str,
         fetched_at: datetime,
         recurrence_rule: str | None = None,
+        spots_left: int | None = None,
+        spots_total: int | None = None,
+        full: bool = False,
     ) -> dict:
-        """One listing in the shared format: page facts plus this source's defaults."""
+        """One listing in the shared format: page facts plus this source's defaults.
+
+        spots_left, spots_total and full come only from the organization's own
+        page, read at the same moment as `fetched_at` (decision 0008). Leave
+        them out when the page shows none: never estimate, and never pass
+        anything about who signed up.
+        """
+        _check_spots(spots_left, spots_total, full)
         return {
             "id": event_id(self.source_id, own_id),
             "org_name": self.org_name,
-            "title": title,
+            "title": self.listing_title or title,
             "start": iso(start),
             "end": iso(end) if end is not None else None,
             "address": address,
@@ -239,7 +269,7 @@ class SourceDefaults:
             "type": self.type,
             "sensitive": self.sensitive,
             "photos_allowed": self.photos_allowed,
-            "signup_url": link,
+            "signup_url": self.signup_url if self.signup_url_always else link,
             "join_method": self.join_method,
             "min_age": self.min_age,
             "listing_language": self.listing_language,
@@ -252,4 +282,23 @@ class SourceDefaults:
             "source_url": link,
             "source_id": self.source_id,
             "last_seen_at": iso(fetched_at),
+            "spots_left": spots_left,
+            "spots_total": spots_total,
+            "full": full,
         }
+
+
+def _whole(value: object) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _check_spots(spots_left: int | None, spots_total: int | None, full: bool) -> None:
+    """Catch a scraper bug before it reaches the calendar (same rules as the event format)."""
+    if spots_left is not None and not (_whole(spots_left) and spots_left >= 0):
+        raise ValueError("spots_left must be a whole number, 0 or more, or None")
+    if spots_total is not None and not (_whole(spots_total) and spots_total >= 1):
+        raise ValueError("spots_total must be a whole number, 1 or more, or None")
+    if not isinstance(full, bool):
+        raise TypeError("full must be True or False")
+    if full and spots_left not in (None, 0):
+        raise ValueError("a full listing cannot show open spots")

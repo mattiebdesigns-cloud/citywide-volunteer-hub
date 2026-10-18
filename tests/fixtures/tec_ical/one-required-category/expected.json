@@ -24,7 +24,10 @@
     "recurrence_rule": null,
     "source_url": "https://www.bartramsgarden.org/event/horticulture-volunteer-october-17/",
     "source_id": "example-garden",
-    "last_seen_at": "2026-10-14T14:14:09-04:00"
+    "last_seen_at": "2026-10-14T14:14:09-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   },
   {
     "id": "example-garden-e4f87712fdd99bde",
@@ -51,7 +54,10 @@
     "recurrence_rule": null,
     "source_url": "https://www.bartramsgarden.org/event/indigenous-peoples-day-volunteering-2/",
     "source_id": "example-garden",
-    "last_seen_at": "2026-10-14T14:14:09-04:00"
+    "last_seen_at": "2026-10-14T14:14:09-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   },
   {
     "id": "example-garden-68314aa63d0ed7ca",
@@ -78,7 +84,10 @@
     "recurrence_rule": null,
     "source_url": "https://www.bartramsgarden.org/event/sankofa-community-farm-volunteer-october-24/",
     "source_id": "example-garden",
-    "last_seen_at": "2026-10-14T14:14:09-04:00"
+    "last_seen_at": "2026-10-14T14:14:09-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   },
   {
     "id": "example-garden-76018e79dbcf46a2",
@@ -105,6 +114,9 @@
     "recurrence_rule": null,
     "source_url": "https://www.bartramsgarden.org/event/horticulture-volunteer-october-31/",
     "source_id": "example-garden",
-    "last_seen_at": "2026-10-14T14:14:09-04:00"
+    "last_seen_at": "2026-10-14T14:14:09-04:00",
+    "spots_left": null,
+    "spots_total": null,
+    "full": false
   }
 ]

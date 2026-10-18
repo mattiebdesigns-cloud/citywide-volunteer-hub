@@ -49,8 +49,18 @@ ALLOWED_IDS = re.compile(
 
 # For packages without an expression: words in a classifier or licence field.
 ALLOWED_WORDS = ("MIT", "Apache", "BSD", "ISC", "PSF", "Python Software Foundation")
-BLOCKED_WORDS = ("GPL", "AGPL", "LGPL", "SSPL", "BUSL", "Business Source", "Commons Clause",
-                 "Elastic License", "source-available", "Source Available")
+BLOCKED_WORDS = (
+    "GPL",
+    "AGPL",
+    "LGPL",
+    "SSPL",
+    "BUSL",
+    "Business Source",
+    "Commons Clause",
+    "Elastic License",
+    "source-available",
+    "Source Available",
+)
 
 # Packages reviewed by the scraping and licence gatekeeper whose metadata is
 # missing or unclear, mapped to the licence the gatekeeper confirmed.
@@ -220,14 +230,17 @@ def check_lock(lock_file: Path) -> list[str]:
         if key in IGNORED or key in REVIEWED:
             continue
         if "pypi.org" not in str(source.get("registry", "")):
-            problems.append(f"{name} {version} (uv.lock): not from pypi.org, check its licence by hand")
+            problems.append(
+                f"{name} {version} (uv.lock): not from pypi.org, check its licence by hand"
+            )
             continue
         info = _pypi_info(name, version)
         if not info:
             problems.append(f"{name} {version} (uv.lock): not found on pypi.org")
             continue
-        reason = judge(info.get("license_expression"), info.get("classifiers") or [],
-                       info.get("license"))
+        reason = judge(
+            info.get("license_expression"), info.get("classifiers") or [], info.get("license")
+        )
         if reason:
             problems.append(f"{name} {version} (uv.lock): {reason}")
     return sorted(problems)
