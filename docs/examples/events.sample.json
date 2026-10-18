@@ -26,7 +26,13 @@
       "recurrence_rule": "FREQ=WEEKLY;BYDAY=TU",
       "source_url": "https://pantry.example.org/volunteer",
       "source_id": "sample-pantry",
-      "last_seen_at": "2026-10-13T05:42:10-04:00"
+      "last_seen_at": "2026-10-13T05:42:10-04:00",
+      "host_type": "faith-based",
+      "faith_tradition": "christian",
+      "activity": ["indoors", "physical"],
+      "spots_left": null,
+      "spots_total": null,
+      "full": false
     },
     {
       "id": "8c21e5d94f0a7b33",
@@ -80,7 +86,13 @@
       "recurrence_rule": null,
       "source_url": "https://tutoring.example.org/calendar",
       "source_id": "sample-tutoring",
-      "last_seen_at": "2026-10-13T05:44:30-04:00"
+      "last_seen_at": "2026-10-13T05:44:30-04:00",
+      "host_type": "nonprofit",
+      "faith_tradition": null,
+      "activity": ["indoors", "seated", "with-children"],
+      "spots_left": 6,
+      "spots_total": 12,
+      "full": false
     },
     {
       "id": "e05f6a3b8d1c2e97",
@@ -107,7 +119,13 @@
       "recurrence_rule": null,
       "source_url": "https://vigil.example.org/",
       "source_id": "sample-vigil",
-      "last_seen_at": "2026-10-13T05:45:02-04:00"
+      "last_seen_at": "2026-10-13T05:45:02-04:00",
+      "host_type": "mutual-aid",
+      "faith_tradition": null,
+      "activity": null,
+      "spots_left": null,
+      "spots_total": null,
+      "full": false
     }
   ]
 }

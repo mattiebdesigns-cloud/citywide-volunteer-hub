@@ -90,6 +90,36 @@ BAD_LISTINGS = {
     "schedule on a one-off listing": lambda e: e.update(
         recurring=False, recurrence_rule="FREQ=WEEKLY;BYDAY=TU"
     ),
+    # Open spots (decision 0008; PROJECT.md 4).
+    "full listing with spots left": lambda e: e.update(spots_left=2, spots_total=10, full=True),
+    "negative spots_left": lambda e: e.update(spots_left=-1, spots_total=10, full=False),
+    "spots_total of 0": lambda e: e.update(spots_left=0, spots_total=0, full=False),
+}
+
+# Each case changes a valid listing in a way the schema must still accept.
+GOOD_LISTINGS = {
+    # The owner allows counts on sensitive listings (decision 0008 as amended).
+    "sensitive listing with spots_left": lambda e: e.update(
+        sensitive=True, spots_left=3, spots_total=None, full=False
+    ),
+    "sensitive listing with spots_total": lambda e: e.update(
+        sensitive=True, spots_left=None, spots_total=20, full=False
+    ),
+    "sensitive listing marked full, no counts": lambda e: e.update(
+        sensitive=True, spots_left=None, spots_total=None, full=True
+    ),
+    "sensitive listing with the open-spots fields left out": lambda e: (
+        e.update(sensitive=True),
+        e.pop("spots_left", None),
+        e.pop("spots_total", None),
+        e.pop("full", None),
+    ),
+    "ordinary listing with counts": lambda e: e.update(
+        sensitive=False, spots_left=3, spots_total=10, full=False
+    ),
+    "ordinary listing full with 0 left": lambda e: e.update(
+        sensitive=False, spots_left=0, spots_total=10, full=True
+    ),
 }
 
 
@@ -99,6 +129,14 @@ def test_schema_rejects_bad_listing(case: str):
     BAD_LISTINGS[case](data["events"][0])
     errors = event_schema.schema_errors(event_schema.file_validator(ROOT), data)
     assert errors, f"schema accepted a listing with: {case}"
+
+
+@pytest.mark.parametrize("case", sorted(GOOD_LISTINGS))
+def test_schema_accepts_good_listing(case: str):
+    data = _sample()
+    GOOD_LISTINGS[case](data["events"][0])
+    errors = event_schema.schema_errors(event_schema.file_validator(ROOT), data)
+    assert not errors, f"schema rejected a valid listing ({case}):\n" + "\n".join(errors)
 
 
 def test_file_without_generated_at_is_rejected():

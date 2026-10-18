@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:citywide-volunteer-hub:schema:event",
   "title": "Volunteer listing",
-  "description": "One volunteer shift or event in the shared event format. Plain-language guide: docs/EVENT-FORMAT.md. Unknown values: join_method and spanish_spoken use the string \"unknown\"; every other field that may be unknown uses null. A field never has two ways to say unknown.",
+  "description": "One volunteer shift or event in the shared event format. Plain-language guide: docs/EVENT-FORMAT.md. Unknown values: join_method and spanish_spoken use the string \"unknown\"; every other field that may be unknown uses null (host_type, faith_tradition and activity included). A field never has two ways to say unknown. The open-spots fields (spots_left, spots_total, full) and the tag fields (host_type, faith_tradition, activity) are optional so older files still validate; new output should always write them (null, or false for full, when the page shows nothing).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -153,6 +153,42 @@
     "last_seen_at": {
       "description": "When the pipeline last saw this listing on its source. Shown as \"last checked\".",
       "$ref": "#/$defs/datetime_with_offset"
+    },
+    "host_type": {
+      "description": "Who runs the shift: a host type id from the city's own settings file (its host type list), for example nonprofit or faith-based. Recorded from the organization's own pages, never guessed. null or left out when not known.",
+      "oneOf": [
+        { "$ref": "#/$defs/slug" },
+        { "type": "null" }
+      ]
+    },
+    "faith_tradition": {
+      "description": "Only for faith-based hosts: a faith tradition id from the city's own settings file. null for every other host, and when not known. Never guessed.",
+      "oneOf": [
+        { "$ref": "#/$defs/slug" },
+        { "type": "null" }
+      ]
+    },
+    "activity": {
+      "description": "What the work is like: any number of activity ids from the city's own settings file, for example outdoors or kitchen. null or left out when not known. Never guessed.",
+      "oneOf": [
+        { "type": "array", "items": { "$ref": "#/$defs/slug" }, "minItems": 1, "uniqueItems": true },
+        { "type": "null" }
+      ]
+    },
+    "spots_left": {
+      "description": "Open spots the organization's own page shows, read at the same time as last_seen_at (which is when they were counted). null or left out when the page shows no count. Never estimated. A count only, never who signed up.",
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "spots_total": {
+      "description": "Total spots the organization's own page shows, read at the same time as last_seen_at. null or left out when the page shows no total. Never estimated.",
+      "type": ["integer", "null"],
+      "minimum": 1
+    },
+    "full": {
+      "description": "true when the organization's own page says the shift is full, read at the same time as last_seen_at. A full listing stays on the calendar and shows \"Full\". Left out or false otherwise.",
+      "type": "boolean",
+      "default": false
     }
   },
   "allOf": [
@@ -165,6 +201,11 @@
       "description": "A schedule can only be given for a recurring listing.",
       "if": { "properties": { "recurrence_rule": { "type": "string" } } },
       "then": { "properties": { "recurring": { "const": true } } }
+    },
+    {
+      "description": "A full listing cannot show open spots.",
+      "if": { "properties": { "full": { "const": true } }, "required": ["full"] },
+      "then": { "properties": { "spots_left": { "enum": [0, null] } } }
     }
   ],
   "$defs": {
