@@ -1,0 +1,7 @@
+{
+  "name": "sharp",
+  "version": "0.0.0-not-installed",
+  "description": "Stand-in for the optional 'sharp' image package. The site does not process images, and sharp's image library is LGPL, which this project does not allow (PROJECT.md section 3). Astro uses its pass-through image service instead (astro.config.mjs).",
+  "license": "MIT",
+  "main": "index.js"
+}

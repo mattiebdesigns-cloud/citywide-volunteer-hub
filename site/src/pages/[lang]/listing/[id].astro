@@ -1,0 +1,273 @@
+---
+/**
+ * Listing detail page (PROJECT.md 2, 4; decision 0008).
+ * Facts, how to join, open spots or "Full", business-led note, the link out
+ * to the organization's own sign-up (sign-ups never happen here in Phase 1),
+ * add to calendar, save, share, last checked, and report a problem.
+ */
+import Base from "../../../layouts/Base.astro";
+import BusinessLedNote from "../../../components/ui/BusinessLedNote.astro";
+import Button from "../../../components/ui/Button.astro";
+import CauseArt from "../../../components/ui/CauseArt.astro";
+import IconButton from "../../../components/ui/IconButton.astro";
+import Pill from "../../../components/ui/Pill.astro";
+import SpotsBadge from "../../../components/ui/SpotsBadge.astro";
+import { buildIcs } from "../../../lib/ics.ts";
+import { paths, siteData, translator } from "../../../lib/site.ts";
+import type { PreparedListing } from "../../../lib/types.ts";
+import { joinLabel, spotsLabel, timeText, typeLabel } from "../../../lib/words.ts";
+
+export function getStaticPaths() {
+  const { i18n, listings } = siteData();
+  return i18n.languages.flatMap((lang) => listings.map((e) => ({ params: { lang, id: e.id }, props: { e } })));
+}
+
+const { lang } = Astro.params as { lang: string };
+const { e } = Astro.props as { e: PreparedListing };
+const { i18n, settings, builtAt, siteUrl } = siteData();
+const tr = translator(lang);
+const t = tr.t;
+const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.listing(code, e.id)]));
+
+const spots = spotsLabel(tr, e, builtAt);
+const type = typeLabel(tr, e);
+const where = [e.address, e.neighborhood_or_town, tr.areaName(e.area)].filter((x): x is string => Boolean(x));
+const cause = tr.causeName(e.cause);
+const host = tr.listName("host_types", e.host_type);
+const faith = tr.listName("faith_traditions", e.faith_tradition);
+const activities = (e.activity ?? []).map((id) => tr.listName("activities", id)).filter(Boolean);
+
+// Short facts, shown only when the organization's page says them.
+const facts: string[] = [];
+if (e.min_age !== null) facts.push(t("listing.min_age", { age: tr.formatNumber(e.min_age) }));
+if (e.training_required === true) facts.push(t("listing.training_required"));
+if (e.training_required === false) facts.push(t("listing.no_training"));
+if (e.clearances_required === true) facts.push(t("listing.clearances_required"));
+if (e.group_friendly === true) facts.push(t("listing.group_friendly"));
+if (e.spanish_spoken === true) facts.push(t("listing.spanish_spoken"));
+if (e.recurring) facts.push(t("listing.recurring"));
+
+const pageUrl = (siteUrl || "") + paths.listing(lang, e.id);
+const ics = buildIcs(e, {
+  location: where.join("\n"),
+  description: [
+    t("listing.hosted_by", { org: e.org_name }),
+    `${joinLabel(tr, e)}. ${t(`listing.join_hint.${e.join_method}`)}`,
+    `${t(`listing.go_button.${e.join_method}`)}: ${e.signup_url}`,
+  ].join("\n"),
+});
+// The subject names the listing id only, never its title: a sensitive event's
+// name never goes in an email subject line (PROJECT.md 8.1 rule 7).
+const reportHref =
+  `mailto:${settings.site.contact_email}` +
+  `?subject=${encodeURIComponent(t("report.mail_subject", { id: e.id }))}` +
+  `&body=${encodeURIComponent(t("report.mail_body", { url: pageUrl }))}`;
+---
+
+<Base lang={lang} title={e.title} alternates={alternates}>
+  <div class="page listing-page">
+    <p class="listing-page__back"><a class="tap-link" href={paths.home(lang)}>{t("listing.back")}</a></p>
+
+    <article class="listing" aria-labelledby="listing-title">
+      <div class="listing__art">
+        <CauseArt cause={e.cause} />
+      </div>
+
+      <h1 id="listing-title" class="listing__title" lang={e.listing_language}>{e.title}</h1>
+      <p class="listing__org">{t("listing.hosted_by", { org: e.org_name })}</p>
+      {e.listing_language !== lang && <p class="listing__original muted">{t("listing.original_language")}</p>}
+
+      <div class="listing__pills">
+        <Pill kind="join" value={e.join_method} label={joinLabel(tr, e)} />
+        {type && <Pill kind="type" value={e.type} label={type} />}
+        {spots && <SpotsBadge label={spots.label} full={spots.full} />}
+      </div>
+
+      <dl class="listing__facts">
+        <div>
+          <dt>{t("listing.when")}</dt>
+          <dd>
+            <time datetime={e.start}>{tr.formatDate(e.start)}</time>
+            <br />
+            {timeText(tr, e)}
+            {e.endsNextDay && (
+              <>
+                <br />
+                {t("listing.ends_next_day")}
+              </>
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt>{t("listing.where")}</dt>
+          <dd>
+            {where.map((line, i) => (i === 0 ? line : [<br />, line]))}
+            {!e.address && (
+              <>
+                {where.length > 0 && <br />}
+                <span class="muted">{t("listing.address_missing")}</span>
+              </>
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt>{t("filters.join.label")}</dt>
+          <dd>
+            <strong>{joinLabel(tr, e)}</strong>
+            <br />
+            {t(`listing.join_hint.${e.join_method}`)}
+          </dd>
+        </div>
+        {
+          cause && (
+            <div>
+              <dt>{t("filters.cause.label")}</dt>
+              <dd>{cause}</dd>
+            </div>
+          )
+        }
+        {
+          host && (
+            <div>
+              <dt>{t("filters.host_type.label")}</dt>
+              <dd>{faith ? [host, <br />, faith] : host}</dd>
+            </div>
+          )
+        }
+        {
+          activities.length > 0 && (
+            <div>
+              <dt>{t("filters.activity.label")}</dt>
+              <dd>
+                <ul class="listing__list">
+                  {activities.map((a) => (
+                    <li>{a}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+
+      {
+        facts.length > 0 && (
+          <ul class="listing__tags">
+            {facts.map((f) => (
+              <li>
+                <Pill label={f} />
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      {
+        e.host_type === "business-led" && (
+          <BusinessLedNote heading={tr.listName("host_types", "business-led")} text={t("listing.business_led_note")} />
+        )
+      }
+
+      <div class="listing__signup">
+        <Button href={e.signup_url} external block>{t(`listing.go_button.${e.join_method}`)}</Button>
+        <p class="muted">{t("listing.external_note")}</p>
+      </div>
+
+      <div class="listing__actions">
+        <Button
+          variant="secondary"
+          icon="calendar"
+          data-ics={ics}
+          data-ics-name={`${e.id}.ics`}
+          aria-describedby="ics-hint"
+          hidden
+        >
+          {t("listing.add_to_calendar")}
+        </Button>
+        <p id="ics-hint" class="sr-only">{t("listing.add_to_calendar_hint")}</p>
+        <IconButton
+          icon="heart"
+          tone="plain"
+          label={t("listing.save")}
+          title={e.title}
+          titleLang={e.listing_language}
+          visibleLabel={t("listing.save_short")}
+          pressed={false}
+          data-save-id={e.id}
+        />
+        <IconButton
+          icon="share"
+          tone="plain"
+          label={t("listing.share")}
+          title={e.title}
+          titleLang={e.listing_language}
+          visibleLabel={t("listing.share_short")}
+          data-share-url={paths.listing(lang, e.id)}
+          data-share-title={e.title}
+        />
+      </div>
+      <p
+        id="action-status"
+        class="action-status"
+        role="status"
+        data-copied={t("listing.share_copied")}
+        data-failed={t("listing.share_failed")}
+      >
+      </p>
+
+      <p class="listing__checked">
+        <strong>{t("listing.last_checked", { date: tr.formatDate(e.last_seen_at) })}</strong>
+        <br />
+        <span class="muted">{t("listing.last_checked_hint")}</span>
+      </p>
+
+      <p class="listing__report">
+        <a class="tap-link" href={reportHref}>{t("report.button")}</a>
+        <br />
+        <span class="muted">{t("report.mail_note")}</span>
+      </p>
+    </article>
+  </div>
+</Base>
+
+<script>
+  import "../../../scripts/actions.ts";
+</script>
+
+<style>
+  /* Text links that stand alone get a 48 px tap target (WCAG 2.5.8 asks 24, the project asks 44). */
+  .tap-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+  .listing__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-3);
+    margin-block: var(--space-4);
+  }
+  .listing__actions [hidden] {
+    display: none;
+  }
+  .listing__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: 0;
+    list-style: none;
+  }
+  .listing__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+  .listing__facts dd {
+    margin: 0 0 var(--space-3);
+  }
+  .listing__facts dt {
+    font-weight: var(--weight-strong);
+  }
+</style>

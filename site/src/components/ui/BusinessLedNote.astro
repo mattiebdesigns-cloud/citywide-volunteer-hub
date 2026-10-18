@@ -1,0 +1,50 @@
+---
+/**
+ * The plain note on a business-led listing's detail page (PROJECT.md 4, 8;
+ * decision 0006). A boxed note with a briefcase icon and a dashed edge,
+ * so it stands out without relying on colour.
+ * On cards, use the short <Pill kind="business"> instead.
+ *
+ * <BusinessLedNote heading={tr.listName("host_types", "business-led")} text={t("listing.business_led_note")} />
+ */
+import Icon from "./Icon.astro";
+
+interface Props {
+  /** Short heading, e.g. "Organized by a business". Optional. */
+  heading?: string;
+  text: string;
+  class?: string;
+}
+
+const { heading, text, class: className } = Astro.props;
+---
+
+<aside class:list={["note", className]}>
+  <Icon name="business" size={1.5} />
+  <div>
+    {heading && <p class="note__heading">{heading}</p>}
+    <p class="note__text">{text}</p>
+  </div>
+</aside>
+
+<style>
+  .note {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    padding: var(--space-4);
+    background: var(--color-notice-bg);
+    border: var(--border) dashed var(--color-notice-border);
+    border-left-width: 6px;
+    border-left-style: solid;
+    border-radius: var(--radius-sm);
+    color: var(--color-ink);
+  }
+  .note p {
+    margin: 0;
+  }
+  .note__heading {
+    font-weight: var(--weight-heavy);
+    margin-bottom: var(--space-1) !important;
+  }
+</style>

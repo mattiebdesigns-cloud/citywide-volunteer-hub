@@ -1,0 +1,46 @@
+---
+/**
+ * The "Test version" line at the very top of every page of a test build
+ * (decision 0009). Striped edge plus words, so it is clear without colour.
+ * Shown only when the build is a test build; the page decides.
+ *
+ * {isTestBuild && <TestBanner text={t("site.test_version")} />}
+ */
+import Icon from "./Icon.astro";
+
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+---
+
+<div class="test-banner" role="note">
+  <Icon name="info" />
+  <p>{text}</p>
+</div>
+
+<style>
+  .test-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--page-pad);
+    background: var(--color-notice-bg);
+    color: var(--color-ink);
+    font-size: var(--text-min);
+    font-weight: var(--weight-strong);
+    text-align: center;
+    border-bottom: 6px solid transparent;
+    border-image: repeating-linear-gradient(
+        -45deg,
+        var(--color-ink) 0 8px,
+        var(--color-accent) 8px 16px
+      )
+      6;
+  }
+  .test-banner p {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,126 @@
+---
+/**
+ * A round 48 px button with an icon. Used for the heart (save) and share
+ * buttons on each listing card.
+ *
+ * `label` is required. It is read aloud by screen readers and, when
+ * `showLabel` is set, also shown under the icon. Because a page has many of
+ * these, the label names the shift through a {title} placeholder in the
+ * translation file (QUESTIONS Q24). Pass the label with the placeholder
+ * still open, and the title and its language separately, so a screen
+ * reader reads "Guardar:" in Spanish and the organization's title in the
+ * language it was written in:
+ *   label={t("listing.save")} title={event.title} titleLang={event.listing_language}
+ * A label without {title} is shown as it is.
+ *
+ * Toggle buttons (the heart) pass `pressed`. The filled heart shows the
+ * saved state by shape, not only colour, and aria-pressed tells screen
+ * readers. Keep the label the same in both states.
+ *
+ * Behaviour (saving to the device, sharing) is wired by the page with the
+ * data attributes it passes through, e.g. data-save-id, data-share-url.
+ */
+import type { HTMLAttributes } from "astro/types";
+import Icon from "./Icon.astro";
+import type { IconName } from "./icons";
+
+type Props = {
+  icon: IconName;
+  label: string;
+  /** Fills {title} in the label, wrapped in its own language. */
+  title?: string;
+  /** Language of the title (listing_language), e.g. "en". */
+  titleLang?: string;
+  pressed?: boolean;
+  showLabel?: boolean;
+  /** Short words to show under the icon ("Save"), while screen readers hear the full label. Implies showLabel. */
+  visibleLabel?: string;
+  /** "light": white circle, for use on artwork. "plain": no circle, for use on the page. */
+  tone?: "light" | "plain";
+  class?: string;
+} & Omit<HTMLAttributes<"button">, "class">;
+
+const { icon, label, title, titleLang, pressed, showLabel = false, visibleLabel, tone = "light", class: className, ...rest } =
+  Astro.props;
+
+// Split "Save: {title}" around the placeholder, so the title can carry its own lang.
+const hasTitle = title !== undefined && label.includes("{title}");
+const [before, ...restParts] = hasTitle ? label.split("{title}") : [label];
+const after = restParts.join(title ?? "");
+---
+
+<button
+  type="button"
+  class:list={["icon-btn", `icon-btn--${tone}`, (showLabel || visibleLabel) && "icon-btn--labelled", className]}
+  aria-pressed={pressed === undefined ? undefined : pressed ? "true" : "false"}
+  {...rest}
+>
+  <span class="icon-btn__circle"><Icon name={icon} size={1.375} /></span>
+  {
+    visibleLabel ? (
+      <>
+        <span class="icon-btn__label" aria-hidden="true">{visibleLabel}</span>
+        <span class="sr-only">
+          {before}
+          {hasTitle && <span lang={titleLang}>{title}</span>}
+          {after}
+        </span>
+      </>
+    ) : (
+      <span class:list={[showLabel ? "icon-btn__label" : "sr-only"]}>
+        {before}
+        {hasTitle && <span lang={titleLang}>{title}</span>}
+        {after}
+      </span>
+    )
+  }
+</button>
+
+<style>
+  .icon-btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    min-width: var(--tap);
+    min-height: var(--tap);
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .icon-btn__circle {
+    display: grid;
+    place-items: center;
+    width: var(--tap);
+    height: var(--tap);
+    border-radius: 50%;
+    transition: background-color var(--speed);
+  }
+  .icon-btn--light .icon-btn__circle {
+    background: var(--color-surface);
+    border: var(--border) solid var(--color-line);
+    box-shadow: var(--shadow);
+  }
+  .icon-btn--plain .icon-btn__circle {
+    border: var(--border) solid var(--color-line);
+  }
+  .icon-btn:hover .icon-btn__circle {
+    background: var(--color-paper);
+  }
+  .icon-btn__label {
+    font-size: var(--text-min);
+    font-weight: var(--weight-strong);
+  }
+  /* Saved: the heart fills in. Shape changes, not only colour. */
+  .icon-btn[aria-pressed="true"] :global(svg) {
+    fill: currentColor;
+  }
+  .icon-btn[aria-pressed="true"] {
+    color: var(--color-primary);
+  }
+  .icon-btn[aria-pressed="true"] .icon-btn__circle {
+    border-color: var(--color-primary);
+  }
+</style>

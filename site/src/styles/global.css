@@ -1,0 +1,8 @@
+/*
+ * Import this once, in the site's main layout:
+ *   import "../styles/global.css";
+ * Component styles live inside each component in src/components/ui/.
+ */
+@import "./tokens.css";
+@import "./base.css";
+@import "./forms.css";

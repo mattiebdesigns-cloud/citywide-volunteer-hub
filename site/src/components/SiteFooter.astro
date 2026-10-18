@@ -1,0 +1,16 @@
+---
+/** Footer: where listings come from (PROJECT.md 2). */
+import { translator } from "../lib/site.ts";
+
+interface Props {
+  lang: string;
+}
+
+const tr = translator(Astro.props.lang);
+---
+
+<footer class="site-footer">
+  <div class="page">
+    <p class="muted">{tr.t("site.footer_sources")}</p>
+  </div>
+</footer>

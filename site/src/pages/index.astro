@@ -1,0 +1,63 @@
+---
+/**
+ * The site's front door. Sends the visitor to their language's home page:
+ * their saved choice first, then their browser's languages, then the city's
+ * default language (PROJECT.md 5). This happens in the browser; no request
+ * carries the choice. Without JavaScript, the page lists each language.
+ */
+import "../styles/global.css";
+import SvgSprite from "../components/ui/SvgSprite.astro";
+import TestBanner from "../components/ui/TestBanner.astro";
+import { paths, siteData } from "../lib/site.ts";
+import { STORAGE_KEY } from "../i18n/index.ts";
+
+const { i18n, settings, testBuild } = siteData();
+const tr = i18n.translator(i18n.defaultLanguage);
+const homes = Object.fromEntries(i18n.languages.map((code) => [code, paths.home(code)]));
+const config = { available: i18n.languages, fallback: i18n.defaultLanguage, homes, key: STORAGE_KEY };
+---
+
+<!doctype html>
+<html lang={tr.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tr.setting(settings.site.name)}</title>
+    <meta name="description" content={tr.t("site.description")} />
+    {testBuild && <meta name="robots" content="noindex, nofollow" />}
+    {i18n.languages.map((code) => <link rel="alternate" hreflang={code} href={homes[code]} />)}
+    <script is:inline define:vars={{ config }}>
+      (function () {
+        var stored = null;
+        try { stored = localStorage.getItem(config.key); } catch (e) {}
+        var candidates = [stored].concat(navigator.languages || [navigator.language]);
+        for (var i = 0; i < candidates.length; i++) {
+          if (!candidates[i]) continue;
+          var code = String(candidates[i]).toLowerCase().split(/[-_]/)[0];
+          if (config.available.indexOf(code) !== -1) { location.replace(config.homes[code]); return; }
+        }
+        location.replace(config.homes[config.fallback]);
+      })();
+    </script>
+  </head>
+  <body>
+    <SvgSprite />
+    {testBuild && <TestBanner text={tr.t("site.test_version")} />}
+    <main class="page">
+      <h1>{tr.setting(settings.site.name)}</h1>
+      <nav aria-label={tr.t("language.choose")}>
+        <ul>
+          {
+            i18n.languages.map((code) => (
+              <li>
+                <a href={homes[code]} lang={code} hreflang={code}>
+                  {i18n.languageName(code)}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </main>
+  </body>
+</html>

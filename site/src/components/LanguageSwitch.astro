@@ -1,0 +1,73 @@
+---
+/**
+ * English / Spanish switch on every page (PROJECT.md 2, 5). Each language is
+ * named in its own language and marked with lang, so screen readers say it
+ * right. A language not yet reviewed by a fluent speaker shows "beta".
+ * The choice is kept in the visitor's own browser only.
+ */
+import { siteData, translator } from "../lib/site.ts";
+
+interface Props {
+  lang: string;
+  alternates: Record<string, string>;
+}
+
+const { lang, alternates } = Astro.props;
+const { i18n } = siteData();
+const tr = translator(lang);
+---
+
+<nav class="lang-switch" aria-label={tr.t("language.choose")}>
+  <ul class="lang-switch__list">
+    {
+      i18n.languages.map((code) => (
+        <li>
+          <a
+            class="lang-switch__link"
+            href={alternates[code]}
+            lang={code}
+            hreflang={code}
+            aria-current={code === lang ? "true" : undefined}
+            data-store-lang={code}
+          >
+            {i18n.languageName(code)}
+            {i18n.isBeta(code) && (
+              <span class="lang-switch__beta"> {i18n.translator(code).t("language.beta")}</span>
+            )}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script>
+  import { storeLanguage } from "../i18n/index.ts";
+  for (const link of document.querySelectorAll<HTMLAnchorElement>("[data-store-lang]")) {
+    link.addEventListener("click", () => storeLanguage(link.dataset.storeLang ?? ""));
+  }
+</script>
+
+<style>
+  /* A row of languages, no bullets; each link is a 48 px tap target. */
+  .lang-switch__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lang-switch__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: var(--tap);
+    min-width: var(--tap);
+    padding: 0 var(--space-2);
+  }
+  .lang-switch__link[aria-current="true"] {
+    font-weight: var(--weight-strong);
+    text-decoration-thickness: 0.2em;
+  }
+</style>

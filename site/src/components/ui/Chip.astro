@@ -1,0 +1,70 @@
+---
+/**
+ * A filter choice that turns on and off with one tap ("Evening", "Just show
+ * up", "No training needed"). 48 px tall, so it works with one thumb.
+ * When on, it fills in AND shows a check mark, so the state never relies on
+ * colour alone; aria-pressed tells screen readers.
+ *
+ * <Chip label={t("filters.time_of_day.evening")} pressed={false} data-filter="time" data-value="evening" />
+ *
+ * For a choice inside a group where only one can be picked, the page can
+ * use real radio buttons styled with the same classes (see docs/design.md).
+ */
+import type { HTMLAttributes } from "astro/types";
+import Icon from "./Icon.astro";
+import type { IconName } from "./icons";
+
+type Props = {
+  label: string;
+  pressed?: boolean;
+  icon?: IconName;
+  class?: string;
+} & Omit<HTMLAttributes<"button">, "class">;
+
+const { label, pressed = false, icon, class: className, ...rest } = Astro.props;
+---
+
+<button type="button" class:list={["chip", className]} aria-pressed={pressed ? "true" : "false"} {...rest}>
+  <span class="chip__check"><Icon name="check" size={1.125} /></span>
+  {icon && <Icon name={icon} size={1.125} />}
+  <span>{label}</span>
+</button>
+
+<style>
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tap);
+    padding: var(--space-2) var(--space-4);
+    border: var(--border) solid var(--color-line);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--text-min);
+    font-weight: var(--weight-strong);
+    white-space: nowrap;
+    flex: none;
+    cursor: pointer;
+    transition: background-color var(--speed), border-color var(--speed);
+  }
+  .chip:hover {
+    border-color: var(--color-ink);
+  }
+  .chip__check {
+    display: none;
+  }
+  .chip[aria-pressed="true"] {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+  .chip[aria-pressed="true"] .chip__check {
+    display: inline-flex;
+  }
+  @media (forced-colors: active) {
+    .chip[aria-pressed="true"] {
+      border-width: 4px;
+    }
+  }
+</style>

@@ -17,6 +17,7 @@
     "footer_sources": "Los anuncios vienen de los calendarios públicos de las organizaciones.",
     "footer_open_source": "Cualquier persona puede ver y reutilizar el código de este sitio.",
     "footer_code_link": "Ver el código",
+    "test_version": "Versión de prueba. Los anuncios pueden tener errores o no estar al día.",
     "rewards_coming": "Las recompensas por hacer voluntariado llegan pronto. Por ahora, busque un turno en el que pueda participar."
   },
   "filters": {
@@ -71,8 +72,12 @@
     "host_type": { "label": "Quién lo organiza" },
     "faith_tradition": { "label": "Tradición religiosa" },
     "activity": { "label": "Cómo es el trabajo" },
-    "show_only": "Mostrar solo",
-    "hide": "Ocultar"
+    "show_only": "Mostrar solo: {name}",
+    "hide": "Ocultar: {name}",
+    "show_only_group": "Mostrar solo",
+    "hide_group": "Ocultar",
+    "active_count": {"one": "{count} filtro activo", "other": "{count} filtros activos"},
+    "saved_only": "Solo turnos guardados"
   },
   "causes": {
     "food": "Alimentos",
@@ -124,6 +129,12 @@
     "none": "Ningún turno coincide con estos filtros.",
     "none_hint": "Pruebe otro día o quite un filtro."
   },
+  "home": {
+    "picks_heading": "Recomendados de esta semana",
+    "picks_note": "Turnos con lugares disponibles, elegidos por nuestro equipo. Nadie paga por aparecer aquí.",
+    "tonight": "Esta noche",
+    "tomorrow": "Mañana"
+  },
   "listing": {
     "hosted_by": "Organiza: {org}",
     "when": "Cuándo",
@@ -153,7 +164,7 @@
     "no_training": "No requiere capacitación",
     "clearances_required": "Requiere verificación de antecedentes",
     "group_friendly": "Ideal para grupos",
-    "business_led_note": "Una empresa organizó esta jornada. La empresa puede presentar el trabajo que usted haga, y sus resultados, como logros propios.",
+    "business_led_note": "Una empresa organizó esta jornada de voluntariado. La empresa puede presentar el trabajo que usted haga, y sus resultados, como logros propios.",
     "spanish_spoken": "Se habla español",
     "recurring": "Se repite con regularidad",
     "original_language": "Se muestra en el idioma que usó la organización.",
@@ -164,7 +175,18 @@
     "back": "Volver a todos los turnos",
     "gone": "Este anuncio ya no está en el calendario.",
     "add_to_calendar": "Agregar a mi calendario",
-    "add_to_calendar_hint": "Descarga un archivo de calendario para este turno."
+    "add_to_calendar_hint": "Descarga un archivo de calendario para este turno.",
+    "date_time": "{date}. {time}",
+    "save": "Guardar: {title}",
+    "share": "Compartir: {title}",
+    "save_short": "Guardar",
+    "share_short": "Compartir",
+    "saved_note": "Guardado solo en este dispositivo.",
+    "share_copied": "Enlace copiado.",
+    "share_failed": "No se pudo copiar el enlace. Cópielo de la barra de direcciones.",
+    "full": "Completo",
+    "spots_left": {"one": "Queda {count} lugar, según datos del {day}", "other": "Quedan {count} lugares, según datos del {day}"},
+    "spots_left_on": {"one": "Queda {count} lugar, según datos del {date}", "other": "Quedan {count} lugares, según datos del {date}"}
   },
   "report": {
     "button": "Reportar un problema con este anuncio",
@@ -184,7 +206,10 @@
     "submit": "Enviar reporte",
     "cancel": "Cancelar",
     "thanks": "Gracias. Recibimos su reporte.",
-    "error": "No pudimos enviar su reporte. Inténtelo de nuevo."
+    "error": "No pudimos enviar su reporte. Inténtelo de nuevo.",
+    "mail_subject": "Problema con el anuncio {id}",
+    "mail_body": "Anuncio: {url}\n\n¿Qué está mal?\n",
+    "mail_note": "Esto abre un correo para nuestro equipo. Por favor, no incluya datos personales de nadie."
   },
   "about": {
     "title": "Sobre nuestros anuncios",

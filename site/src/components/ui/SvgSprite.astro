@@ -1,0 +1,46 @@
+---
+/**
+ * Every icon and every cause drawing, once, as <symbol>s that <Icon /> and
+ * <CauseArt /> point to. Put this once per page, first thing inside <body>,
+ * on every page (simplest: in the main layout). About 14 KB in total, so a
+ * page of 300 cards does not repeat the drawings 300 times.
+ */
+import { art, fallback } from "./causeArt";
+import { paths } from "./icons";
+
+// Colours are written onto each shape as a style, because page CSS does not
+// reach shapes drawn through <use> in every browser. The variables come from
+// styles/tokens.css, so a city restyles the drawings there.
+const styles: Record<string, string> = {
+  a: "fill:var(--art-fill)",
+  b: "fill:var(--art-fill-2)",
+  c: "fill:var(--art-fill-3)",
+  s: "fill:#fff;opacity:.55",
+  l: "fill:none;stroke:var(--art-line);stroke-width:4;stroke-linecap:round;stroke-linejoin:round",
+  cl: "fill:var(--art-fill-3);stroke:var(--art-line);stroke-width:3",
+  w: "fill:none;stroke:var(--art-fill-3);stroke-width:6;stroke-linecap:round;stroke-linejoin:round",
+};
+const paint = (drawing: string): string =>
+  drawing.replace(/class="(\w+)"/g, (whole, name: string) => (styles[name] ? `style="${styles[name]}"` : whole));
+// A <g class="b"> group passes its colour down to the shapes inside it.
+const symbols = [...Object.entries(art), ["default", fallback]].map(([id, d]) => [id, paint(d)] as const);
+---
+
+<svg class="cause-art-sprite" aria-hidden="true" focusable="false" width="0" height="0">
+  {Object.entries(paths).map(([name, drawing]) => <symbol id={`icon-${name}`} viewBox="0 0 24 24" set:html={drawing} />)}
+  {
+    symbols.map(([id, drawing]) => (
+      <symbol id={`cause-art-${id}`} viewBox="0 0 320 150" overflow="visible" set:html={drawing} />
+    ))
+  }
+</svg>
+
+<style is:global>
+  /* Hidden but not display:none, so every browser can still draw from it. */
+  .cause-art-sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+</style>

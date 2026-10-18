@@ -1,0 +1,69 @@
+---
+/**
+ * The frame of every page (PROJECT.md 2, 5; decision 0009).
+ * Language, title, the test-build line and noindex, skip link, header,
+ * rewards line, main content and footer. Styles come from pv-design
+ * (src/styles/, src/components/ui/).
+ */
+import "../styles/global.css";
+import SvgSprite from "../components/ui/SvgSprite.astro";
+import TestBanner from "../components/ui/TestBanner.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import { siteData, translator } from "../lib/site.ts";
+
+interface Props {
+  lang: string;
+  /** The page's own title. The site name is used when left out. */
+  title?: string;
+  /** Language of the title text, when it is the organization's own wording. */
+  titleLang?: string;
+  /** This page's address in every language, for the language switch. */
+  alternates: Record<string, string>;
+  /** Show the filters button in the header (home page only). */
+  filters?: boolean;
+}
+
+const { lang, title, alternates, filters = false } = Astro.props;
+const { testBuild, siteUrl, settings, listings } = siteData();
+// Every listing in this build and when it is over, so the browser can clear
+// saved shifts that have ended (owner, Q32). Ids are letters, digits, - and _.
+const live = JSON.stringify(listings.map((e) => [e.id, e.overAt]));
+const tr = translator(lang);
+const siteName = tr.setting(settings.site.name);
+const pageTitle = title ?? siteName;
+const absolute = (path: string) => (siteUrl ? siteUrl + path : path);
+---
+
+<!doctype html>
+<html lang={tr.lang} dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={tr.t("site.description")} />
+    {testBuild && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    {
+      Object.entries(alternates).map(([code, href]) => (
+        <link rel="alternate" hreflang={code} href={absolute(href)} />
+      ))
+    }
+    <slot name="head" />
+  </head>
+  <body>
+    <SvgSprite />
+    {testBuild && <TestBanner text={tr.t("site.test_version")} />}
+    <a class="skip-link" href="#main">{tr.t("site.skip_to_content")}</a>
+    <SiteHeader lang={lang} alternates={alternates} filters={filters} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter lang={lang} />
+    <script type="application/json" id="live-listings" set:html={live} />
+    <script>
+      import { pruneSavedNow } from "../scripts/device.ts";
+      pruneSavedNow();
+    </script>
+  </body>
+</html>

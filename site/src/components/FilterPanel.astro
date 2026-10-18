@@ -1,0 +1,224 @@
+---
+/**
+ * Filters (PROJECT.md 2), behind the one Filters button in the header.
+ *
+ * Privacy: the filters work only in the visitor's browser. There is no form
+ * and nothing to submit, so a choice such as "faith-hosted" never reaches a
+ * server or its logs. Choices are kept for this browser tab only
+ * (sessionStorage), so "Back to all shifts" keeps them.
+ *
+ * Without JavaScript the button and panel stay hidden and every listing shows.
+ *
+ * Only choices that some listing has are offered. Areas appear only when the
+ * settings mark them live (PROJECT.md 4), and only when there are two or more.
+ */
+import Button from "./ui/Button.astro";
+import Chip from "./ui/Chip.astro";
+import IconButton from "./ui/IconButton.astro";
+import { liveAreas, usedIds } from "../lib/prepare.ts";
+import { siteData, translator } from "../lib/site.ts";
+
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+const { settings, listings } = siteData();
+const tr = translator(lang);
+const t = tr.t;
+
+const areas = liveAreas(settings);
+const causes = usedIds(settings.causes, listings.map((e) => e.cause));
+const types = (["service", "training", "campaign", "protest_action"] as const).filter(
+  (type) => (type !== "campaign" || settings.features.campaigns) && listings.some((e) => e.type === type),
+);
+const hosts = usedIds(settings.host_types, listings.map((e) => e.host_type));
+const faiths = usedIds(settings.faith_traditions, listings.map((e) => e.faith_tradition));
+const activities = usedIds(settings.activities, listings.flatMap((e) => e.activity ?? []));
+const days = ["today", "tomorrow", "this_week", "this_weekend", "pick_date"];
+const times = ["morning", "afternoon", "evening", "overnight"];
+const joins = ["drop_in", "signup", "application", "unknown"];
+---
+
+<section
+  id="filter-panel"
+  class="filter-panel"
+  aria-labelledby="filter-panel-heading"
+  hidden
+  data-timezone={settings.site.timezone}
+>
+  <div class="filter-panel__top">
+    <h2 id="filter-panel-heading" class="filter-panel__heading">{t("filters.open")}</h2>
+    <IconButton icon="close" label={t("filters.close")} tone="plain" data-filters-close />
+  </div>
+
+  <div class="filter-panel__fields">
+    <div class="field">
+      <label for="filter-day">{t("filters.day.label")}</label>
+      <select id="filter-day" data-filter="day">
+        <option value="">{t("filters.any")}</option>
+        {days.map((d) => <option value={d}>{t(`filters.day.${d}`)}</option>)}
+      </select>
+    </div>
+    <div class="field" data-date-field hidden>
+      <label for="filter-date">{t("filters.day.pick_date")}</label>
+      <input id="filter-date" type="date" data-filter="date" />
+    </div>
+
+    <div class="field">
+      <label for="filter-time">{t("filters.time_of_day.label")}</label>
+      <select id="filter-time" data-filter="time">
+        <option value="">{t("filters.any")}</option>
+        {times.map((x) => <option value={x}>{t(`filters.time_of_day.${x}`)}</option>)}
+      </select>
+    </div>
+
+    {
+      areas.length > 1 && (
+        <div class="field">
+          <label for="filter-area">{t("filters.area.label")}</label>
+          <select id="filter-area" data-filter="area">
+            <option value="">{t("filters.area.all")}</option>
+            {areas.map((id) => <option value={id}>{tr.areaName(id)}</option>)}
+          </select>
+        </div>
+      )
+    }
+
+    {
+      causes.length > 0 && (
+        <div class="field">
+          <label for="filter-cause">{t("filters.cause.label")}</label>
+          <select id="filter-cause" data-filter="cause">
+            <option value="">{t("filters.cause.all")}</option>
+            {causes.map((id) => <option value={id}>{tr.causeName(id)}</option>)}
+          </select>
+        </div>
+      )
+    }
+
+    {
+      types.length > 1 && (
+        <div class="field">
+          <label for="filter-type">{t("filters.type.label")}</label>
+          <select id="filter-type" data-filter="type">
+            <option value="">{t("filters.type.all")}</option>
+            {types.map((x) => <option value={x}>{t(`filters.type.${x}`)}</option>)}
+          </select>
+        </div>
+      )
+    }
+
+    <div class="field">
+      <label for="filter-join">{t("filters.join.label")}</label>
+      <select id="filter-join" data-filter="join">
+        <option value="">{t("filters.join.all")}</option>
+        {joins.map((x) => <option value={x}>{t(`filters.join.${x}`)}</option>)}
+      </select>
+    </div>
+
+    {
+      hosts.length > 0 && (
+        <div class="field">
+          <label for="filter-host">{t("filters.host_type.label")}</label>
+          <select id="filter-host" data-filter="host">
+            <option value="">{t("filters.any")}</option>
+            <optgroup label={t("filters.show_only_group")}>
+              {hosts.map((id) => <option value={`only:${id}`}>{t("filters.show_only", { name: tr.listName("host_types", id) })}</option>)}
+            </optgroup>
+            <optgroup label={t("filters.hide_group")}>
+              {hosts.map((id) => <option value={`hide:${id}`}>{t("filters.hide", { name: tr.listName("host_types", id) })}</option>)}
+            </optgroup>
+          </select>
+        </div>
+      )
+    }
+
+    {
+      faiths.length > 0 && (
+        <div class="field">
+          <label for="filter-faith">{t("filters.faith_tradition.label")}</label>
+          <select id="filter-faith" data-filter="faith">
+            <option value="">{t("filters.any")}</option>
+            {faiths.map((id) => <option value={id}>{tr.listName("faith_traditions", id)}</option>)}
+          </select>
+        </div>
+      )
+    }
+
+    {
+      activities.length > 0 && (
+        <div class="field">
+          <label for="filter-activity">{t("filters.activity.label")}</label>
+          <select id="filter-activity" data-filter="activity">
+            <option value="">{t("filters.any")}</option>
+            <optgroup label={t("filters.show_only_group")}>
+              {activities.map((id) => <option value={`only:${id}`}>{t("filters.show_only", { name: tr.listName("activities", id) })}</option>)}
+            </optgroup>
+            <optgroup label={t("filters.hide_group")}>
+              {activities.map((id) => <option value={`hide:${id}`}>{t("filters.hide", { name: tr.listName("activities", id) })}</option>)}
+            </optgroup>
+          </select>
+        </div>
+      )
+    }
+
+    <div class="filter-panel__chips">
+      <Chip label={t("filters.no_training")} data-filter-toggle="no_training" />
+      <Chip label={t("filters.spanish_spoken")} data-filter-toggle="spanish" />
+      <Chip label={t("filters.saved_only")} icon="heart" data-filter-toggle="saved" aria-describedby="saved-note" />
+    </div>
+    <p id="saved-note" class="muted">{t("listing.saved_note")}</p>
+  </div>
+
+  <div class="filter-panel__actions">
+    <Button block data-filters-apply>{t("filters.apply")}</Button>
+    <Button variant="quiet" block data-filters-clear>{t("filters.clear")}</Button>
+  </div>
+</section>
+
+<style>
+  /* Panel layout only. The fields themselves (label above, 48 px, full width)
+     come from pv-design's styles/forms.css. */
+  .filter-panel {
+    width: 100%;
+    max-width: var(--page-max);
+    margin: 0 auto var(--space-5);
+    padding: var(--space-4) var(--page-pad);
+    background: var(--color-surface);
+    border-block: var(--border) solid var(--color-line);
+  }
+  .filter-panel[hidden] {
+    display: none;
+  }
+  .filter-panel__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+  .filter-panel__heading {
+    margin: 0;
+  }
+  .filter-panel__fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+  .filter-panel__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .filter-panel__chips + p {
+    margin: 0;
+  }
+  .filter-panel__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+</style>

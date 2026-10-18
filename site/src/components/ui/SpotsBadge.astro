@@ -1,0 +1,49 @@
+---
+/**
+ * Open spots on a listing (PROJECT.md 4, decision 0008). Two looks:
+ *   full: dark badge with a "no entry" icon:  "Full"
+ *   open: white badge with a ticket icon:     "6 spots left as of last night"
+ * The page builds the words (with the plural helper) and passes them in.
+ * Show nothing when the organization's page gives no count and is not full.
+ *
+ * <SpotsBadge full label={t("listing.full")} />
+ * <SpotsBadge label={plural("listing.spots_left", event.spots_left)} />
+ */
+import Icon from "./Icon.astro";
+
+interface Props {
+  label: string;
+  full?: boolean;
+  class?: string;
+}
+
+const { label, full = false, class: className } = Astro.props;
+---
+
+<span class:list={["spots", full ? "spots--full" : "spots--open", className]}>
+  <Icon name={full ? "full" : "spots"} size={1.125} />
+  <span>{label}</span>
+</span>
+
+<style>
+  .spots {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: 2rem;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    border: var(--border) solid var(--color-ink);
+    font-size: var(--text-min);
+    font-weight: var(--weight-heavy);
+    line-height: var(--leading-tight);
+  }
+  .spots--open {
+    background: var(--color-spots-bg);
+    color: var(--color-spots-text);
+  }
+  .spots--full {
+    background: var(--color-full-bg);
+    color: var(--color-full-text);
+  }
+</style>

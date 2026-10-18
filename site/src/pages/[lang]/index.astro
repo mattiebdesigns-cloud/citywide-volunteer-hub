@@ -1,0 +1,99 @@
+---
+/**
+ * Home page: one column of listing cards, soonest first
+ * (PROJECT.md 2; docs/briefs/phase1-home-page.md). One page per language.
+ * Weekly picks (decision 0008) come in the next slice.
+ */
+import Base from "../../layouts/Base.astro";
+import FilterPanel from "../../components/FilterPanel.astro";
+import ListingCard from "../../components/ui/ListingCard.astro";
+import { languagePaths, paths, siteData, translator } from "../../lib/site.ts";
+import { businessLabel, joinLabel, placeText, spotsLabel, typeLabel, whenText } from "../../lib/words.ts";
+
+export const getStaticPaths = languagePaths;
+
+const { lang } = Astro.params as { lang: string };
+const { i18n, listings, builtAt } = siteData();
+const tr = translator(lang);
+const t = tr.t;
+const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.home(code)]));
+---
+
+<Base lang={lang} alternates={alternates} filters>
+  <div class="page results">
+    <h1 id="results-heading" class="results__heading" tabindex="-1">{t("filters.heading")}</h1>
+  </div>
+  <FilterPanel lang={lang} />
+  <div class="page results">
+    <p
+      id="results-count"
+      class="results__count"
+      role="status"
+      data-count-one={t("results.count.one")}
+      data-count-other={t("results.count.other")}
+    >
+      {tr.plural("results.count", listings.length)}
+    </p>
+    <div id="results-none" class="results__none" hidden={listings.length > 0}>
+      <p>{t("results.none")}</p>
+      <p class="muted">{t("results.none_hint")}</p>
+    </div>
+
+    <ul id="listing-list" class="stack listing-list">
+      {
+        listings.map((e) => (
+          <li
+            data-id={e.id}
+            data-date={e.localDate}
+            data-weekday={e.weekday}
+            data-time={e.timeOfDay}
+            data-area={e.area}
+            data-cause={e.cause ?? ""}
+            data-type={e.type}
+            data-join={e.join_method}
+            data-training={e.training_required === null ? "" : String(e.training_required)}
+            data-spanish={String(e.spanish_spoken)}
+            data-host={e.host_type ?? ""}
+            data-faith={e.faith_tradition ?? ""}
+            data-activity={(e.activity ?? []).join(" ")}
+            data-over-at={e.overAt}
+          >
+            <ListingCard
+              id={e.id}
+              href={paths.listing(lang, e.id)}
+              title={e.title}
+              titleLang={e.listing_language}
+              when={whenText(tr, e)}
+              datetime={e.start}
+              place={placeText(tr, e)}
+              cause={e.cause}
+              joinMethod={e.join_method}
+              joinLabel={joinLabel(tr, e)}
+              type={typeLabel(tr, e) ? e.type : undefined}
+              typeLabel={typeLabel(tr, e)}
+              businessLabel={businessLabel(tr, e)}
+              spots={spotsLabel(tr, e, builtAt)}
+              saveLabel={t("listing.save")}
+              shareLabel={t("listing.share")}
+              shareUrl={paths.listing(lang, e.id)}
+              headingLevel={2}
+            />
+          </li>
+        ))
+      }
+    </ul>
+    <p
+      id="action-status"
+      class="action-status"
+      role="status"
+      data-copied={t("listing.share_copied")}
+      data-failed={t("listing.share_failed")}
+    >
+    </p>
+  </div>
+</Base>
+
+<script>
+  import "../../scripts/actions.ts";
+  import "../../scripts/filters.ts";
+</script>

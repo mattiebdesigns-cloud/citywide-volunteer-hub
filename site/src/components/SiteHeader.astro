@@ -1,0 +1,101 @@
+---
+/**
+ * Header (docs/briefs/phase1-home-page.md): site name from the settings,
+ * the language switch, and on the home page the one Filters button.
+ * Under it, the "rewards are coming" line (PROJECT.md 2, decision 0005).
+ */
+import Button from "./ui/Button.astro";
+import LanguageSwitch from "./LanguageSwitch.astro";
+import { paths, siteData, translator } from "../lib/site.ts";
+
+interface Props {
+  lang: string;
+  alternates: Record<string, string>;
+  filters?: boolean;
+}
+
+const { lang, alternates, filters = false } = Astro.props;
+const tr = translator(lang);
+const siteName = tr.setting(siteData().settings.site.name);
+---
+
+<header class="site-header">
+  <div class="page site-header__inner">
+    <p class="site-header__name"><a href={paths.home(lang)}>{siteName}</a></p>
+    <LanguageSwitch lang={lang} alternates={alternates} />
+    {
+      filters && (
+        <Button
+          variant="secondary"
+          icon="filter"
+          class="site-header__filters"
+          id="filters-toggle"
+          aria-expanded="false"
+          aria-controls="filter-panel"
+          hidden
+        >
+          {tr.t("filters.open")}
+          <span
+            class="site-header__filters-count"
+            data-filters-count
+            data-count-one={tr.t("filters.active_count.one")}
+            data-count-other={tr.t("filters.active_count.other")}
+            hidden
+          >
+            <span class="site-header__filters-number" aria-hidden="true" data-filters-number></span>
+            <span class="sr-only" data-filters-words></span>
+          </span>
+        </Button>
+      )
+    }
+  </div>
+  {tr.isBeta && <p class="page site-header__beta muted">{tr.t("language.beta_note")}</p>}
+</header>
+<p class="page rewards-coming">{tr.t("site.rewards_coming")}</p>
+
+<style>
+  .site-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-3);
+    padding-block: var(--space-2);
+  }
+  .site-header__name {
+    margin: 0;
+    font-weight: var(--weight-heavy);
+  }
+  /* 48 px tap target for the site name link. */
+  .site-header__name a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+  .site-header__beta {
+    margin: 0 auto var(--space-2);
+  }
+  /* The number of filters on, as a small round badge next to "Filters". */
+  .site-header__filters-count {
+    display: inline-flex;
+    margin-inline-start: var(--space-2);
+  }
+  .site-header__filters-count[hidden] {
+    display: none;
+  }
+  .site-header__filters-number {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 var(--space-1);
+    border-radius: 999px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-size: var(--text-min);
+    line-height: 1;
+  }
+  .rewards-coming {
+    margin-block: var(--space-3);
+  }
+</style>

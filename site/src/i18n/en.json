@@ -17,6 +17,7 @@
     "footer_sources": "Listings come from organizations' public calendars.",
     "footer_open_source": "Anyone can see and reuse the code for this site.",
     "footer_code_link": "See the code",
+    "test_version": "Test version. Listings may be wrong or out of date.",
     "rewards_coming": "Rewards for volunteering are coming. For now, find a shift you can join."
   },
   "filters": {
@@ -71,8 +72,12 @@
     "host_type": { "label": "Who runs it" },
     "faith_tradition": { "label": "Faith tradition" },
     "activity": { "label": "What the work is like" },
-    "show_only": "Show only",
-    "hide": "Hide"
+    "show_only": "Show only: {name}",
+    "hide": "Hide: {name}",
+    "show_only_group": "Show only",
+    "hide_group": "Hide",
+    "active_count": {"one": "{count} filter on", "other": "{count} filters on"},
+    "saved_only": "Saved shifts only"
   },
   "causes": {
     "food": "Food",
@@ -124,6 +129,12 @@
     "none": "No shifts match these filters.",
     "none_hint": "Try another day, or remove a filter."
   },
+  "home": {
+    "picks_heading": "This week's picks",
+    "picks_note": "Shifts with open spots, chosen by our team. No one pays to be picked.",
+    "tonight": "Tonight",
+    "tomorrow": "Tomorrow"
+  },
   "listing": {
     "hosted_by": "Hosted by {org}",
     "when": "When",
@@ -153,7 +164,7 @@
     "no_training": "No training needed",
     "clearances_required": "Background checks required",
     "group_friendly": "Good for groups",
-    "business_led_note": "A business organized this day. The business may count your work and its results as its own.",
+    "business_led_note": "A business organized this volunteer day. The business may count your work and its results as its own.",
     "spanish_spoken": "Spanish spoken here",
     "recurring": "Repeats on a schedule",
     "original_language": "Shown in the language the organization used.",
@@ -164,7 +175,18 @@
     "back": "Back to all shifts",
     "gone": "This listing is no longer on the calendar.",
     "add_to_calendar": "Add to my calendar",
-    "add_to_calendar_hint": "Downloads a calendar file for this shift."
+    "add_to_calendar_hint": "Downloads a calendar file for this shift.",
+    "date_time": "{date}. {time}",
+    "save": "Save: {title}",
+    "share": "Share: {title}",
+    "save_short": "Save",
+    "share_short": "Share",
+    "saved_note": "Saved on this device only.",
+    "share_copied": "Link copied.",
+    "share_failed": "Could not copy the link. Copy it from the address bar.",
+    "full": "Full",
+    "spots_left": {"one": "{count} spot left as of {day}", "other": "{count} spots left as of {day}"},
+    "spots_left_on": {"one": "{count} spot left as of {date}", "other": "{count} spots left as of {date}"}
   },
   "report": {
     "button": "Report a problem with this listing",
@@ -184,7 +206,10 @@
     "submit": "Send report",
     "cancel": "Cancel",
     "thanks": "Thank you. We received your report.",
-    "error": "We could not send your report. Please try again."
+    "error": "We could not send your report. Please try again.",
+    "mail_subject": "Problem with listing {id}",
+    "mail_body": "Listing: {url}\n\nWhat is wrong?\n",
+    "mail_note": "This opens an email to our team. Please do not include anyone's personal details."
   },
   "about": {
     "title": "About our listings",

@@ -126,6 +126,8 @@ export interface Translator {
   listName(list: NamedList, id: string | null | undefined): string;
   /** A date with the month written out, so it cannot be misread. */
   formatDate(date: Date | string): string;
+  /** The day of the week only, such as Monday or lunes. */
+  formatWeekday(date: Date | string): string;
   /** A clock time, such as 6:30 PM or 6:30 p. m. */
   formatTime(date: Date | string): string;
   /** A number written the way this language writes it. */
@@ -220,6 +222,8 @@ export function createI18n(settings: I18nSettings, catalogs: Record<string, Mess
           year: "numeric",
           timeZone: zone(),
         }).format(asDate(d)),
+      formatWeekday: (d) =>
+        new Intl.DateTimeFormat(lang, { weekday: "long", timeZone: zone() }).format(asDate(d)),
       formatTime: (d) =>
         new Intl.DateTimeFormat(lang, { hour: "numeric", minute: "2-digit", hourCycle, timeZone: zone() }).format(asDate(d)),
       formatNumber: (n) => numbers.format(n),

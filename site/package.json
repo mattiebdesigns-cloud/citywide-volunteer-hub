@@ -1,0 +1,33 @@
+{
+  "name": "citywide-volunteer-hub-site",
+  "private": true,
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "description": "Phase 1 calendar website for the Citywide Volunteer Hub (static, Astro).",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "build:test": "PV_TEST_BUILD=1 ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "check:licences": "node scripts/check-licences.mjs",
+    "check:strings": "node scripts/check-strings.mjs",
+    "test": "node --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "astro": "6.4.8",
+    "sharp": "file:vendor/no-sharp",
+    "typescript": "5.9.3"
+  },
+  "overrides": {
+    "sharp": "$sharp"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@types/node": "24.19.2"
+  }
+}

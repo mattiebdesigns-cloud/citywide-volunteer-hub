@@ -1,0 +1,36 @@
+---
+/** Page not found, in the city's default language, with a link to each language's calendar. */
+import Base from "../layouts/Base.astro";
+import { paths, siteData } from "../lib/site.ts";
+
+const { i18n } = siteData();
+const lang = i18n.defaultLanguage;
+const tr = i18n.translator(lang);
+const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.home(code)]));
+---
+
+<Base lang={lang} title={tr.t("not_found.title")} alternates={alternates}>
+  <div class="page">
+    <h1>{tr.t("not_found.title")}</h1>
+    <p>{tr.t("not_found.body")}</p>
+    <ul>
+      {
+        i18n.languages.map((code) => (
+          <li>
+            <a class="tap-link" href={paths.home(code)} lang={code}>
+              {i18n.translator(code).t("not_found.link")}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .tap-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+</style>

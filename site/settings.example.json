@@ -1,0 +1,24 @@
+{
+  "_about": "Example city settings for building the site with no private files. Philadelphia is only the example. A real city passes its own settings with PV_SETTINGS=path/to/settings.json (the private repo converts config/site.yml to JSON). Every key the site reads is here; see site/README.md.",
+  "site": {
+    "name": "Citywide Rewards",
+    "region": { "en": "Greater Philadelphia", "es": "Gran Filadelfia" },
+    "contact_email": "hello@example.org",
+    "timezone": "America/New_York"
+  },
+  "languages": {
+    "default": "en",
+    "available": ["en", "es"],
+    "es_reviewed_by_fluent_speaker": false
+  },
+  "areas": [
+    { "id": "philadelphia", "name": { "en": "Philadelphia", "es": "Filadelfia" }, "live": true },
+    { "id": "pa-suburbs", "name": { "en": "Pennsylvania suburbs", "es": "Suburbios de Pensilvania" }, "live": false }
+  ],
+  "time_of_day": { "morning": "05:00", "afternoon": "12:00", "evening": "17:00", "overnight": "22:00" },
+  "causes": ["food", "parks-and-trees", "animals", "youth", "housing", "elders", "civic-action", "education", "health", "clothing", "repair"],
+  "host_types": ["nonprofit", "government", "faith-based", "school-or-university", "mutual-aid", "business-led"],
+  "faith_traditions": ["christian", "muslim", "jewish", "buddhist", "hindu", "sikh", "interfaith", "spiritual", "other"],
+  "activities": ["outdoors", "indoors", "physical", "seated", "with-animals", "with-children", "kitchen", "remote"],
+  "features": { "campaigns": true }
+}

@@ -1,0 +1,42 @@
+---
+/**
+ * Small line icons, drawn for this project (MIT, like the rest of the repo).
+ * The drawings are on the page once, in <SvgSprite /> (in the layout);
+ * each icon only points to one.
+ * Icons are decorative: they always sit next to words, so screen readers skip
+ * them (aria-hidden). An icon never carries meaning on its own.
+ *
+ * <Icon name="clock" />
+ */
+import type { IconName } from "./icons";
+
+interface Props {
+  name: IconName;
+  /** Size in rem. Default 1.25 (20 px). */
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 1.25, class: className } = Astro.props;
+---
+
+<svg
+  class:list={["icon", className]}
+  style={size === 1.25 ? undefined : `--icon-size:${size}rem`}
+  viewBox="0 0 24 24"
+  aria-hidden="true"
+><use href={`#icon-${name}`} /></svg>
+
+<style is:global>
+  /* Global (not scoped) so each of the many icons on a page stays small. */
+  .icon {
+    flex: none;
+    width: var(--icon-size, 1.25rem);
+    height: var(--icon-size, 1.25rem);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>

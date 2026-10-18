@@ -1,0 +1,108 @@
+---
+/**
+ * A small label with an icon: listing type, how to join, cause, and tags
+ * such as "Organized by a business". The icon and the words carry the
+ * meaning together; colour only helps. The words come in `label`.
+ *
+ * <Pill kind="join" value={event.join_method} label={t(`filters.join.${event.join_method}`)} />
+ * <Pill kind="type" value={event.type} label={t(`filters.type.${event.type}`)} />
+ * <Pill kind="business" label={tr.listName("host_types", "business-led")} />
+ * <Pill icon="check" label={t("listing.no_training")} />
+ */
+import Icon from "./Icon.astro";
+import type { IconName } from "./icons";
+
+interface Props {
+  label: string;
+  /** What the pill describes. Picks the icon and the shape. */
+  kind?: "join" | "type" | "business" | "sensitive" | "tag";
+  /** For kind "join": drop_in | signup | application | unknown. For kind "type": service | training | campaign | protest_action. */
+  value?: string | null;
+  /** Override the icon. */
+  icon?: IconName;
+  /** "light" for the page; "on-band" for the dark band on a card. */
+  tone?: "light" | "on-band";
+  class?: string;
+}
+
+const { label, kind = "tag", value, icon, tone = "light", class: className } = Astro.props;
+
+const joinIcons: Record<string, IconName> = {
+  drop_in: "walk-in",
+  signup: "signup",
+  application: "apply",
+  unknown: "question",
+};
+const typeIcons: Record<string, IconName> = {
+  service: "service",
+  training: "training",
+  campaign: "campaign",
+  protest_action: "protest_action",
+};
+
+let iconName: IconName | undefined = icon;
+if (!iconName) {
+  if (kind === "join") iconName = joinIcons[value ?? "unknown"] ?? "question";
+  else if (kind === "type") iconName = typeIcons[value ?? ""] ?? undefined;
+  else if (kind === "business") iconName = "business";
+  else if (kind === "sensitive") iconName = "sensitive";
+}
+---
+
+<span class:list={["pill", `pill--${kind}`, `pill--${tone}`, className]} data-value={value ?? undefined}>
+  {iconName && <Icon name={iconName} size={1.125} />}
+  <span>{label}</span>
+</span>
+
+<style>
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: 2rem;
+    padding: var(--space-1) var(--space-3);
+    border: var(--border) solid var(--color-line);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--text-min);
+    font-weight: var(--weight-strong);
+    line-height: var(--leading-tight);
+    max-width: 100%;
+  }
+  /* Listing type: square corners, so it reads as a category, not a status. */
+  .pill--type {
+    border-radius: var(--radius-sm);
+  }
+  /* How to join: accent (coral) fill, the one fact every card must show. */
+  .pill--join.pill--light {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    border-color: var(--color-on-accent);
+  }
+  /* Business-led and sensitive: dashed border, so they stand out in grey-scale too. */
+  .pill--business,
+  .pill--sensitive {
+    border-style: dashed;
+    background: var(--color-notice-bg);
+    border-color: var(--color-notice-border);
+  }
+
+  /* On the dark band */
+  .pill--on-band {
+    background: transparent;
+    color: var(--color-on-band);
+    border-color: var(--color-on-band-muted);
+  }
+  .pill--join.pill--on-band {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    border-color: var(--color-accent);
+  }
+  .pill--business.pill--on-band,
+  .pill--sensitive.pill--on-band {
+    background: transparent;
+    color: var(--color-on-band);
+    border-color: var(--color-accent);
+  }
+</style>

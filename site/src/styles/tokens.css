@@ -1,0 +1,113 @@
+/*
+ * Design tokens for the calendar site (PROJECT.md sections 2 and 5).
+ * Every colour, size and space on the site comes from here, so a city can
+ * restyle its copy by changing this one file. See docs/design.md.
+ *
+ * Palette: navy and coral, picked by the owner on 2026-10-18 (QUESTIONS
+ * Q25/Q27). Contrast ratios are listed next to each pairing that carries
+ * text or a needed edge; all meet WCAG 2.1 AA (4.5:1 for text, 3:1 for
+ * borders and icons), most meet AAA (7:1).
+ */
+
+:root {
+  /* ---- Colour ------------------------------------------------------- */
+
+  /* Page */
+  --color-paper: #f8fafd;          /* page background, cool off-white */
+  --color-surface: #ffffff;        /* cards' text areas, sheets, pills on artwork */
+  --color-ink: #17202e;            /* body text: 15.7:1 on paper, 16.4:1 on white */
+  --color-ink-muted: #4a5568;      /* secondary text: 7.2:1 on paper, 7.5:1 on white */
+  --color-line: #7c8799;           /* borders that must be seen: 3.5:1 on paper, 3.6:1 on white */
+  --color-line-soft: #dde3ec;      /* dividers only, never the only sign of anything */
+
+  /* Brand */
+  --color-primary: #1f4e8c;        /* navy: buttons, links. White on it 8.3:1; it on paper 8.0:1 */
+  --color-primary-hover: #183e70;  /* white on it 10.7:1; it on paper 10.2:1 */
+  --color-on-primary: #ffffff;
+  --color-accent: #f08a6c;         /* coral: fills behind ink text (6.7:1), never text itself; only 2.4:1 on paper, so never the only edge of anything */
+  --color-on-accent: #17202e;
+
+  /* The solid band of text over cause artwork */
+  --color-band: #15294a;           /* white on it 14.5:1; coral on it 5.9:1 */
+  --color-on-band: #ffffff;
+  --color-on-band-muted: #d5deeb;  /* 10.7:1 on band */
+
+  /* Status. Always paired with an icon and words, never colour alone. */
+  --color-full-bg: #17202e;        /* "Full": white text on ink, 16.4:1 */
+  --color-full-text: #ffffff;
+  --color-spots-bg: #ffffff;       /* "6 spots left": ink on white, 16.4:1 */
+  --color-spots-text: #17202e;
+  --color-notice-bg: #fdece6;      /* business-led note, test banner. Ink on it 14.3:1 */
+  --color-notice-border: #a8432b;  /* 5.2:1 on the notice background */
+
+  /* Focus ring: dark outline with a white inner ring, visible on every background */
+  --color-focus: #17202e;
+  --color-focus-inner: #ffffff;
+  --color-focus-on-dark: #f08a6c;  /* used inside the dark band: 5.9:1 */
+
+  /* Cause artwork backgrounds (decorative only; text never sits on them) */
+  --art-food: #f6dcc0;
+  --art-parks-and-trees: #cfe5c8;
+  --art-animals: #f1e1c6;
+  --art-youth: #cfe0f2;
+  --art-housing: #f2d2c6;
+  --art-elders: #e6d9ef;
+  --art-civic-action: #f7e2a8;
+  --art-education: #d5e7e4;
+  --art-health: #f4d6da;
+  --art-clothing: #dcdcef;
+  --art-repair: #dde3e6;
+  --art-default: #e9e4d6;
+  --art-line: #17202e;             /* outlines in the drawings */
+  --art-fill: #1f4e8c;             /* main shapes (navy) */
+  --art-fill-2: #f08a6c;           /* second shapes (coral) */
+  --art-fill-3: #ffffff;           /* highlights */
+
+  /* ---- Type --------------------------------------------------------- */
+  /* System fonts: nothing to download, so the first screen shows fast. */
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-heading: var(--font-body);
+
+  /* Scale. The smallest size anywhere is 1rem (16 px); nothing goes below it. */
+  --text-min: 1rem;                /* 16 px: small print, pills, labels */
+  --text-body: 1.125rem;           /* 18 px: body text, readable at arm's length */
+  --text-lead: 1.25rem;            /* 20 px: card titles, intro lines */
+  --text-h3: 1.375rem;             /* 22 px */
+  --text-h2: 1.625rem;             /* 26 px */
+  --text-h1: clamp(1.875rem, 1.5rem + 2vw, 2.5rem); /* 30 to 40 px */
+
+  --weight-normal: 400;
+  --weight-strong: 650;
+  --weight-heavy: 750;
+  --leading-tight: 1.25;
+  --leading-body: 1.55;
+
+  /* ---- Space (4 px steps) ------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  /* ---- Shape and size ----------------------------------------------- */
+  --tap: 3rem;                     /* 48 px: every button and toggle. WCAG asks for 44. */
+  --radius-sm: 0.5rem;
+  --radius: 0.875rem;
+  --radius-pill: 999px;
+  --border: 2px;
+  --page-max: 40rem;               /* one column of cards, phone first */
+  --page-pad: var(--space-4);      /* 16 px each side at 360 px wide */
+  --shadow: 0 1px 2px rgb(23 32 46 / 12%), 0 4px 12px rgb(23 32 46 / 8%);
+
+  /* ---- Motion -------------------------------------------------------- */
+  --speed: 150ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --speed: 0ms;
+  }
+}

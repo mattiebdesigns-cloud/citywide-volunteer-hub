@@ -1,0 +1,245 @@
+---
+/**
+ * One listing in the home page's list (docs/briefs/phase1-home-page.md).
+ *
+ *   +------------------------------------+
+ *   | [6 spots left]          (heart)(share)
+ *   |        cause drawing               |
+ *   |+----------------------------------+|
+ *   || Title (link to the detail page)  ||   solid dark band, white text
+ *   || clock  Tue, Oct 20, 6:30 to 8:30 ||
+ *   || pin    Kensington                ||
+ *   || [Just show up] [Training]        ||
+ *   |+----------------------------------+|
+ *
+ * Every word is passed in, already translated (site/src/i18n/). The whole
+ * card is one link to the detail page; the heart and share buttons sit on
+ * top of it and work on their own.
+ *
+ * Heart and share do nothing by themselves. The page wires them, using the
+ * data attributes on the card: data-listing-id, and data-share-url on the
+ * share button. See docs/design.md.
+ */
+import CauseArt from "./CauseArt.astro";
+import Icon from "./Icon.astro";
+import IconButton from "./IconButton.astro";
+import Pill from "./Pill.astro";
+import SpotsBadge from "./SpotsBadge.astro";
+
+interface Props {
+  /** The listing's id, for saving on the device. */
+  id: string;
+  /** Link to our detail page for this listing. */
+  href: string;
+  /** The organization's own title, untranslated. */
+  title: string;
+  /** listing_language, so screen readers read the title in the right voice. */
+  titleLang?: string;
+  /** Day, date and time, already formatted, e.g. "Tuesday, October 20, 6:30 to 8:30 PM". */
+  when: string;
+  /** Start time as an ISO string, for the <time> element. */
+  datetime?: string;
+  /** Neighborhood or town. Leave empty when unknown. */
+  place?: string;
+  /** Cause id: picks the drawing. */
+  cause?: string | null;
+  /** join_method and its words ("Just show up"). Every card shows how to join. */
+  joinMethod: string;
+  joinLabel: string;
+  /** Listing type and its words. Leave out to hide (for example, for plain service shifts). */
+  type?: string;
+  typeLabel?: string;
+  /** "Organized by a business", for business-led listings only. */
+  businessLabel?: string;
+  /** Open spots, from SpotsBadge. Leave out when the organization gives no count. */
+  spots?: { label: string; full?: boolean };
+  /** Button labels with the {title} placeholder left open: t("listing.save"), t("listing.share").
+   *  The card fills in the title in its own language (titleLang). */
+  saveLabel: string;
+  shareLabel: string;
+  saved?: boolean;
+  /** Full address of the detail page, for sharing. */
+  shareUrl: string;
+  /** Heading level for the title: 2 on a plain list, 3 under day headings. */
+  headingLevel?: 2 | 3;
+  class?: string;
+}
+
+const {
+  id,
+  href,
+  title,
+  titleLang,
+  when,
+  datetime,
+  place,
+  cause,
+  joinMethod,
+  joinLabel,
+  type,
+  typeLabel,
+  businessLabel,
+  spots,
+  saveLabel,
+  shareLabel,
+  saved = false,
+  shareUrl,
+  headingLevel = 3,
+  class: className,
+} = Astro.props;
+
+const Heading = headingLevel === 2 ? "h2" : "h3";
+---
+
+<article class:list={["card", spots?.full && "card--full", className]} data-listing-id={id}>
+  <div class="card__art">
+    <CauseArt cause={cause} />
+  </div>
+
+  <div class="card__band">
+    <Heading class="card__title">
+      <a class="card__link" href={href} lang={titleLang}>{title}</a>
+    </Heading>
+    <p class="card__line">
+      <Icon name="clock" />
+      {datetime ? <time datetime={datetime}>{when}</time> : <span>{when}</span>}
+    </p>
+    {
+      place && (
+        <p class="card__line">
+          <Icon name="pin" />
+          <span>{place}</span>
+        </p>
+      )
+    }
+    <div class="card__pills">
+      <Pill kind="join" value={joinMethod} label={joinLabel} tone="on-band" />
+      {type && typeLabel && <Pill kind="type" value={type} label={typeLabel} tone="on-band" />}
+      {businessLabel && <Pill kind="business" label={businessLabel} tone="on-band" />}
+    </div>
+  </div>
+
+  {
+    spots && (
+      <div class="card__spots">
+        <SpotsBadge label={spots.label} full={spots.full} />
+      </div>
+    )
+  }
+
+  <div class="card__actions">
+    <IconButton icon="heart" label={saveLabel} title={title} titleLang={titleLang} pressed={saved} data-save-id={id} />
+    <IconButton
+      icon="share"
+      label={shareLabel}
+      title={title}
+      titleLang={titleLang}
+      data-share-url={shareUrl}
+      data-share-title={title}
+    />
+  </div>
+</article>
+
+<style>
+  .card {
+    position: relative; /* the link's cover (below) is measured from here */
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--color-band);
+    box-shadow: var(--shadow);
+  }
+
+  /* Picture area: 152 px tall on every screen, so the list scans evenly. */
+  .card__art {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    height: 9.5rem;
+  }
+
+  /* Solid band of real text over the bottom of the picture. */
+  .card__band {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-top: -1rem;
+    padding: var(--space-4);
+    background: var(--color-band);
+    color: var(--color-on-band);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .card__title {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-lead);
+    line-height: var(--leading-tight);
+  }
+  .card__link {
+    color: var(--color-on-band);
+    text-decoration: none;
+  }
+  .card__link:hover {
+    color: var(--color-on-band);
+    text-decoration: underline;
+  }
+  /* The whole card is the link. */
+  .card__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .card__link:focus-visible {
+    outline-color: var(--color-focus-on-dark);
+    box-shadow: none;
+  }
+  .card:has(.card__link:focus-visible) {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  .card__line {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-1);
+    color: var(--color-on-band-muted);
+    font-size: var(--text-min);
+  }
+  .card__line :global(.icon) {
+    margin-top: 0.1em;
+  }
+
+  .card__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+
+  .card__spots {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    justify-self: start;
+    margin: var(--space-3);
+    position: relative;
+    z-index: 2;
+  }
+  .card__actions {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    display: flex;
+    gap: var(--space-2);
+    margin: var(--space-2);
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Full listings stay on the calendar; the drawing fades so the badge leads. */
+  .card--full .card__art {
+    opacity: 0.55;
+  }
+</style>
