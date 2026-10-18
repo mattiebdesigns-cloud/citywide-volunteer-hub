@@ -1,5 +1,6 @@
 """Every Python package has an allowed licence (PROJECT.md section 3, rule 8;
-PSF-2.0 allowed by decision 0003).
+PSF-2.0 allowed by decision 0003; Python-2.0, BlueOak-1.0.0 and CC0-1.0 by the
+owner's answer to Q29, PROJECT.md v30).
 
 Identical in both repos. The lock-file check reads licences from pypi.org.
 Offline on a laptop it skips; in CI (where GitHub sets CI=true) it fails
@@ -51,6 +52,18 @@ def test_locked_packages_are_permissive():
         ("PSF-2.0", True),
         ("PSF-2.0 AND GPL-3.0", False),
         ("PSF-2.0 OR GPL-3.0-only", True),
+        ("Python-2.0", True),
+        ("BlueOak-1.0.0", True),
+        ("CC0-1.0", True),
+        ("MIT AND CC0-1.0", True),
+        ("BlueOak-1.0.0 AND MPL-2.0", False),
+        ("CC0-1.0 AND LGPL-2.1-or-later", False),
+        ("Python-2.0 AND AGPL-3.0-only", False),
+        ("GPL-3.0-only AND (MIT OR Apache-2.0)", False),
+        ("LGPL-3.0-only", False),
+        ("AGPL-3.0-only", False),
+        ("SSPL-1.0", False),
+        ("BUSL-1.1", False),
         ("GPL-3.0-only", False),
         ("MIT AND (GPL-2.0-only OR MPL-2.0)", False),
         ("GPL-2.0-only WITH Classpath-exception-2.0", False),
@@ -81,3 +94,22 @@ def test_without_expression_every_classifier_must_be_allowed():
 def test_missing_licence_fails():
     assert licence_check.judge(None, [], None)
     assert licence_check.judge(None, [], "UNKNOWN")
+
+
+def test_new_licences_by_classifier_and_blocked_ones_still_fail():
+    ok = [
+        "License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+        "License :: OSI Approved :: Python Software Foundation License",
+        "License :: OSI Approved :: Python License (CNRI Python License)",
+    ]
+    for classifier in ok:
+        assert licence_check.judge(None, [classifier], None) is None, classifier
+    assert licence_check.judge(None, [], "BlueOak-1.0.0") is None
+    blocked = [
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "License :: OSI Approved :: GNU Affero General Public License v3",
+    ]
+    for classifier in blocked:
+        assert licence_check.judge(None, [classifier], None), classifier

@@ -19,7 +19,7 @@ CI (`.github/workflows/ci.yml`) runs all four on every push and pull request.
 |---|---|
 | `test_event_schema.py` | Both schema files in `docs/` are valid. Every sample `events.json` matches the schema and has unique listing ids. The schema rejects listings it must reject (missing fields, guessed values, attendee lists, a protest action not marked sensitive). |
 | `test_repo_guards.py` | Nothing that belongs only to a city's private setup is in this repo, now or in its history: source lists, settings files, `.env` files, private folders. No key-shaped text in any file or commit. |
-| `test_licences.py` | Every Python package used is MIT, Apache-2.0, BSD, ISC or PSF-2.0. |
+| `test_licences.py` | Every Python package used is MIT, Apache-2.0, BSD, ISC, PSF-2.0, Python-2.0, BlueOak-1.0.0 or CC0-1.0 (MPL, LGPL, GPL, AGPL and source-available licences stay blocked). |
 | `test_workflows.py` | Every GitHub Action is pinned to a fixed version; no workflow runs fork code with this repo's permissions, grants write access, or reads a secret. |
 
 Paths in this repo must be on an allow list: `pvscrapers/`, `site/`, `tests/`, `.github/`, `docs/examples/`, `docs/EVENT-FORMAT.md`, `docs/design.md`, `docs/*.schema.json`, and the root files `README.md`, `LICENSE`, `CONTRIBUTING.md`, `CLAUDE.md`, `pyproject.toml`, `uv.lock`, `.gitignore`. Some names are blocked even inside those folders, including `site.yml`, `sources.yml` and any `.env` file. A sample settings file must therefore have another name, for example `site/site.example.yml`.

@@ -2,8 +2,10 @@
 
 The same file lives in `tests/guards/` of both repos; keep them identical.
 
-Allowed licences: MIT, Apache-2.0, BSD, ISC, PSF-2.0 (PSF-2.0 by the owner's
-decision 0003). Anything else fails, including a
+Allowed licences: MIT, Apache-2.0, BSD, ISC, PSF-2.0, Python-2.0, BlueOak-1.0.0
+and CC0-1.0 (PSF-2.0 by the owner's decision 0003; the last three by his answer
+to Q29, PROJECT.md v30 sections 3 and 14). MPL, LGPL, GPL, AGPL and
+source-available licences stay blocked. Anything else fails, including a
 package whose licence cannot be read. The fix for a failure is never to edit
 this file on your own: remove the package, or ask the coordinator, who routes
 it to the scraping and licence gatekeeper.
@@ -44,11 +46,23 @@ from pathlib import Path
 
 # SPDX ids that are allowed. Matched against the whole id.
 ALLOWED_IDS = re.compile(
-    r"^(MIT|MIT-0|Apache-2\.0|ISC|0BSD|BSD-[1-4]-Clause(-[A-Za-z]+)?|PSF-2\.0)$", re.IGNORECASE
+    r"^(MIT|MIT-0|Apache-2\.0|ISC|0BSD|BSD-[1-4]-Clause(-[A-Za-z]+)?|PSF-2\.0|Python-2\.0"
+    r"|BlueOak-1\.0\.0|CC0-1\.0)$",
+    re.IGNORECASE,
 )
 
 # For packages without an expression: words in a classifier or licence field.
-ALLOWED_WORDS = ("MIT", "Apache", "BSD", "ISC", "PSF", "Python Software Foundation")
+ALLOWED_WORDS = (
+    "MIT",
+    "Apache",
+    "BSD",
+    "ISC",
+    "PSF",
+    "Python Software Foundation",
+    "Python License",
+    "Blue ?Oak",  # a regular expression: "BlueOak" or "Blue Oak"
+    "CC0",
+)
 BLOCKED_WORDS = (
     "GPL",
     "AGPL",
@@ -261,7 +275,10 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Could not reach pypi.org to check {args[0]}: {error}")
             return 1
     if problems:
-        print("Packages without an allowed licence (MIT, Apache-2.0, BSD, ISC, PSF-2.0):")
+        print(
+            "Packages without an allowed licence (MIT, Apache-2.0, BSD, ISC, PSF-2.0, Python-2.0, "
+            "BlueOak-1.0.0, CC0-1.0):"
+        )
         for problem in problems:
             print(f"  - {problem}")
         return 1
