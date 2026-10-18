@@ -67,7 +67,12 @@
       "unknown": "Consultar con el organizador"
     },
     "no_training": "No requiere capacitación",
-    "spanish_spoken": "Se habla español"
+    "spanish_spoken": "Se habla español",
+    "host_type": { "label": "Quién lo organiza" },
+    "faith_tradition": { "label": "Tradición religiosa" },
+    "activity": { "label": "Cómo es el trabajo" },
+    "show_only": "Mostrar solo",
+    "hide": "Ocultar"
   },
   "causes": {
     "food": "Alimentos",
@@ -81,6 +86,35 @@
     "health": "Salud",
     "clothing": "Ropa",
     "repair": "Reparación"
+  },
+  "host_types": {
+    "nonprofit": "Organización sin fines de lucro",
+    "government": "Agencia de gobierno",
+    "faith-based": "Comunidad de fe",
+    "school-or-university": "Escuela o universidad",
+    "mutual-aid": "Ayuda mutua o grupo comunitario",
+    "business-led": "Organizado por una empresa"
+  },
+  "faith_traditions": {
+    "christian": "Cristiana",
+    "muslim": "Musulmana",
+    "jewish": "Judía",
+    "buddhist": "Budista",
+    "hindu": "Hindú",
+    "sikh": "Sij",
+    "interfaith": "Interreligiosa",
+    "spiritual": "Espiritual",
+    "other": "Otra tradición"
+  },
+  "activities": {
+    "outdoors": "Al aire libre",
+    "indoors": "Bajo techo",
+    "physical": "Trabajo físico (cargar cosas, estar de pie por horas)",
+    "seated": "Trabajo sentado",
+    "with-animals": "Con animales",
+    "with-children": "Con niños",
+    "kitchen": "Trabajo en cocina",
+    "remote": "Desde casa o en línea"
   },
   "results": {
     "count": {
@@ -119,6 +153,7 @@
     "no_training": "No requiere capacitación",
     "clearances_required": "Requiere verificación de antecedentes",
     "group_friendly": "Ideal para grupos",
+    "business_led_note": "Una empresa organizó esta jornada. La empresa puede presentar el trabajo que usted haga, y sus resultados, como logros propios.",
     "spanish_spoken": "Se habla español",
     "recurring": "Se repite con regularidad",
     "original_language": "Se muestra en el idioma que usó la organización.",

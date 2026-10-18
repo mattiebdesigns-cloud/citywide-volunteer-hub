@@ -5,7 +5,9 @@
 //   node site/src/i18n/check-keys.mjs --settings path/to/site.json
 // or with the environment variable I18N_SETTINGS=path/to/site.json.
 // Then every language in languages.available needs a file here, every cause id
-// needs a "causes.<id>" name, and every area needs a name in every language.
+// in causes, host_types, faith_traditions and activities needs a name in every
+// language file (for example "causes.<id>"), and every area needs a name in
+// every language.
 // With no settings file (as in the public repo) that part is skipped.
 // Exits 1, with a plain list of problems, when any language file:
 //   - is missing a key that en.json has, or has a key en.json does not have
@@ -34,6 +36,12 @@ if (settingsGiven && (!settingsPath || !settingsPath.trim() || settingsPath.star
 const positional = args.filter((_, n) => at < 0 || (n !== at && n !== at + 1));
 const dir = positional[0] ?? dirname(fileURLToPath(import.meta.url));
 const REFERENCE = "en";
+const NAMED_LISTS = [
+  ["causes", "cause"],
+  ["host_types", "host type"],
+  ["faith_traditions", "faith tradition"],
+  ["activities", "activity"],
+];
 const PLURALS = new Set(["zero", "one", "two", "few", "many", "other"]);
 const problems = [];
 
@@ -148,9 +156,11 @@ function checkSettings(path) {
     if (!files.includes(`${lang}.json`)) problems.push(`${where}: languages.available lists "${lang}" but there is no ${lang}.json`);
     else texts[lang] = load(`${lang}.json`);
   }
-  for (const id of settings?.causes ?? [])
-    for (const [lang, flat] of Object.entries(texts))
-      if (!flat[`causes.${id}`]) problems.push(`${lang}.json: no name for cause "${id}" (add "causes.${id}")`);
+  // Each settings list whose ids get their names from the language files.
+  for (const [list, what] of NAMED_LISTS)
+    for (const id of settings?.[list] ?? [])
+      for (const [lang, flat] of Object.entries(texts))
+        if (!flat[`${list}.${id}`]) problems.push(`${lang}.json: no name for ${what} "${id}" (add "${list}.${id}")`);
   for (const area of settings?.areas ?? []) {
     const name = area?.name;
     if (typeof name === "string" && name.trim()) continue;

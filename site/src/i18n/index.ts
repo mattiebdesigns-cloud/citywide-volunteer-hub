@@ -26,6 +26,12 @@ export interface I18nSettings {
   areas?: Array<{ id: string; name: LocalizedText; live?: boolean }>;
   /** Cause ids. `id` matches `cause` in each listing; names live in `causes.<id>` in the language files. */
   causes?: string[];
+  /** Who runs a shift (`host_type`). Names live in `host_types.<id>`. */
+  host_types?: string[];
+  /** Only for faith-based hosts (`faith_tradition`). Names live in `faith_traditions.<id>`. */
+  faith_traditions?: string[];
+  /** What the work is like (`activity`, any number). Names live in `activities.<id>`. */
+  activities?: string[];
   languages: {
     default: string;
     available: string[];
@@ -33,6 +39,9 @@ export interface I18nSettings {
     [key: string]: unknown;
   };
 }
+
+/** Settings lists whose names come from the language files, keyed by id. */
+export type NamedList = "causes" | "host_types" | "faith_traditions" | "activities";
 
 export type Vars = Record<string, string | number>;
 
@@ -113,6 +122,8 @@ export interface Translator {
   areaName(id: string | null | undefined): string;
   /** A cause's name in this language, from `causes.<id>` in the language files. Empty for null or an unknown id, so the page can skip it. */
   causeName(id: string | null | undefined): string;
+  /** A name from one of the settings lists named in the language files. Empty for null or an unknown id. */
+  listName(list: NamedList, id: string | null | undefined): string;
   /** A date with the month written out, so it cannot be misread. */
   formatDate(date: Date | string): string;
   /** A clock time, such as 6:30 PM or 6:30 p. m. */
@@ -168,6 +179,10 @@ export function createI18n(settings: I18nSettings, catalogs: Record<string, Mess
       return text === undefined ? key : fill(text, { ...builtIn, ...vars });
     };
 
+    function listName(list: NamedList, id: string | null | undefined): string {
+      return id && lookup(`${list}.${id}`) !== undefined ? t(`${list}.${id}`) : "";
+    }
+
     const pluralRules = new Intl.PluralRules(lang);
     const numbers = new Intl.NumberFormat(lang);
     const zone = (): string => {
@@ -195,7 +210,8 @@ export function createI18n(settings: I18nSettings, catalogs: Record<string, Mess
         const area = id ? settings.areas?.find((a) => a.id === id) : undefined;
         return area ? localize(area.name, lang, defaultLanguage) : "";
       },
-      causeName: (id) => (id && lookup(`causes.${id}`) !== undefined ? t(`causes.${id}`) : ""),
+      causeName: (id) => listName("causes", id),
+      listName,
       formatDate: (d) =>
         new Intl.DateTimeFormat(lang, {
           weekday: "long",

@@ -67,7 +67,12 @@
       "unknown": "Check with the organizer"
     },
     "no_training": "No training needed",
-    "spanish_spoken": "Spanish spoken here"
+    "spanish_spoken": "Spanish spoken here",
+    "host_type": { "label": "Who runs it" },
+    "faith_tradition": { "label": "Faith tradition" },
+    "activity": { "label": "What the work is like" },
+    "show_only": "Show only",
+    "hide": "Hide"
   },
   "causes": {
     "food": "Food",
@@ -81,6 +86,35 @@
     "health": "Health",
     "clothing": "Clothing",
     "repair": "Repair"
+  },
+  "host_types": {
+    "nonprofit": "Nonprofit",
+    "government": "Government agency",
+    "faith-based": "Faith community",
+    "school-or-university": "School or university",
+    "mutual-aid": "Mutual aid or community group",
+    "business-led": "Organized by a business"
+  },
+  "faith_traditions": {
+    "christian": "Christian",
+    "muslim": "Muslim",
+    "jewish": "Jewish",
+    "buddhist": "Buddhist",
+    "hindu": "Hindu",
+    "sikh": "Sikh",
+    "interfaith": "Interfaith",
+    "spiritual": "Spiritual",
+    "other": "Other tradition"
+  },
+  "activities": {
+    "outdoors": "Outdoors",
+    "indoors": "Indoors",
+    "physical": "Physical work (lifting, standing for hours)",
+    "seated": "Seated work",
+    "with-animals": "With animals",
+    "with-children": "With children",
+    "kitchen": "Kitchen work",
+    "remote": "From home or online"
   },
   "results": {
     "count": {
@@ -119,6 +153,7 @@
     "no_training": "No training needed",
     "clearances_required": "Background checks required",
     "group_friendly": "Good for groups",
+    "business_led_note": "A business organized this day. The business may count your work and its results as its own.",
     "spanish_spoken": "Spanish spoken here",
     "recurring": "Repeats on a schedule",
     "original_language": "Shown in the language the organization used.",
