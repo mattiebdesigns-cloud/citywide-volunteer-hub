@@ -393,3 +393,46 @@ def test_longest_rule_wins_and_allow_wins_ties():
 
 def test_empty_disallow_allows_everything():
     assert rules("User-agent: *\nDisallow:").allowed("https://x.org/anything")
+
+
+# Read-only facts for the run report: robots.txt read when, and the delay used.
+
+
+def test_robots_check_and_delay_are_reported():
+    from datetime import UTC, datetime
+
+    from pvscrapers.fetch import Fetcher, Response
+
+    def transport(url, headers, timeout, max_bytes):
+        if url.endswith("/robots.txt"):
+            return Response(url, 200, {}, b"User-agent: *\nCrawl-delay: 7\n")
+        return Response(url, 200, {}, b"ok")
+
+    when = datetime(2026, 10, 18, 18, 39, tzinfo=UTC)
+    fetcher = Fetcher(
+        "bot@example.org", transport=transport, sleep=lambda s: None, wall_clock=lambda: when
+    )
+    page = "https://site.example.org/cal"
+    assert fetcher.robots_check(page) is None
+    fetcher.fetch(page)
+    check = fetcher.robots_check(page)
+    assert (check.url, check.read_at, check.status) == (
+        "https://site.example.org/robots.txt",
+        when,
+        200,
+    )
+    assert fetcher.delay_seconds(page) == 7
+    assert fetcher.delay_seconds(page, extra_delay_seconds=10) == 10
+
+
+def test_missing_robots_is_reported_with_its_status_and_the_floor():
+    from pvscrapers.fetch import FLOOR_DELAY_SECONDS, Fetcher, Response
+
+    def transport(url, headers, timeout, max_bytes):
+        status = 404 if url.endswith("/robots.txt") else 200
+        return Response(url, status, {}, b"")
+
+    fetcher = Fetcher("bot@example.org", transport=transport, sleep=lambda s: None)
+    fetcher.fetch("https://site.example.org/cal")
+    assert fetcher.robots_check("https://site.example.org/x").status == 404
+    assert fetcher.delay_seconds("https://site.example.org/x") == FLOOR_DELAY_SECONDS

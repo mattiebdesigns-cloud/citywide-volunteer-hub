@@ -28,6 +28,7 @@ import urllib.error
 import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from email.message import Message
 from urllib.parse import urljoin, urlsplit
 
@@ -72,6 +73,15 @@ class Response:
             return self.body.decode(charset)
         except (LookupError, UnicodeDecodeError):
             return self.body.decode("utf-8", errors="replace")
+
+
+@dataclass(frozen=True)
+class RobotsCheck:
+    """When and how a site's robots.txt was read, for the run report. Read-only."""
+
+    url: str  # the robots.txt address finally read (after redirects)
+    read_at: datetime  # wall-clock time, UTC
+    status: int  # 200: rules found; 4xx: no robots.txt, so everything is allowed (RFC 9309)
 
 
 # A transport sends one GET request and returns the response without following
@@ -136,7 +146,9 @@ class Fetcher:
     timeout_seconds: float = 30.0
     max_bytes: int = 5_000_000
     max_redirects: int = 5
+    wall_clock: Callable[[], datetime] = lambda: datetime.now(UTC)
     _robots: dict[str, RobotsRules] = field(default_factory=dict, init=False, repr=False)
+    _robots_checked: dict[str, RobotsCheck] = field(default_factory=dict, init=False, repr=False)
     _last_request: dict[str, float] = field(default_factory=dict, init=False, repr=False)
     _user_agent: str = field(default="", init=False, repr=False)
 
@@ -190,6 +202,14 @@ class Fetcher:
         """The robots.txt rules already read for this address's site, if any."""
         return self._robots.get(_origin(url))
 
+    def robots_check(self, url: str) -> RobotsCheck | None:
+        """When and how this address's site robots.txt was read this run, if it was."""
+        return self._robots_checked.get(_origin(url))
+
+    def delay_seconds(self, url: str, *, extra_delay_seconds: float = 0.0) -> float:
+        """The gap this fetcher keeps between two requests to this address's site."""
+        return self._gap(_origin(url), extra_delay_seconds)
+
     # -- internals ----------------------------------------------------------
 
     @staticmethod
@@ -220,6 +240,7 @@ class Fetcher:
         else:
             raise FetchError(url, f"robots.txt could not be read (HTTP {response.status})")
         self._robots[origin] = rules
+        self._robots_checked[origin] = RobotsCheck(url, self.wall_clock(), response.status)
         return rules
 
     @staticmethod
