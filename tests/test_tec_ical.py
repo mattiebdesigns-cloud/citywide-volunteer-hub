@@ -308,3 +308,14 @@ def test_overrides_do_not_change_ids_or_drop_reports():
 def test_bad_override_keys_are_refused(changes):
     with pytest.raises(SourceError):
         run(feed(event()), **changes)
+
+
+def test_dropped_events_carry_their_own_categories():
+    """The run report checks a dropped event's own categories before naming it (8.1)."""
+    cancelled = event(uid="2@example.org", extra="STATUS:CANCELLED")
+    other = event(uid="3@example.org").replace("CATEGORIES:Volunteer,Free", "CATEGORIES:Hike")
+    result = run(feed(cancelled, other), require_categories=["Volunteer"])
+    assert [(d.reason, d.categories) for d in result.dropped] == [
+        ("cancelled", ["Volunteer", "Free"]),
+        ("not in required categories: Volunteer", ["Hike"]),
+    ]

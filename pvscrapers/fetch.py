@@ -17,7 +17,7 @@ What it promises (README ground rules 1 and 2):
   429) it stops and raises `Blocked`. It never retries, and never tries
   another way in. A robots.txt that cannot be read (server error, network
   failure) also stops the source, as RFC 9309 asks.
-- No retries at all: a failed fetch is reported, and the next nightly run tries again.
+- No retries at all: a failed fetch is reported, and the next scheduled run tries again.
 """
 
 from __future__ import annotations

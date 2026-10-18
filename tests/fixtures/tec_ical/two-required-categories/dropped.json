@@ -2,6 +2,10 @@
   {
     "title": "Service Oriented Singles",
     "start": "2026-11-21T13:00:00-05:00",
-    "reason": "not in required categories: Free"
+    "reason": "not in required categories: Free",
+    "categories": [
+      "21+",
+      "Volunteer"
+    ]
   }
 ]

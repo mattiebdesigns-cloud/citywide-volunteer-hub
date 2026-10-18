@@ -77,13 +77,16 @@ class SourceError(ValueError):
 class Dropped:
     """An event on the source page that was not turned into a listing, and why.
 
-    Holds only what the morning report needs: the title, the start as the
-    page gave it, and the reason. Never anything about people.
+    Holds only what the run report needs: the title, the start as the
+    page gave it, the reason, and the event's own category words (so the
+    report can check them before naming a sensitive event). Never anything
+    about people.
     """
 
     title: str
     start: str | None
     reason: str
+    categories: list[str] = field(default_factory=list)
 
 
 @dataclass

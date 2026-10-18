@@ -62,9 +62,24 @@ def parse_with_report(page_text: str, source: dict, fetched_at: datetime) -> Par
         title = _one_line(event.text("SUMMARY"))
         start_prop = event.first("DTSTART")
         start_text = start_prop.value.strip() if start_prop else None
+        categories = [
+            item for prop in event.all("CATEGORIES") for item in ical.split_list(prop.value)
+        ]
 
-        def drop(reason: str, title: str | None = title, start: str | None = start_text) -> None:
-            result.dropped.append(Dropped(title=title or "(no title)", start=start, reason=reason))
+        def drop(
+            reason: str,
+            title: str | None = title,
+            start: str | None = start_text,
+            categories: list[str] = categories,
+        ) -> None:
+            result.dropped.append(
+                Dropped(
+                    title=title or "(no title)",
+                    start=start,
+                    reason=reason,
+                    categories=list(categories),
+                )
+            )
 
         if not title:
             drop("no title")
@@ -89,9 +104,6 @@ def parse_with_report(page_text: str, source: dict, fetched_at: datetime) -> Par
         if (event.text("STATUS") or "").upper() == "CANCELLED":
             drop("cancelled", start=start_text)
             continue
-        categories = [
-            item for prop in event.all("CATEGORIES") for item in ical.split_list(prop.value)
-        ]
         missing = defaults.missing_categories(categories)
         if missing:
             drop(f"not in required categories: {', '.join(missing)}", start=start_text)
