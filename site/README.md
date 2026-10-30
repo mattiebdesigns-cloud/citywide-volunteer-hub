@@ -80,4 +80,15 @@ Rules the code follows:
 - **Areas appear in the area filter only when the settings mark them `live`**, and only when there are two or more.
 - **Where a shift is (decision 0013).** A card shows the section and neighborhood, such as "River Wards · Kensington"; only one known shows that one; neither shows the area name. Section names come from `sections` in the settings, like area names; with no `sections`, none are shown. The listing page lists address, neighborhood, section and area, skipping empty or repeated ones.
 - **Open spots** show only when the organization's page gave them: "Full", or "6 spots left as of last night". Nothing is estimated.
-- **No outside scripts, fonts or images.** No image processing either: `vendor/no-sharp` stands in for Astro's optional image package, whose image library has a licence this project does not allow.
+- **No outside scripts, fonts or images.**
+
+## Two packages replaced by empty stand-ins
+
+We use Astro 7 because it has the security fixes. Astro 7 brings two packages whose licences this project does not allow, so each is replaced by an empty stand-in in `vendor/`, through `overrides` in `package.json`:
+
+| Package | Licence | Why we can do without it |
+|---|---|---|
+| `sharp` (image library) | LGPL | The site processes no images; `astro.config.mjs` uses the pass-through image service. |
+| `lightningcss` (CSS tool inside Vite) | MPL-2.0 | `astro.config.mjs` tells Vite to handle CSS with PostCSS and not to minify it. The CSS ships unminified (about 16 KB before compression). |
+
+If anything ever calls a stand-in, the build stops with an error naming the setting to keep. `npm test` checks that the stand-ins are installed and that the settings are in place.

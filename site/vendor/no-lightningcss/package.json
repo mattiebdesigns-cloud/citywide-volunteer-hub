@@ -1,0 +1,7 @@
+{
+  "name": "lightningcss",
+  "version": "0.0.0-not-installed",
+  "description": "Stand-in for 'lightningcss', which Vite 8 lists as a dependency. Its licence is MPL-2.0, which this project does not allow (PROJECT.md section 3). The site does not use it: astro.config.mjs tells Vite to handle CSS with PostCSS and not to minify CSS. If anything ever calls it, the build stops with an error.",
+  "license": "MIT",
+  "main": "index.js"
+}

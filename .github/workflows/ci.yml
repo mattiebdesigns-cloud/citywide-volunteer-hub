@@ -1,6 +1,6 @@
 # CI for the public repo (PROJECT.md sections 3, 13 and 15 step 4).
 # Runs on every push and pull request: lint, tests, event-schema check,
-# English/Spanish key check,
+# English/Spanish key check, the site's npm licence check, tests and type check,
 # licence check, secret scan, and the check that no private file is here.
 # Uses no secrets. Actions are pinned to full commit ids (tag in the comment).
 name: CI
@@ -54,3 +54,42 @@ jobs:
       - name: Interface text check (English and Spanish have the same keys)
         # Owned by pv-languages. Plain Node, no packages; Node comes with the runner.
         run: node site/src/i18n/check-keys.mjs
+
+  site:
+    name: Calendar site (npm licences, tests, type check)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Node (version from site/.nvmrc; the site needs 22.12 or newer)
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: site/.nvmrc
+
+      - name: Install the site's packages exactly as locked
+        # --ignore-scripts: no package's own install code runs here. Only
+        # esbuild (works without it) and fsevents (Mac only) have any.
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: No known high or critical security flaw in any npm package
+        # Separate from the install so a flaw fails CI with a clear step name.
+        # Reads the public advisory database; needs no key.
+        run: npm audit --audit-level=high
+
+      - name: Every npm package has an allowed licence
+        run: npm run check:licences
+
+      - name: Site tests
+        run: npm test
+
+      - name: Type and template check
+        env:
+          ASTRO_TELEMETRY_DISABLED: "1"
+        run: npm run check

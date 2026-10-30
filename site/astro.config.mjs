@@ -28,4 +28,8 @@ export default defineConfig({
   // No image processing, so the LGPL image library is never needed (see vendor/no-sharp).
   image: { service: passthroughImageService() },
   devToolbar: { enabled: false },
+  // CSS through PostCSS, not minified: Vite never calls lightningcss (MPL-2.0),
+  // which is replaced by an empty stand-in (vendor/no-lightningcss). Changing
+  // either setting makes the build stop with an error. tests/build-guards.test.ts checks both.
+  vite: { css: { transformer: "postcss" }, build: { cssMinify: false } },
 });

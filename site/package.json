@@ -19,12 +19,14 @@
     "test": "node --test tests/*.test.ts"
   },
   "dependencies": {
-    "astro": "6.4.8",
+    "astro": "7.4.0",
     "sharp": "file:vendor/no-sharp",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "lightningcss": "file:vendor/no-lightningcss"
   },
   "overrides": {
-    "sharp": "$sharp"
+    "sharp": "$sharp",
+    "lightningcss": "$lightningcss"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
