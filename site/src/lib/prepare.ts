@@ -31,6 +31,9 @@ export function checkSettings(settings: SiteSettings, source: string): void {
   }
   if (!Array.isArray(settings?.areas)) problems.push("areas is missing");
   if (!Array.isArray(settings?.causes)) problems.push("causes is missing");
+  if (settings?.sections !== undefined && !Array.isArray(settings.sections)) {
+    problems.push("sections must be a list (or left out)");
+  }
   for (const name of ["morning", "afternoon", "evening", "overnight"] as const) {
     if (!settings?.time_of_day?.[name]) problems.push(`time_of_day.${name} is missing`);
   }

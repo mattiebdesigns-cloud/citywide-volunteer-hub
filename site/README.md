@@ -22,7 +22,7 @@ All optional. Relative paths are read from the folder you run the command in.
 |---|---|---|
 | `PV_EVENTS` | The events file (`docs/EVENT-FORMAT.md`) | `../docs/examples/events.sample.json` |
 | `PV_SETTINGS` | The city settings, as JSON | `settings.example.json` |
-| `PV_SITE_URL` | The site's public address, for full links | none |
+| `PV_SITE_URL` | The site's public address, for full links and link previews (below) | none |
 | `PV_TEST_BUILD` | `1` makes a test build (below) | off |
 
 Example, with a city's own files:
@@ -39,12 +39,20 @@ A city keeps its settings in its own private place. If they are in YAML, convert
 
 - a "Test version" line at the top of every page;
 - `noindex, nofollow` on every page;
-- a `robots.txt` that asks every search engine to stay out.
+- a `robots.txt` that lets in only Facebook's link-preview bot (`facebookexternalhit`) and asks every other crawler to stay out (decision 0014).
+
+A normal build's `robots.txt` lets every crawler in.
+
+### Link previews
+
+When someone shares a link on Facebook or a similar site, the post shows a picture, a title and a short description (decision 0014). Every page carries these tags (`og:*` and `twitter:card`) in its own language. The home page uses the site's name and `og.description`. A listing page uses exactly the home page's preview; only `og:url` points at the listing. No listing's title, date, organization or picture ever goes into a preview (owner, Q38). The pictures are `public/og/en.png` and `public/og/es.png`, 1200 × 630 px.
+
+**Set `PV_SITE_URL` for previews to show a picture.** Facebook needs a full web address for the picture and the page. Without `PV_SITE_URL`, the build leaves out `og:image` and `og:url`, and a shared link shows text only.
 
 ## Checks
 
 ```sh
-npm test               # logic: time of day, day filters, campaign switch, open spots, calendar file
+npm test               # logic (time of day, filters, campaign switch, open spots, calendar file) and built pages (link previews, robots.txt, place line)
 npm run check          # TypeScript and Astro type check
 npm run check:licences # every npm package has an allowed licence (MIT, Apache-2.0, BSD, ISC, PSF-2.0, Python-2.0, BlueOak-1.0.0, CC0-1.0)
 npm run check:strings  # after a build: any interface text missing from src/i18n/
@@ -70,5 +78,6 @@ Rules the code follows:
 - **Report a problem** opens the visitor's email app, addressed to `site.contact_email`. The subject names the listing's id, never its title.
 - **Campaign listings exist only when `features.campaigns` is true.** With it false, no campaign listing, filter choice or label is in the build.
 - **Areas appear in the area filter only when the settings mark them `live`**, and only when there are two or more.
+- **Where a shift is (decision 0013).** A card shows the section and neighborhood, such as "River Wards · Kensington"; only one known shows that one; neither shows the area name. Section names come from `sections` in the settings, like area names; with no `sections`, none are shown. The listing page lists address, neighborhood, section and area, skipping empty or repeated ones.
 - **Open spots** show only when the organization's page gave them: "Full", or "6 spots left as of last night". Nothing is estimated.
 - **No outside scripts, fonts or images.** No image processing either: `vendor/no-sharp` stands in for Astro's optional image package, whose image library has a licence this project does not allow.

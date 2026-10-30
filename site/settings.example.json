@@ -15,6 +15,16 @@
     { "id": "philadelphia", "name": { "en": "Philadelphia", "es": "Filadelfia" }, "live": true },
     { "id": "pa-suburbs", "name": { "en": "Pennsylvania suburbs", "es": "Suburbios de Pensilvania" }, "live": false }
   ],
+  "sections": [
+    { "id": "center-city", "area": "philadelphia", "name": { "en": "Center City", "es": "Center City" } },
+    { "id": "north", "area": "philadelphia", "name": { "en": "North Philly", "es": "Norte de Filadelfia" } },
+    { "id": "river-wards", "area": "philadelphia", "name": { "en": "River Wards", "es": "River Wards" } },
+    { "id": "northeast", "area": "philadelphia", "name": { "en": "Northeast Philly", "es": "Noreste de Filadelfia" } },
+    { "id": "northwest", "area": "philadelphia", "name": { "en": "Northwest Philly", "es": "Noroeste de Filadelfia" } },
+    { "id": "west", "area": "philadelphia", "name": { "en": "West Philly", "es": "Oeste de Filadelfia" } },
+    { "id": "southwest", "area": "philadelphia", "name": { "en": "Southwest Philly", "es": "Suroeste de Filadelfia" } },
+    { "id": "south", "area": "philadelphia", "name": { "en": "South Philly", "es": "Sur de Filadelfia" } }
+  ],
   "time_of_day": { "morning": "05:00", "afternoon": "12:00", "evening": "17:00", "overnight": "22:00" },
   "causes": ["food", "parks-and-trees", "animals", "youth", "housing", "elders", "civic-action", "education", "health", "clothing", "repair"],
   "host_types": ["nonprofit", "government", "faith-based", "school-or-university", "mutual-aid", "business-led"],

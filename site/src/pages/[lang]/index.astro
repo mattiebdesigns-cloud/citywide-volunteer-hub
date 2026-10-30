@@ -8,18 +8,18 @@ import Base from "../../layouts/Base.astro";
 import FilterPanel from "../../components/FilterPanel.astro";
 import ListingCard from "../../components/ui/ListingCard.astro";
 import { languagePaths, paths, siteData, translator } from "../../lib/site.ts";
-import { businessLabel, joinLabel, placeText, spotsLabel, typeLabel, whenText } from "../../lib/words.ts";
+import { businessLabel, joinLabel, placeSpoken, placeText, spotsLabel, typeLabel, whenText } from "../../lib/words.ts";
 
 export const getStaticPaths = languagePaths;
 
 const { lang } = Astro.params as { lang: string };
-const { i18n, listings, builtAt } = siteData();
+const { i18n, listings, builtAt, settings } = siteData();
 const tr = translator(lang);
 const t = tr.t;
 const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.home(code)]));
 ---
 
-<Base lang={lang} alternates={alternates} filters>
+<Base lang={lang} alternates={alternates} path={paths.home(lang)} filters>
   <div class="page results">
     <h1 id="results-heading" class="results__heading" tabindex="-1">{t("filters.heading")}</h1>
   </div>
@@ -65,7 +65,8 @@ const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.
               titleLang={e.listing_language}
               when={whenText(tr, e)}
               datetime={e.start}
-              place={placeText(tr, e)}
+              place={placeText(tr, e, settings)}
+              placeSpoken={placeSpoken(tr, e, settings)}
               cause={e.cause}
               joinMethod={e.join_method}
               joinLabel={joinLabel(tr, e)}

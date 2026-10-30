@@ -97,6 +97,9 @@ BAD_LISTINGS = {
     "full listing with spots left": lambda e: e.update(spots_left=2, spots_total=10, full=True),
     "negative spots_left": lambda e: e.update(spots_left=-1, spots_total=10, full=False),
     "spots_total of 0": lambda e: e.update(spots_left=0, spots_total=0, full=False),
+    # Section (decision 0013; PROJECT.md 4).
+    "section typed as a place name": lambda e: e.update(section="River Wards"),
+    "section as an empty string": lambda e: e.update(section=""),
 }
 
 # Each case changes a valid listing in a way the schema must still accept.
@@ -123,6 +126,9 @@ GOOD_LISTINGS = {
     "ordinary listing full with 0 left": lambda e: e.update(
         sensitive=False, spots_left=0, spots_total=10, full=True
     ),
+    # Section is optional so older files still pass (decision 0013).
+    "section left out": lambda e: e.pop("section", None),
+    "section null": lambda e: e.update(section=None),
 }
 
 

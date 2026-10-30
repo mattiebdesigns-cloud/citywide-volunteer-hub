@@ -15,6 +15,8 @@ export interface Listing {
   end: string | null;
   address: string | null;
   area: string;
+  /** Section id from settings `sections` (decision 0013); null or missing when unknown. */
+  section?: string | null;
   neighborhood_or_town: string | null;
   cause: string | null;
   type: ListingType;
@@ -55,6 +57,8 @@ export interface SiteSettings extends I18nSettings {
     [key: string]: unknown;
   };
   areas: Array<{ id: string; name: LocalizedText; live?: boolean }>;
+  /** Broad parts of an area, such as River Wards (decision 0013). Missing: no section names are shown. */
+  sections?: Array<{ id: string; area: string; name: LocalizedText }>;
   time_of_day: Record<TimeOfDay, string>;
   causes: string[];
   host_types?: string[];

@@ -3,8 +3,8 @@
 // Build-time inputs, all optional:
 //   PV_EVENTS      path to the events file   (default: ../docs/examples/events.sample.json)
 //   PV_SETTINGS    path to the city settings (default: settings.example.json)
-//   PV_SITE_URL    the site's public address, e.g. https://example.org (used for full links)
-//   PV_TEST_BUILD  1 for a test build: "Test version" line, noindex, robots.txt blocks everything
+//   PV_SITE_URL    the site's public address, e.g. https://example.org (full links; link-preview picture)
+//   PV_TEST_BUILD  1 for a test build: "Test version" line, noindex, robots.txt lets in only Facebook's preview bot
 // Relative paths are read from the folder you run the command in.
 import { defineConfig, passthroughImageService } from "astro/config";
 import { fileURLToPath } from "node:url";

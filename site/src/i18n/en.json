@@ -139,6 +139,8 @@
     "hosted_by": "Hosted by {org}",
     "when": "When",
     "where": "Where",
+    "place_pair": "{section} · {neighborhood}",
+    "place_pair_spoken": "{section}, {neighborhood}",
     "time_range": "{start} to {end}",
     "starts_at": "Starts {start}",
     "ends_next_day": "Ends the next day",
@@ -232,6 +234,12 @@
     "success_confirm": "Thank you. Check your email to confirm your sign-up.",
     "invalid": "Enter an email address like name@example.com.",
     "error": "Something went wrong. Please try again."
+  },
+  "og": {
+    "headline": "Volunteer shifts across {city}",
+    "tagline": "Find one near you.",
+    "description": "Volunteer shifts across {city}, all in one calendar.",
+    "image_alt": "The words “Volunteer shifts across {city}” and “Find one near you.” beside a map of {city} divided into its sections."
   },
   "not_found": {
     "title": "Page not found",

@@ -10,6 +10,7 @@ import SvgSprite from "../components/ui/SvgSprite.astro";
 import TestBanner from "../components/ui/TestBanner.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import PreviewTags from "../components/PreviewTags.astro";
 import { siteData, translator } from "../lib/site.ts";
 
 interface Props {
@@ -22,9 +23,11 @@ interface Props {
   alternates: Record<string, string>;
   /** Show the filters button in the header (home page only). */
   filters?: boolean;
+  /** This page's path, for the link-preview address (decision 0014). */
+  path: string;
 }
 
-const { lang, title, alternates, filters = false } = Astro.props;
+const { lang, title, alternates, filters = false, path } = Astro.props;
 const { testBuild, siteUrl, settings, listings } = siteData();
 // Every listing in this build and when it is over, so the browser can clear
 // saved shifts that have ended (owner, Q32). Ids are letters, digits, - and _.
@@ -44,6 +47,7 @@ const absolute = (path: string) => (siteUrl ? siteUrl + path : path);
     <meta name="description" content={tr.t("site.description")} />
     {testBuild && <meta name="robots" content="noindex, nofollow" />}
     <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <PreviewTags lang={lang} path={path} />
     {
       Object.entries(alternates).map(([code, href]) => (
         <link rel="alternate" hreflang={code} href={absolute(href)} />

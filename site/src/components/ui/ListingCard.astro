@@ -41,6 +41,8 @@ interface Props {
   datetime?: string;
   /** Neighborhood or town. Leave empty when unknown. */
   place?: string;
+  /** What a screen reader says instead of `place`, e.g. "River Wards, Kensington". Leave empty to read `place` as is. */
+  placeSpoken?: string;
   /** Cause id: picks the drawing. */
   cause?: string | null;
   /** join_method and its words ("Just show up"). Every card shows how to join. */
@@ -73,6 +75,7 @@ const {
   when,
   datetime,
   place,
+  placeSpoken,
   cause,
   joinMethod,
   joinLabel,
@@ -108,7 +111,14 @@ const Heading = headingLevel === 2 ? "h2" : "h3";
       place && (
         <p class="card__line">
           <Icon name="pin" />
-          <span>{place}</span>
+          {placeSpoken ? (
+            <>
+              <span aria-hidden="true">{place}</span>
+              <span class="sr-only">{placeSpoken}</span>
+            </>
+          ) : (
+            <span>{place}</span>
+          )}
         </p>
       )
     }

@@ -6,7 +6,7 @@
 // or with the environment variable I18N_SETTINGS=path/to/site.json.
 // Then every language in languages.available needs a file here, every cause id
 // in causes, host_types, faith_traditions and activities needs a name in every
-// language file (for example "causes.<id>"), and every area needs a name in
+// language file (for example "causes.<id>"), and every area and section needs a name in
 // every language.
 // With no settings file (as in the public repo) that part is skipped.
 // Exits 1, with a plain list of problems, when any language file:
@@ -14,6 +14,7 @@
 //   - has an empty value or a value that is not text
 //   - uses different {placeholders} from en.json for the same key
 //   - lacks a plural form (keys ending .one, .other, ...) that it needs
+//   - has a "·" in any og.* (link preview) value
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -101,6 +102,13 @@ if (!files.includes(`${REFERENCE}.json`)) {
 }
 const ref = split(load(`${REFERENCE}.json`));
 
+// Link-preview text (og.*, decision 0014) is read aloud by screen readers on
+// other sites, which skip " · " or read it out loud. Use words or a period.
+for (const file of files)
+  for (const [key, value] of Object.entries(load(file)))
+    if (key.startsWith("og.") && value.includes("·"))
+      problems.push(`${file}: "${key}" contains " · " (screen readers skip it or read it aloud; use words or a period)`);
+
 for (const file of files.filter((f) => f !== `${REFERENCE}.json`)) {
   const lang = file.replace(/\.json$/, "");
   const cur = split(load(file));
@@ -135,7 +143,7 @@ for (const file of files.filter((f) => f !== `${REFERENCE}.json`)) {
 }
 
 if (settingsPath) checkSettings(settingsPath);
-else console.log("No settings file given: skipping the cause and area name check.");
+else console.log("No settings file given: skipping the cause, area and section name check.");
 
 function checkSettings(path) {
   const where = `settings (${path})`;
@@ -161,16 +169,25 @@ function checkSettings(path) {
     for (const id of settings?.[list] ?? [])
       for (const [lang, flat] of Object.entries(texts))
         if (!flat[`${list}.${id}`]) problems.push(`${lang}.json: no name for ${what} "${id}" (add "${list}.${id}")`);
-  for (const area of settings?.areas ?? []) {
-    const name = area?.name;
-    if (typeof name === "string" && name.trim()) continue;
-    if (!name || typeof name !== "object") {
-      problems.push(`${where}: area "${area?.id}" has no name`);
+  // Areas and sections (decision 0013) carry their names in the settings file.
+  for (const [list, what] of [["areas", "area"], ["sections", "section"]]) {
+    const items = settings?.[list];
+    if (items === undefined || items === null) continue;
+    if (!Array.isArray(items)) {
+      problems.push(`${where}: ${list} must be a list`);
       continue;
     }
-    for (const lang of available)
-      if (typeof name[lang] !== "string" || !name[lang].trim())
-        problems.push(`${where}: area "${area?.id}" has no ${lang} name`);
+    for (const item of items) {
+      const name = item?.name;
+      if (typeof name === "string" && name.trim()) continue;
+      if (!name || typeof name !== "object") {
+        problems.push(`${where}: ${what} "${item?.id}" has no name`);
+        continue;
+      }
+      for (const lang of available)
+        if (typeof name[lang] !== "string" || !name[lang].trim())
+          problems.push(`${where}: ${what} "${item?.id}" has no ${lang} name`);
+    }
   }
 }
 

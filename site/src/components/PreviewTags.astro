@@ -1,0 +1,35 @@
+---
+/**
+ * Link-preview tags for Facebook and similar sites (decision 0014, owner Q38).
+ * Every page, listing pages included, gets the home page's preview in its
+ * language: the site's name, og.description and the site picture. No
+ * listing's title, date, organization or image ever goes into a preview, so
+ * there is deliberately no way to pass them in. Only og:url is the page's own.
+ */
+import { cityName, previewTags } from "../lib/og.ts";
+import { siteData } from "../lib/site.ts";
+
+interface Props {
+  lang: string;
+  /** This page's path, such as /en/ or /en/listing/abc/. */
+  path: string;
+}
+
+const { lang, path } = Astro.props;
+const { i18n, settings, siteUrl } = siteData();
+const tr = i18n.translator(lang);
+const city = cityName(tr, settings);
+const siteName = tr.setting(settings.site.name);
+const tags = previewTags({
+  lang,
+  languages: i18n.languages,
+  siteName,
+  title: siteName,
+  description: tr.t("og.description", { city }),
+  imageAlt: tr.t("og.image_alt", { city }),
+  path,
+  siteUrl,
+});
+---
+
+{tags.map((m) => (m.attr === "property" ? <meta property={m.key} content={m.content} /> : <meta name={m.key} content={m.content} />))}

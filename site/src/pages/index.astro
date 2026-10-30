@@ -8,6 +8,7 @@
 import "../styles/global.css";
 import SvgSprite from "../components/ui/SvgSprite.astro";
 import TestBanner from "../components/ui/TestBanner.astro";
+import PreviewTags from "../components/PreviewTags.astro";
 import { paths, siteData } from "../lib/site.ts";
 import { STORAGE_KEY } from "../i18n/index.ts";
 
@@ -25,6 +26,7 @@ const config = { available: i18n.languages, fallback: i18n.defaultLanguage, home
     <title>{tr.setting(settings.site.name)}</title>
     <meta name="description" content={tr.t("site.description")} />
     {testBuild && <meta name="robots" content="noindex, nofollow" />}
+    <PreviewTags lang={i18n.defaultLanguage} path="/" />
     {i18n.languages.map((code) => <link rel="alternate" hreflang={code} href={homes[code]} />)}
     <script is:inline define:vars={{ config }}>
       (function () {

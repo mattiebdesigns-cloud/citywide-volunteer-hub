@@ -15,7 +15,7 @@ import SpotsBadge from "../../../components/ui/SpotsBadge.astro";
 import { buildIcs } from "../../../lib/ics.ts";
 import { paths, siteData, translator } from "../../../lib/site.ts";
 import type { PreparedListing } from "../../../lib/types.ts";
-import { joinLabel, spotsLabel, timeText, typeLabel } from "../../../lib/words.ts";
+import { joinLabel, spotsLabel, timeText, typeLabel, whereLines } from "../../../lib/words.ts";
 
 export function getStaticPaths() {
   const { i18n, listings } = siteData();
@@ -31,7 +31,7 @@ const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.
 
 const spots = spotsLabel(tr, e, builtAt);
 const type = typeLabel(tr, e);
-const where = [e.address, e.neighborhood_or_town, tr.areaName(e.area)].filter((x): x is string => Boolean(x));
+const where = whereLines(tr, e, settings);
 const cause = tr.causeName(e.cause);
 const host = tr.listName("host_types", e.host_type);
 const faith = tr.listName("faith_traditions", e.faith_tradition);
@@ -64,7 +64,7 @@ const reportHref =
   `&body=${encodeURIComponent(t("report.mail_body", { url: pageUrl }))}`;
 ---
 
-<Base lang={lang} title={e.title} alternates={alternates}>
+<Base lang={lang} title={e.title} alternates={alternates} path={paths.listing(lang, e.id)}>
   <div class="page listing-page">
     <p class="listing-page__back"><a class="tap-link" href={paths.home(lang)}>{t("listing.back")}</a></p>
 

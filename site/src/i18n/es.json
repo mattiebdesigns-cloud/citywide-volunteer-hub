@@ -139,6 +139,8 @@
     "hosted_by": "Organiza: {org}",
     "when": "Cuándo",
     "where": "Dónde",
+    "place_pair": "{section} · {neighborhood}",
+    "place_pair_spoken": "{section}, {neighborhood}",
     "time_range": "De {start} a {end}",
     "starts_at": "Inicio: {start}",
     "ends_next_day": "Termina al día siguiente",
@@ -232,6 +234,12 @@
     "success_confirm": "Gracias. Revise su correo para confirmar su suscripción.",
     "invalid": "Escriba un correo electrónico como nombre@ejemplo.com.",
     "error": "Algo salió mal. Inténtelo de nuevo."
+  },
+  "og": {
+    "headline": "Turnos de voluntariado en todo {city}",
+    "tagline": "Encuentre uno cerca de usted.",
+    "description": "Turnos de voluntariado en todo {city}, reunidos en un solo calendario.",
+    "image_alt": "Las frases “Turnos de voluntariado en todo {city}” y “Encuentre uno cerca de usted.” junto a un mapa de {city} dividido en sus secciones."
   },
   "not_found": {
     "title": "Página no encontrada",

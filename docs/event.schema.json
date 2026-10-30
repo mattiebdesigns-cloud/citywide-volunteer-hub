@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:citywide-volunteer-hub:schema:event",
   "title": "Volunteer listing",
-  "description": "One volunteer shift or event in the shared event format. Plain-language guide: docs/EVENT-FORMAT.md. Unknown values: join_method and spanish_spoken use the string \"unknown\"; every other field that may be unknown uses null (host_type, faith_tradition and activity included). A field never has two ways to say unknown. The open-spots fields (spots_left, spots_total, full) and the tag fields (host_type, faith_tradition, activity) are optional so older files still validate; new output should always write them (null, or false for full, when the page shows nothing).",
+  "description": "One volunteer shift or event in the shared event format. Plain-language guide: docs/EVENT-FORMAT.md. Unknown values: join_method and spanish_spoken use the string \"unknown\"; every other field that may be unknown uses null (section, host_type, faith_tradition and activity included). A field never has two ways to say unknown. The open-spots fields (spots_left, spots_total, full), the tag fields (host_type, faith_tradition, activity) and section are optional so older files still validate; new output should always write them (null, or false for full, when the page shows nothing).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -68,8 +68,15 @@
       "description": "Area id from the city's own settings file (areas[].id). Never a free-typed place name.",
       "$ref": "#/$defs/slug"
     },
+    "section": {
+      "description": "Section id from the city's own settings file (sections[].id): a broad part of the area, for example river-wards. Filled from the address's ZIP code using the city's ZIP table, never guessed. null or left out when not known. Optional so older files still validate.",
+      "oneOf": [
+        { "$ref": "#/$defs/slug" },
+        { "type": "null" }
+      ]
+    },
     "neighborhood_or_town": {
-      "description": "Neighborhood or town, finer than area. null when not known.",
+      "description": "Neighborhood or town, finer than area. A value the source gives wins; otherwise the pipeline may fill it from the city's ZIP table. null when not known.",
       "type": ["string", "null"],
       "minLength": 1
     },

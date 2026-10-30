@@ -143,6 +143,10 @@ The "Test version" strip at the top of every page of a test build (decision 0009
 ### `Icon`
 Small line icons drawn for this project, listed in `icons.ts` (needs `SvgSprite` on the page). Always next to words, so they are hidden from screen readers.
 
+## Link-preview picture (decision 0014)
+
+`site/public/og/en.png` and `es.png`, 1200 x 630, about 85 KB each: the headline (white, 80 px heavy, 14.5:1) and tagline (coral, 42 px bold, 5.9:1) on the band navy `#15294a`, beside a stylized map of the city's eight sections (pale blues, Center City in coral, the Schuylkill as a gap, the Delaware as a line, five coral pins). No labels on the map: they would be unreadable in a Facebook thumbnail. Words stay inside x 72 to 612, y 70 to 560, away from edge crops. Words come from `og.headline` and `og.tagline`, with `{city}` from the area's name in the settings file. To redraw after a word change: `node scripts/render-og.mjs` in `site/` (template: `site/scripts/og/template.svg`; uses the Mac's Google Chrome, no packages, system fonts). The script shrinks the headline if a language runs long, and stops with an error if the words still do not fit, or if a picture is not 1200 x 630 or is over 300 KB.
+
 ## Page layout (guidance for pv-calendar-site)
 
 - **Home:** test banner (test builds), header (site name left, language link right, written in its own language with `lang="es"`), the rewards line (white box, coral left edge), a row of day chips, "This week's picks" with a one-line note, then day headings ("Tonight", "Tomorrow", then dates) each with a `.stack` list of cards. The Filters button is fixed to the bottom of the screen; it opens a full-height sheet with the filter groups and a full-width "Show shifts" button at the bottom.

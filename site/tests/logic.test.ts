@@ -8,7 +8,9 @@ import { checkSettings, liveAreas, prepareListings, spotsStatus, usedIds } from 
 import { EMPTY_FILTERS, activeCount, matches, type CardFacts } from "../src/lib/filter-logic.ts";
 import { buildIcs, escapeText, foldLine } from "../src/lib/ics.ts";
 import { pruneSaved } from "../src/lib/saved.ts";
-import type { EventsFile, SiteSettings } from "../src/lib/types.ts";
+import { createI18n } from "../src/i18n/index.ts";
+import { placeSpoken, placeText, sectionName, whereLines } from "../src/lib/words.ts";
+import type { EventsFile, PreparedListing, SiteSettings } from "../src/lib/types.ts";
 
 const settings: SiteSettings = JSON.parse(readFileSync(new URL("../settings.example.json", import.meta.url), "utf8"));
 const sample: EventsFile = JSON.parse(
@@ -159,4 +161,74 @@ test("saved shifts are cleared once over or no longer listed (owner, Q32)", () =
   const kept = pruneSaved(["future", "ended", "gone", "ends-now"], live, now);
   assert.deepEqual([...kept].sort(), ["ends-now", "future"]);
   assert.equal(pruneSaved([], live, now).size, 0);
+});
+
+// Place line on cards and listing pages (decision 0013, PROJECT.md 4).
+
+const languageFiles = Object.fromEntries(
+  ["en", "es"].map((code) => [code, JSON.parse(readFileSync(new URL(`../src/i18n/${code}.json`, import.meta.url), "utf8"))]),
+);
+const placeI18n = createI18n(settings, languageFiles);
+const enTr = placeI18n.translator("en");
+const esTr = placeI18n.translator("es");
+const place = (section: string | null | undefined, neighborhood: string | null): PreparedListing =>
+  ({ ...prepareListings(sample, settings, { now: before })[0], section, neighborhood_or_town: neighborhood }) as PreparedListing;
+const pairLike = /^River Wards\s*\S\s*Kensington$/;
+
+test("card place line: section and neighborhood together", () => {
+  assert.match(placeText(enTr, place("river-wards", "Kensington"), settings), pairLike);
+  assert.match(placeText(esTr, place("northwest", "Washington Square West"), settings), /^Noroeste de Filadelfia\s*\S\s*Washington Square West$/);
+});
+
+test("card place line for screen readers: a comma between the two, never the dot", () => {
+  assert.equal(placeSpoken(enTr, place("river-wards", "Kensington"), settings), "River Wards, Kensington");
+  assert.equal(placeSpoken(esTr, place("northwest", "Germantown"), settings), "Noroeste de Filadelfia, Germantown");
+  // One name only: nothing extra to say; the shown text reads fine.
+  assert.equal(placeSpoken(enTr, place("river-wards", null), settings), "");
+  assert.equal(placeSpoken(enTr, place(null, "Kensington"), settings), "");
+  assert.equal(placeSpoken(enTr, place("center-city", "Center City"), settings), "");
+});
+
+test("card place line text always comes from the language files", () => {
+  const words = readFileSync(new URL("../src/lib/words.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(words, /`\$\{section\} · \$\{neighborhood\}`/);
+});
+
+test("card place line: only one of them known shows that one", () => {
+  assert.equal(placeText(enTr, place("river-wards", null), settings), "River Wards");
+  assert.equal(placeText(enTr, place(null, "Kensington"), settings), "Kensington");
+  // An id the settings do not list counts as unknown.
+  assert.equal(placeText(enTr, place("nowhere", "Kensington"), settings), "Kensington");
+  // Neighborhood is a proper name: never translated.
+  assert.equal(placeText(esTr, place(undefined, "Kensington"), settings), "Kensington");
+});
+
+test("card place line: neither known shows the area name, as before", () => {
+  assert.equal(placeText(enTr, place(null, null), settings), "Philadelphia");
+  assert.equal(placeText(esTr, place(undefined, null), settings), "Filadelfia");
+});
+
+test("settings with no sections: no section names, the site still builds", () => {
+  const noSections = structuredClone(settings);
+  delete noSections.sections;
+  checkSettings(noSections, "no sections");
+  assert.equal(sectionName(enTr, noSections, "river-wards"), "");
+  assert.equal(placeText(enTr, place("river-wards", "Kensington"), noSections), "Kensington");
+  assert.equal(placeText(enTr, place("river-wards", null), noSections), "Philadelphia");
+  assert.throws(() => checkSettings({ ...settings, sections: "x" } as unknown as SiteSettings, "bad"), /sections/);
+});
+
+test("listing page place lines: address, neighborhood, section, area; no empties or repeats", () => {
+  const e = { ...place("river-wards", "Kensington"), address: "100 Example Street, Philadelphia, PA 19125" };
+  assert.deepEqual(whereLines(enTr, e, settings), [
+    "100 Example Street, Philadelphia, PA 19125",
+    "Kensington",
+    "River Wards",
+    "Philadelphia",
+  ]);
+  assert.deepEqual(whereLines(enTr, { ...place("center-city", "Center City"), address: null }, settings), [
+    "Center City",
+    "Philadelphia",
+  ]);
+  assert.deepEqual(whereLines(esTr, { ...place(null, null), address: null }, settings), ["Filadelfia"]);
 });

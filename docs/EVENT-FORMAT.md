@@ -23,7 +23,7 @@ No other top-level fields are allowed.
 
 ## One listing
 
-Every field in the first table must be present in every listing, even when its value is unknown. The tag fields and the open-spots fields in the later tables are optional. No other fields are allowed, so nothing extra (above all, nothing about people) can slip in.
+Every field in the first table must be present in every listing, even when its value is unknown. Three groups are optional, so older files still pass: `section` (marked optional in the table), and the tag fields and open-spots fields in the later tables. No other fields are allowed, so nothing extra (above all, nothing about people) can slip in.
 
 | Field | Type | Notes |
 |---|---|---|
@@ -34,7 +34,8 @@ Every field in the first table must be present in every listing, even when its v
 | end | date-time with offset, or null | null when the source gives no end time |
 | address | text or null | |
 | area | area id | An `id` from the city's settings file, for example `philadelphia` (an example city, as in the sample). Lowercase letters, digits and hyphens. Never a place name typed by the scraper |
-| neighborhood_or_town | text or null | |
+| section | section id, or null (optional) | An `id` from the city's section list in its settings file, for example `river-wards` or `west` (example city). Same id rules as `area`. null when unknown. See "Section" below |
+| neighborhood_or_town | text or null | A value the source gives always wins. When the source gives none, the pipeline may fill it from the city's ZIP table (see "Section" below) |
 | cause | cause id, or null | An id from the city's cause list in its settings file, for example `food` or `parks-and-trees`. Same id rules as `area`. The listing-quality step maps the source's own words ("Hunger", "Food Access") to an id. null when unknown. Each city has its own list, so the schema does not fix the values |
 | type | `service`, `training`, `campaign`, `protest_action` | |
 | sensitive | true or false | Always true for `protest_action`. Also true for anything immigration-related or flagged sensitive. When unsure, true |
@@ -52,6 +53,14 @@ Every field in the first table must be present in every listing, even when its v
 | source_url | web address | The public page the facts came from |
 | source_id | text | Matches the entry in the city's source list |
 | last_seen_at | date-time with offset | When the pipeline last saw the listing on its source. Shown as "last checked" |
+
+### Section (optional)
+
+`section` is a broad part of the area, so a card can say where in the city a shift is, for example "River Wards · Kensington".
+
+- The pipeline fills it from the five-digit ZIP code at the end of `address`, using the city's ZIP table in its settings file. The same lookup gives `neighborhood_or_town` only when the source gave none.
+- No address, no ZIP code, or a ZIP code not in the table: `section` is null. Never guess.
+- Older files may leave it out. New output should always write it (null when unknown).
 
 ### Tags: host, faith tradition, activity (optional)
 
@@ -97,7 +106,7 @@ These three fields say whether a shift still has room. They are optional, so fil
 If the source does not say, record that it does not say. Each field has exactly one way to do this:
 
 - `join_method` and `spanish_spoken` use the text `"unknown"`, because the site shows those two to visitors as "unknown" or "check with the organizer". They are never null.
-- Every other field that can be unknown uses `null`: `end`, `address`, `neighborhood_or_town`, `cause`, `host_type`, `faith_tradition`, `activity`, `min_age`, `training_required`, `clearances_required`, `group_friendly`, `recurrence_rule`.
+- Every other field that can be unknown uses `null`: `end`, `address`, `section`, `neighborhood_or_town`, `cause`, `host_type`, `faith_tradition`, `activity`, `min_age`, `training_required`, `clearances_required`, `group_friendly`, `recurrence_rule`.
 - `photos_allowed` is the one field with a default: true, unless the listing says "no photos".
 - `sensitive` has no unknown: when unsure, write true.
 - `spots_left` and `spots_total` use `null` when the page shows no count; `full` is false unless the page says full. All three may be left out of older files.
@@ -108,12 +117,12 @@ If the source does not say, record that it does not say. Each field has exactly 
 - A listing with a `recurrence_rule` must have `recurring: true`.
 - A listing with `full: true` must have `spots_left` of 0 or null.
 - Dates must include a UTC offset (`Z` or `-04:00`).
-- `area`, and `cause`, `host_type`, `faith_tradition` and each `activity` when not null, must look like an id: lowercase letters, digits and hyphens. Whether it is on the city's lists is checked against the city's settings file, not here.
+- `area`, and `section`, `cause`, `host_type`, `faith_tradition` and each `activity` when not null, must look like an id: lowercase letters, digits and hyphens. Whether it is on the city's lists is checked against the city's settings file, not here.
 - `activity`, when not null, lists at least one id and no id twice.
 
 ## Nothing city-specific
 
-The format names no city. Area ids, cause ids, host type, faith tradition and activity ids, the region name and languages come from the settings file each city supplies. Philadelphia appears only as the example: in the sample file and in example values on this page.
+The format names no city. Area ids, section ids, cause ids, host type, faith tradition and activity ids, the region name and languages come from the settings file each city supplies. Philadelphia appears only as the example: in the sample file and in example values on this page.
 
 ## Validating a file
 

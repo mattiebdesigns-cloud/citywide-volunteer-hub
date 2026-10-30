@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" lang="{{LANG}}">
+  <!--
+    Link-preview picture (decision 0014; PROJECT.md section 5). 1200 x 630.
+    Filled in and saved as PNG by site/scripts/render-og.mjs. Do not type words here:
+    {{HEADLINE}} and {{TAGLINE}} come from og.headline and og.tagline in site/src/i18n/.
+    Colours are the site's tokens (site/src/styles/tokens.css):
+      band #15294a, white #ffffff (14.5:1 on band), coral #f08a6c (5.9:1 on band).
+    The map is a stylized drawing of Philadelphia's eight sections (decision 0013),
+    traced roughly from longitude and latitude. It is not to scale and has no labels:
+    they would be too small to read in a Facebook thumbnail.
+  -->
+  <rect width="1200" height="630" fill="#15294a"/>
+  <!-- soft lighter circle behind the map, decorative -->
+  <circle cx="905" cy="315" r="282" fill="#1b3460"/>
+
+  <g transform="translate(662 58)" stroke-linejoin="round" stroke-linecap="round">
+    <g stroke="#15294a" stroke-width="7">
+      <path fill="#9dbbe3" d="M292.5 254.6 L315.0 278.1 L375.0 229.1 L435.0 180.2 L484.5 143.0 L450.0 23.5 L390.0 0.0 L315.0 111.6 L270.0 170.4 L262.5 219.3 Z"/><!-- Northeast -->
+      <path fill="#9dbbe3" d="M127.5 262.4 L157.5 229.1 L187.5 189.9 L195.0 131.2 L165.0 121.4 L105.0 86.2 L67.5 121.4 L22.5 170.4 L67.5 219.3 L105.0 248.7 Z"/><!-- Northwest -->
+      <path fill="#d5e3f4" d="M142.5 323.1 L187.5 330.9 L195.0 317.2 L247.5 282.0 L292.5 254.6 L262.5 219.3 L270.0 170.4 L225.0 141.0 L195.0 131.2 L187.5 189.9 L157.5 229.1 L127.5 262.4 L135.0 287.9 Z"/><!-- North Philly -->
+      <path fill="#eef3fa" d="M187.5 330.9 L214.5 336.8 L270.0 317.2 L315.0 278.1 L292.5 254.6 L247.5 282.0 L195.0 317.2 Z"/><!-- River Wards -->
+      <path fill="#eef3fa" d="M120.0 395.6 L150.0 370.1 L142.5 323.1 L135.0 287.9 L127.5 262.4 L105.0 248.7 L0.0 317.2 L22.5 356.4 L45.0 385.8 Z"/><!-- West Philly -->
+      <path fill="#9dbbe3" d="M120.0 395.6 L45.0 385.8 L37.5 424.9 L22.5 509.1 L67.5 517.0 L120.0 507.2 L112.5 444.5 Z"/><!-- Southwest Philly -->
+      <path fill="#d5e3f4" d="M150.0 370.1 L207.0 376.0 L207.0 424.9 L195.0 464.1 L165.0 493.5 L120.0 507.2 L112.5 444.5 L120.0 395.6 Z"/><!-- South Philly -->
+      <path fill="#f08a6c" d="M142.5 323.1 L187.5 330.9 L214.5 336.8 L207.0 376.0 L150.0 370.1 Z"/><!-- Center City -->
+    </g>
+    <!-- Schuylkill River: a wider gap between the sections it separates -->
+    <path fill="none" stroke="#15294a" stroke-width="13" d="M120.0 507.2 L112.5 444.5 L120.0 395.6 L150.0 370.1 L142.5 323.1 L135.0 287.9 L127.5 262.4 L105.0 248.7 L67.5 219.3 L22.5 170.4"/>
+    <!-- Delaware River: a light line just off the east shore -->
+    <path fill="none" stroke="#3a6aa8" stroke-width="5" transform="translate(9 7)" d="M484.5 143.0 L435.0 180.2 L375.0 229.1 L315.0 278.1 L270.0 317.2 L214.5 336.8 L207.0 376.0 L207.0 424.9 L195.0 464.1 L165.0 493.5 L120.0 507.2"/>
+
+    <!-- Map pins (shifts), decorative. Coral with a band-coloured edge and centre. -->
+    <g fill="#f08a6c" stroke="#15294a" stroke-width="4">
+      <path d="M0 0 C-4 -10 -17 -18 -17 -31 A17 17 0 1 1 17 -31 C17 -18 4 -10 0 0 Z" transform="translate(378 128)"/>
+      <path d="M0 0 C-4 -10 -17 -18 -17 -31 A17 17 0 1 1 17 -31 C17 -18 4 -10 0 0 Z" transform="translate(120 186)"/>
+      <path d="M0 0 C-4 -10 -17 -18 -17 -31 A17 17 0 1 1 17 -31 C17 -18 4 -10 0 0 Z" transform="translate(212 240)"/>
+      <path d="M0 0 C-4 -10 -17 -18 -17 -31 A17 17 0 1 1 17 -31 C17 -18 4 -10 0 0 Z" transform="translate(70 344)"/>
+      <path d="M0 0 C-4 -10 -17 -18 -17 -31 A17 17 0 1 1 17 -31 C17 -18 4 -10 0 0 Z" transform="translate(162 462)"/>
+    </g>
+    <g fill="#15294a">
+      <circle cx="378" cy="97" r="6"/><circle cx="120" cy="155" r="6"/><circle cx="212" cy="209" r="6"/>
+      <circle cx="70" cy="313" r="6"/><circle cx="162" cy="431" r="6"/>
+    </g>
+  </g>
+
+  <!-- Words. Kept inside x 72 to 612 and y 70 to 560 so Facebook's edge crops miss them. -->
+  <foreignObject x="72" y="70" width="540" height="490">
+    <div xmlns="http://www.w3.org/1999/xhtml" lang="{{LANG}}" class="words">
+      <div class="bar"></div>
+      <h1 id="headline">{{HEADLINE}}</h1>
+      <p id="tagline">{{TAGLINE}}</p>
+    </div>
+  </foreignObject>
+</svg>

@@ -2,7 +2,7 @@
 // translation files (PROJECT.md 5); organization text goes in as placeholders.
 import type { Translator } from "../i18n/index.ts";
 import { spotsStatus } from "./prepare.ts";
-import type { PreparedListing } from "./types.ts";
+import type { PreparedListing, SiteSettings } from "./types.ts";
 
 export function timeText(tr: Translator, e: PreparedListing): string {
   const start = tr.formatTime(e.start);
@@ -14,9 +14,61 @@ export function whenText(tr: Translator, e: PreparedListing): string {
   return tr.t("listing.date_time", { date: tr.formatDate(e.start), time: timeText(tr, e) });
 }
 
-/** Neighborhood or town, else the area's name, else nothing. */
-export function placeText(tr: Translator, e: PreparedListing): string {
-  return e.neighborhood_or_town ?? tr.areaName(e.area);
+/**
+ * A section's name in this language, from `sections` in the settings file
+ * (decision 0013), the same way area names work. Empty for null, an unknown
+ * id, or settings with no `sections`, so the page can leave it out.
+ */
+export function sectionName(
+  tr: Translator,
+  settings: Pick<SiteSettings, "sections">,
+  id: string | null | undefined,
+): string {
+  const section = id ? settings.sections?.find((s) => s.id === id) : undefined;
+  return section ? tr.setting(section.name) : "";
+}
+
+/** Section and neighborhood, when both are known and differ; otherwise null. */
+function placePair(tr: Translator, e: PreparedListing, settings: Pick<SiteSettings, "sections">) {
+  const section = sectionName(tr, settings, e.section);
+  const neighborhood = e.neighborhood_or_town?.trim() ?? "";
+  return section && neighborhood && !sameName(section, neighborhood) ? { section, neighborhood } : null;
+}
+
+/**
+ * The card's place line (decision 0013): "River Wards · Kensington"
+ * (listing.place_pair). Only one of section and neighborhood known: that one.
+ * Neither: the area's name, as before. The neighborhood is a proper name and
+ * is never translated.
+ */
+export function placeText(tr: Translator, e: PreparedListing, settings: Pick<SiteSettings, "sections">): string {
+  const pair = placePair(tr, e, settings);
+  if (pair) return tr.t("listing.place_pair", pair);
+  return sectionName(tr, settings, e.section) || e.neighborhood_or_town?.trim() || tr.areaName(e.area);
+}
+
+/**
+ * What a screen reader says for the place line when it is a pair: "River
+ * Wards, Kensington" (listing.place_pair_spoken), since the dot between them
+ * is read out or skipped. Empty when the line is one name, which reads fine.
+ */
+export function placeSpoken(tr: Translator, e: PreparedListing, settings: Pick<SiteSettings, "sections">): string {
+  const pair = placePair(tr, e, settings);
+  return pair ? tr.t("listing.place_pair_spoken", pair) : "";
+}
+
+/** The detail page's place lines: address, neighborhood, section, area; empties and repeats left out. */
+export function whereLines(tr: Translator, e: PreparedListing, settings: Pick<SiteSettings, "sections">): string[] {
+  const lines: string[] = [];
+  for (const line of [e.address, e.neighborhood_or_town, sectionName(tr, settings, e.section), tr.areaName(e.area)]) {
+    const text = line?.trim();
+    if (text && !lines.some((l) => sameName(l, text))) lines.push(text);
+  }
+  return lines;
+}
+
+function sameName(a: string, b: string): boolean {
+  return a.localeCompare(b, undefined, { sensitivity: "base" }) === 0;
 }
 
 export function joinLabel(tr: Translator, e: PreparedListing): string {

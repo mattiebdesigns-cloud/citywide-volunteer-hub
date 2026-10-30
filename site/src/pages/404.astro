@@ -9,7 +9,7 @@ const tr = i18n.translator(lang);
 const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.home(code)]));
 ---
 
-<Base lang={lang} title={tr.t("not_found.title")} alternates={alternates}>
+<Base lang={lang} title={tr.t("not_found.title")} alternates={alternates} path="/">
   <div class="page">
     <h1>{tr.t("not_found.title")}</h1>
     <p>{tr.t("not_found.body")}</p>
