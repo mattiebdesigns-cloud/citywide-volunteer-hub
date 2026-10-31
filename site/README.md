@@ -4,7 +4,7 @@ The Phase 1 calendar: a static website built with Astro. It reads one events fil
 
 ## Build it
 
-You need Node 22.12 or newer to build (Astro 6 requires it), and Node 22.18 or newer to run `npm test`, which runs TypeScript directly. Node 24 is recommended; `.nvmrc` names it.
+You need Node 22.22 or newer to build and test (Astro 7.4 requires it; `npm test` also runs TypeScript directly). Node 24 is recommended; `.nvmrc` names it.
 
 ```sh
 cd site
@@ -91,4 +91,4 @@ We use Astro 7 because it has the security fixes. Astro 7 brings two packages wh
 | `sharp` (image library) | LGPL | The site processes no images; `astro.config.mjs` uses the pass-through image service. |
 | `lightningcss` (CSS tool inside Vite) | MPL-2.0 | `astro.config.mjs` tells Vite to handle CSS with PostCSS and not to minify it. The CSS ships unminified (about 16 KB before compression). |
 
-If anything ever calls a stand-in, the build stops with an error naming the setting to keep. `npm test` checks that the stand-ins are installed and that the settings are in place.
+If anything ever calls a stand-in, the build stops with an error naming the setting to keep (for lightningcss: `lightningcss.bundleAsync was called, but lightningcss is not installed ... Keep vite.css.transformer 'postcss' ...`). `npm test` checks that the stand-ins are installed and that the settings are in place.

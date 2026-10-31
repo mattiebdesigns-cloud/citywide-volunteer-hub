@@ -29,3 +29,14 @@ test("the sharp stand-in is installed and images are never processed (LGPL)", ()
   assert.equal(pkg.version, "0.0.0-not-installed");
   assert.match(config, /passthroughImageService\(\)/);
 });
+
+test("loaded the way Vite loads it (import()), each lightningcss function stops with the plain error", async () => {
+  // Vite calls these by name after `await import("lightningcss")`; a missing
+  // name would fail with "is not a function" and hide the reason.
+  const lightningcss = await import("lightningcss");
+  for (const name of ["transform", "transformStyleAttribute", "bundle", "bundleAsync", "browserslistToTargets", "composeVisitors"]) {
+    const fn = (lightningcss as Record<string, unknown>)[name];
+    assert.equal(typeof fn, "function", name);
+    assert.throws(() => (fn as () => void)(), /lightningcss is not installed.*vite\.css\.transformer 'postcss'/, name);
+  }
+});

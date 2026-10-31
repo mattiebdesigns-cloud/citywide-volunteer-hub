@@ -7,4 +7,16 @@ const notInstalled = (name) => () => {
       "Keep vite.css.transformer 'postcss' and vite.build.cssMinify false in astro.config.mjs (see site/README.md).",
   );
 };
-module.exports = new Proxy({}, { get: (_, name) => (name === "__esModule" ? false : notInstalled(String(name))) });
+// Vite loads this file with import(), and Node finds a CommonJS file's named
+// exports only when they are written out one by one like this. Without them,
+// a call would fail with "transform is not a function" instead of the message above.
+exports.transform = notInstalled("transform");
+exports.transformStyleAttribute = notInstalled("transformStyleAttribute");
+exports.bundle = notInstalled("bundle");
+exports.bundleAsync = notInstalled("bundleAsync");
+exports.browserslistToTargets = notInstalled("browserslistToTargets");
+exports.composeVisitors = notInstalled("composeVisitors");
+// Any other name, read the CommonJS way (require), gives the same error.
+module.exports = new Proxy(exports, {
+  get: (target, name) => (name === "__esModule" ? false : name in target ? target[name] : notInstalled(String(name))),
+});

@@ -6,7 +6,7 @@
   "type": "module",
   "description": "Phase 1 calendar website for the Citywide Volunteer Hub (static, Astro).",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.22.0"
   },
   "scripts": {
     "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
