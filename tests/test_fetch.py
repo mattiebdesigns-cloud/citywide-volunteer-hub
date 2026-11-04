@@ -6,9 +6,12 @@ fake clock records every wait.
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from pvscrapers import __version__
+from pvscrapers import fetch as fetch_module
 from pvscrapers.fetch import (
     BOT_NAME,
     Blocked,
@@ -436,3 +439,247 @@ def test_missing_robots_is_reported_with_its_status_and_the_floor():
     fetcher.fetch("https://site.example.org/cal")
     assert fetcher.robots_check("https://site.example.org/x").status == 404
     assert fetcher.delay_seconds("https://site.example.org/x") == FLOOR_DELAY_SECONDS
+
+
+# -- python -m pvscrapers.fetch: one polite fetch by hand (Q48) ---------------
+
+
+@pytest.fixture(autouse=True)
+def _own_cache(tmp_path, monkeypatch):
+    """The command's default state file goes to a test folder, never ~/.cache."""
+    monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
+
+
+PAGE = "https://org.example.org/volunteer/"
+ROBOTS = "https://org.example.org/robots.txt"
+
+
+def _cli(pages, argv, capsys):
+    site, waits = FakeSite(pages), []
+    code = fetch_module.main(argv, transport=site, sleep=waits.append)
+    return code, site, waits, capsys.readouterr()
+
+
+def test_command_fetches_through_robots_and_saves_the_page(tmp_path, capsys):
+    out = tmp_path / "page.html"
+    pages = {ROBOTS: (200, {}, b"User-agent: *\nCrawl-delay: 5\n"), PAGE: (200, {}, b"<p>hi</p>")}
+    code, site, waits, shown = _cli(pages, [PAGE, "--contact", CONTACT, "--out", str(out)], capsys)
+    assert code == 0
+    assert site.urls == [ROBOTS, PAGE]  # robots.txt first
+    assert all(h["User-Agent"] == user_agent(CONTACT) for _, h in site.requests)
+    assert waits and waits[0] > 4  # the site's Crawl-delay is kept between the two
+    assert out.read_bytes() == b"<p>hi</p>"
+    assert f"HTTP 200 {PAGE}: 9 bytes, saved to {out}" in shown.err
+    assert "Crawl-delay" not in shown.err and "delay 5 s" in shown.err
+    assert shown.out == ""
+
+
+def test_command_reads_contact_from_settings(tmp_path, capsys):
+    settings = tmp_path / "site.json"
+    settings.write_text(json.dumps({"site": {"contact_email": CONTACT}}))
+    pages = {ROBOTS: (404, {}, b""), PAGE: (200, {}, b"ok")}
+    code, site, _, shown = _cli(
+        pages, [PAGE, "--settings", str(settings), "--out", str(tmp_path / "o")], capsys
+    )
+    assert code == 0
+    assert CONTACT in site.requests[0][1]["User-Agent"]
+    assert "HTTP 404, none, so all allowed" in shown.err
+
+
+def test_command_reads_yaml_settings_when_pyyaml_is_there(tmp_path, capsys):
+    pytest.importorskip("yaml")
+    settings = tmp_path / "site.yml"
+    settings.write_text(f"site:\n  contact_email: {CONTACT}\n")
+    pages = {ROBOTS: (404, {}, b""), PAGE: (200, {}, b"ok")}
+    code, *_ = _cli(
+        pages, [PAGE, "--settings", str(settings), "--out", str(tmp_path / "o")], capsys
+    )
+    assert code == 0
+
+
+def test_command_refuses_a_disallowed_address(tmp_path, capsys):
+    out = tmp_path / "page.html"
+    pages = {ROBOTS: (200, {}, b"User-agent: *\nDisallow: /volunteer/\n"), PAGE: (200, {}, b"x")}
+    code, site, _, shown = _cli(pages, [PAGE, "--contact", CONTACT, "--out", str(out)], capsys)
+    assert code == fetch_module.EXIT_DISALLOWED == 3
+    assert site.urls == [ROBOTS]  # the page itself is never asked for
+    assert not out.exists()
+    assert f"REFUSED: robots.txt disallows {PAGE} for {BOT_NAME}" in shown.err
+
+
+def test_command_checks_robots_for_every_redirect(tmp_path, capsys):
+    other = "https://other.example.org/private/page"
+    pages = {
+        ROBOTS: (404, {}, b""),
+        PAGE: (301, {"location": other}, b""),
+        "https://other.example.org/robots.txt": (200, {}, b"User-agent: *\nDisallow: /private/\n"),
+        other: (200, {}, b"secret"),
+    }
+    code, site, _, shown = _cli(pages, [PAGE, "--contact", CONTACT], capsys)
+    assert code == 3
+    assert other not in site.urls
+    assert "https://other.example.org/robots.txt" in site.urls
+    assert f"REFUSED: robots.txt disallows {other}" in shown.err
+
+
+def test_command_stops_when_the_site_turns_the_bot_away(capsys):
+    pages = {ROBOTS: (404, {}, b""), PAGE: (403, {}, b"no")}
+    code, site, _, shown = _cli(pages, [PAGE, "--contact", CONTACT], capsys)
+    assert code == fetch_module.EXIT_BLOCKED
+    assert site.urls == [ROBOTS, PAGE]  # no retry
+    assert "BLOCKED" in shown.err and "Do not retry" in shown.err
+
+
+def test_command_reports_a_failed_fetch(capsys):
+    pages = {ROBOTS: (404, {}, b"")}
+    code, _, _, shown = _cli(pages, [PAGE, "--contact", CONTACT], capsys)
+    assert code == fetch_module.EXIT_FAILED
+    assert f"FAILED: {PAGE}: HTTP 404" in shown.err
+
+
+def test_command_needs_a_real_contact_address(tmp_path, capsys):
+    code, site, _, shown = _cli({}, [PAGE, "--contact", "not-an-address"], capsys)
+    assert code == fetch_module.EXIT_USAGE
+    assert site.urls == []
+    settings = tmp_path / "site.json"
+    settings.write_text('{"site": {}}')
+    code, site, _, shown = _cli({}, [PAGE, "--settings", str(settings)], capsys)
+    assert code == 2 and site.urls == [] and "no site.contact_email" in shown.err
+
+
+def test_command_writes_to_standard_output_without_out(capsysbinary):
+    pages = {ROBOTS: (404, {}, b""), PAGE: (200, {}, b"<p>body</p>")}
+    code = fetch_module.main(
+        [PAGE, "--contact", CONTACT], transport=FakeSite(pages), sleep=lambda s: None
+    )
+    shown = capsysbinary.readouterr()
+    assert code == 0
+    assert shown.out == b"<p>body</p>"
+    assert b"saved to standard output" in shown.err
+
+
+# -- licence gate follow-up: waits across commands, several addresses, blocks --
+
+PAGE2 = "https://org.example.org/volunteer/shifts/"
+OTHER = "https://other.example.org/page"
+
+
+class WallClock(FakeClock):
+    """A fake wall clock shared by several commands; sleeping moves it on."""
+
+    def __init__(self):
+        super().__init__()
+        self.now = 1_800_000_000.0
+
+
+def _run(pages, argv, clock, site=None):
+    site = site or FakeSite(pages)
+    code = fetch_module.main(argv, transport=site, sleep=clock.sleep, clock=clock)
+    return code, site
+
+
+def test_two_commands_in_a_row_keep_the_crawl_delay(tmp_path):
+    clock, state = WallClock(), tmp_path / "state.json"
+    pages = {ROBOTS: (200, {}, b"User-agent: *\nCrawl-delay: 3\n"), PAGE: OK, PAGE2: OK}
+    base = ["--contact", CONTACT, "--state", str(state)]
+    code, _ = _run(pages, [PAGE, *base, "--out", str(tmp_path / "a")], clock)
+    assert code == 0 and clock.waits == [3.0]  # robots.txt, wait, the page
+    clock.now += 0.09  # the next command starts right away
+    code, site = _run(pages, [PAGE2, *base, "--out", str(tmp_path / "b")], clock)
+    assert code == 0
+    assert site.urls == [ROBOTS, PAGE2]
+    assert clock.waits[1] == 2.91  # before its robots.txt: the rest of the 3 s
+    assert clock.waits[2] == 3.0  # and again before the page
+    saved = json.loads(state.read_text())
+    assert set(saved) == {"https://org.example.org"}  # site addresses and times only
+    assert saved["https://org.example.org"]["delay_seconds"] == 3.0
+
+
+def test_two_commands_in_a_row_keep_the_one_second_floor(tmp_path):
+    clock, state = WallClock(), tmp_path / "state.json"
+    pages = {ROBOTS: (404, {}, b""), PAGE: OK}
+    argv = [PAGE, "--contact", CONTACT, "--state", str(state), "--out", str(tmp_path / "p")]
+    _run(pages, argv, clock)
+    clock.now += 0.2
+    _run(pages, argv, clock)
+    assert clock.waits == [1.0, 0.8, 1.0]
+
+
+def test_default_state_file_is_in_the_cache_folder(tmp_path):
+    clock = WallClock()
+    pages = {ROBOTS: (404, {}, b""), PAGE: OK}
+    _run(pages, [PAGE, "--contact", CONTACT, "--out", str(tmp_path / "p")], clock)
+    assert (tmp_path / "cache" / "pvscrapers" / "last-request.json").is_file()
+
+
+def test_one_command_fetches_a_sites_pages_in_turn(tmp_path):
+    clock, out = WallClock(), tmp_path / "pages"
+    pages = {
+        ROBOTS: (200, {}, b"User-agent: *\nCrawl-delay: 2\n"),
+        PAGE: (200, {}, b"one"),
+        PAGE2: (200, {}, b"two"),
+    }
+    argv = [PAGE, PAGE2, "--contact", CONTACT, "--out-dir", str(out)]
+    code, site = _run(pages, argv, clock)
+    assert code == 0
+    assert site.urls == [ROBOTS, PAGE, PAGE2]  # robots.txt read once
+    assert clock.waits == [2.0, 2.0]
+    files = sorted(out.iterdir())
+    assert [f.read_bytes() for f in files] == [b"one", b"two"]
+    assert files[0].name == "01-org-example-org-volunteer"
+
+
+def test_several_addresses_need_an_out_dir(tmp_path, capsys):
+    code, site = _run({}, [PAGE, PAGE2, "--contact", CONTACT], WallClock())
+    assert code == 2 and site.urls == []
+    assert "need --out-dir" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("status", [401, 403, 429])
+def test_robots_txt_turning_the_bot_away_blocks_the_whole_site(tmp_path, capsys, status):
+    clock = WallClock()
+    pages = {
+        ROBOTS: (status, {}, b"Access Denied"),
+        PAGE: OK,
+        PAGE2: OK,
+        "https://other.example.org/robots.txt": (404, {}, b""),
+        OTHER: OK,
+    }
+    argv = [PAGE, PAGE2, OTHER, "--contact", CONTACT, "--out-dir", str(tmp_path / "o")]
+    code, site = _run(pages, argv, clock)
+    assert code == fetch_module.EXIT_BLOCKED == 4
+    assert site.urls.count(ROBOTS) == 1  # asked once; then nothing more from that site
+    assert PAGE not in site.urls and PAGE2 not in site.urls
+    assert OTHER in site.urls  # another site is still fetched
+    err = capsys.readouterr().err
+    assert err.count("BLOCKED") == 2 and "Nothing more is asked of this site" in err
+
+
+@pytest.mark.parametrize("status", [404, 410])
+def test_robots_txt_missing_still_allows_fetching(status):
+    fetcher, _, _ = make({"https://org.example.org/robots.txt": (status, {}, b""), FEED: OK})
+    assert fetcher.fetch(FEED).status == 200
+
+
+def test_scraper_fetcher_asks_a_blocked_site_nothing_more():
+    """Scraper runs share one Fetcher: a second source on a site that turned the bot
+    away is blocked without another request."""
+    second = "https://org.example.org/other-feed/?ical=1"
+    fetcher, site, _ = make({"https://org.example.org/robots.txt": (403, {}, b"no"), FEED: OK})
+    with pytest.raises(Blocked):
+        fetcher.fetch(FEED)
+    with pytest.raises(Blocked, match="earlier this run"):
+        fetcher.fetch(second)
+    assert site.urls == ["https://org.example.org/robots.txt"]
+
+
+def test_page_turning_the_bot_away_blocks_the_rest_of_the_site():
+    second = "https://org.example.org/other-feed/?ical=1"
+    fetcher, site, _ = make(
+        {"https://org.example.org/robots.txt": robots(""), FEED: (429, {}, b""), second: OK}
+    )
+    with pytest.raises(Blocked):
+        fetcher.fetch(FEED)
+    with pytest.raises(Blocked):
+        fetcher.fetch(second)
+    assert second not in site.urls
