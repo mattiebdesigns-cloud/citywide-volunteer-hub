@@ -668,7 +668,7 @@ def test_scraper_fetcher_asks_a_blocked_site_nothing_more():
     fetcher, site, _ = make({"https://org.example.org/robots.txt": (403, {}, b"no"), FEED: OK})
     with pytest.raises(Blocked):
         fetcher.fetch(FEED)
-    with pytest.raises(Blocked, match="earlier this run"):
+    with pytest.raises(Blocked, match="nothing more is asked of this site this run"):
         fetcher.fetch(second)
     assert site.urls == ["https://org.example.org/robots.txt"]
 
@@ -683,3 +683,73 @@ def test_page_turning_the_bot_away_blocks_the_rest_of_the_site():
     with pytest.raises(Blocked):
         fetcher.fetch(second)
     assert second not in site.urls
+
+
+# -- a blocked site is remembered for 24 hours across commands (owner, licence note 1) --
+
+
+def _blocking_pages():
+    return {
+        ROBOTS: (404, {}, b""),
+        PAGE: (403, {}, b"Access Denied"),
+        PAGE2: OK,
+        "https://other.example.org/robots.txt": (404, {}, b""),
+        OTHER: OK,
+    }
+
+
+def test_blocked_site_is_remembered_across_commands(tmp_path, capsys):
+    clock, state = WallClock(), tmp_path / "state.json"
+    base = ["--contact", CONTACT, "--state", str(state)]
+    code, _ = _run(_blocking_pages(), [PAGE, *base, "--out", str(tmp_path / "a")], clock)
+    assert code == 4
+    saved = json.loads(state.read_text())
+    entry = saved["https://org.example.org"]
+    assert entry["blocked_at"] == clock.now
+    assert set(entry) <= {"last_request", "delay_seconds", "blocked_at"}  # times only
+    assert "Access Denied" not in state.read_text() and "403" not in state.read_text()
+    capsys.readouterr()
+
+    clock.now += 3600  # an hour later, another command
+    code, site = _run(_blocking_pages(), [PAGE2, *base, "--out", str(tmp_path / "b")], clock)
+    assert code == fetch_module.EXIT_BLOCKED
+    assert site.urls == []  # refused without a request, robots.txt included
+    err = capsys.readouterr().err
+    blocked_at = fetch_module._local_time(clock.now - 3600)
+    after = fetch_module._local_time(clock.now - 3600 + 86_400)
+    assert f"BLOCKED: {PAGE2}: blocked at {blocked_at}; try again after {after}" in err
+
+
+def test_remembered_block_expires_after_24_hours(tmp_path):
+    clock, state = WallClock(), tmp_path / "state.json"
+    base = ["--contact", CONTACT, "--state", str(state)]
+    _run(_blocking_pages(), [PAGE, *base, "--out", str(tmp_path / "a")], clock)
+    clock.now += 86_400 - 1
+    code, site = _run(_blocking_pages(), [PAGE2, *base, "--out", str(tmp_path / "b")], clock)
+    assert code == 4 and site.urls == []  # one second short of a day: still refused
+    clock.now += 1
+    code, site = _run(_blocking_pages(), [PAGE2, *base, "--out", str(tmp_path / "c")], clock)
+    assert code == 0
+    assert site.urls == [ROBOTS, PAGE2]
+    assert "blocked_at" not in json.loads(state.read_text())["https://org.example.org"]
+
+
+def test_remembered_block_leaves_other_sites_alone(tmp_path):
+    clock, state = WallClock(), tmp_path / "state.json"
+    base = ["--contact", CONTACT, "--state", str(state)]
+    _run(_blocking_pages(), [PAGE, *base, "--out", str(tmp_path / "a")], clock)
+    clock.now += 60
+    argv = [PAGE2, OTHER, *base, "--out-dir", str(tmp_path / "o")]
+    code, site = _run(_blocking_pages(), argv, clock)
+    assert code == 4  # the highest exit of the two
+    assert site.urls == ["https://other.example.org/robots.txt", OTHER]
+    assert (tmp_path / "o" / "02-other-example-org-page").read_bytes() == CALENDAR
+
+
+def test_scraper_fetcher_ignores_the_command_state_file(tmp_path):
+    """A Fetcher made without carry_over (as scheduled scraper runs make it) knows
+    nothing of a block remembered by the command line."""
+    clock, state = WallClock(), tmp_path / "state.json"
+    _run(_blocking_pages(), [PAGE, "--contact", CONTACT, "--state", str(state)], clock)
+    fetcher, _, _ = make({ROBOTS: (404, {}, b""), PAGE2: OK})
+    assert fetcher.fetch(PAGE2).status == 200

@@ -33,7 +33,11 @@ bot's name and the contact address from the settings. Between two requests to
 one site it waits the site's Crawl-delay, and never less than 1 second, also
 across commands: each site's last request time and delay are kept in a small
 file (--state, default ~/.cache/pvscrapers/last-request.json; it holds site
-addresses and times only). What happened goes to the screen (standard error);
+addresses and times only). A site that turns the bot away is remembered in
+the same file for 24 hours: every command refuses it without a request
+("blocked at <time>; try again after <time>"). Scheduled scraper runs do not
+read this file: each run makes its own Fetcher, which stops asking a site that
+turned it away for the rest of that run only. What happened goes to the screen (standard error);
 pages go to --out-dir (one file per address), to --out (one address), or to
 standard output (one address, neither given). Exit codes: 0 fetched; 1 the fetch
 failed (an HTTP error, the network); 2 a usage or settings problem; 3 robots.txt
@@ -64,6 +68,7 @@ from pvscrapers.robots import RobotsRules
 
 BOT_NAME = "CitywideVolunteerHubBot"
 FLOOR_DELAY_SECONDS = 1.0  # never wait less than this between requests to one site
+BLOCK_SECONDS = 86_400  # the command line remembers a site that turned the bot away this long
 _EMAIL = re.compile(r"^[^@\s()<>]+@[^@\s()<>]+\.[^@\s()<>]+$")
 _REDIRECTS = {301, 302, 303, 307, 308}
 
@@ -156,6 +161,13 @@ def _cloudflare_challenge(response: Response) -> bool:
     return b"challenge-platform" in head or b"<title>just a moment" in head
 
 
+def _local_time(seconds: float) -> str:
+    try:
+        return datetime.fromtimestamp(seconds, UTC).astimezone().isoformat(timespec="minutes")
+    except (OverflowError, OSError, ValueError):
+        return f"{seconds:.0f}"
+
+
 def _origin(url: str) -> str:
     parts = urlsplit(url)
     return f"{parts.scheme}://{parts.netloc}".lower()
@@ -179,6 +191,7 @@ class Fetcher:
     _last_request: dict[str, float] = field(default_factory=dict, init=False, repr=False)
     _user_agent: str = field(default="", init=False, repr=False)
     _blocked: dict[str, str] = field(default_factory=dict, init=False, repr=False)
+    _blocked_at: dict[str, float] = field(default_factory=dict, init=False, repr=False)
     _carried_delay: dict[str, float] = field(default_factory=dict, init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -214,9 +227,7 @@ class Fetcher:
             self._check_scheme(url)
             origin = _origin(url)
             if origin in self._blocked:
-                raise Blocked(
-                    url, f"{self._blocked[origin]} earlier this run; nothing more is asked of it"
-                )
+                raise Blocked(url, self._blocked[origin])
             rules = self._robots_for(origin, extra_delay_seconds)
             self._check_crawl_delay(url, rules)
             if not rules.allowed(url):
@@ -245,9 +256,26 @@ class Fetcher:
 
     def carry_over(self, last_requests: dict[str, dict]) -> None:
         """Waits from an earlier run of this fetcher (the command line keeps them in a
-        file): {site: {"last_request": <clock time>, "delay_seconds": <gap>}}. Use it
-        only with a wall clock (time.time), so times from another process compare."""
+        file): {site: {"last_request": <clock time>, "delay_seconds": <gap>,
+        "blocked_at": <clock time, if it turned the bot away>}}. A site blocked less
+        than BLOCK_SECONDS ago is refused without a request. Use it only with a wall
+        clock (time.time), so times from another process compare."""
+        now = self.clock()
         for origin, entry in last_requests.items():
+            if not isinstance(entry, dict):
+                continue
+            blocked_at = entry.get("blocked_at")
+            if (
+                isinstance(blocked_at, (int, float))
+                and not isinstance(blocked_at, bool)
+                and 0 <= now - blocked_at < BLOCK_SECONDS
+            ):
+                key = origin.lower()
+                self._blocked_at[key] = float(blocked_at)
+                self._blocked[key] = (
+                    f"blocked at {_local_time(blocked_at)}; try again after "
+                    f"{_local_time(blocked_at + BLOCK_SECONDS)}"
+                )
             try:
                 at = float(entry["last_request"])
                 delay = float(entry["delay_seconds"])
@@ -259,11 +287,17 @@ class Fetcher:
                 self._carried_delay[key] = max(delay, 0.0)
 
     def last_requests(self) -> dict[str, dict]:
-        """Each site asked this run: when, and the gap kept (for carry_over)."""
-        return {
-            origin: {"last_request": at, "delay_seconds": self._gap(origin, 0.0)}
-            for origin, at in self._last_request.items()
-        }
+        """Each site asked this run: when, the gap kept, and when it turned the bot away
+        (for carry_over). Site addresses and times only."""
+        found: dict[str, dict] = {}
+        for origin in set(self._last_request) | set(self._blocked_at):
+            entry: dict = {"delay_seconds": self._gap(origin, 0.0)}
+            if origin in self._last_request:
+                entry["last_request"] = self._last_request[origin]
+            if origin in self._blocked_at:
+                entry["blocked_at"] = self._blocked_at[origin]
+            found[origin] = entry
+        return found
 
     # -- internals ----------------------------------------------------------
 
@@ -317,7 +351,9 @@ class Fetcher:
         elif response.status == 429:
             reason = "HTTP 429; the site asks us to slow down"
         if reason is not None:
-            self._blocked[_origin(response.url)] = reason  # ask that site nothing more
+            origin = _origin(response.url)
+            self._blocked_at[origin] = self.clock()
+            self._blocked[origin] = f"{reason}; nothing more is asked of this site this run"
             raise Blocked(response.url, reason)
 
     def _gap(self, origin: str, extra_delay: float) -> float:
@@ -363,7 +399,7 @@ def _contact_from_settings(path: Path) -> str:
     return str(contact)
 
 
-STATE_KEEP_SECONDS = 86_400  # older entries in the state file are dropped
+STATE_KEEP_SECONDS = BLOCK_SECONDS  # older entries in the state file are dropped
 
 
 def default_state_file() -> Path:
@@ -382,11 +418,14 @@ def _read_state(path: Path) -> dict[str, dict]:
 
 
 def _write_state(path: Path, entries: dict[str, dict], now: float) -> None:
+    def newest(entry: dict) -> float:
+        times = [entry.get(k) for k in ("last_request", "blocked_at")]
+        return max((t for t in times if isinstance(t, (int, float))), default=float("-inf"))
+
     keep = {
-        k: v
+        k: {f: v[f] for f in ("last_request", "delay_seconds", "blocked_at") if f in v}
         for k, v in entries.items()
-        if isinstance(v.get("last_request"), (int, float))
-        and now - v["last_request"] < STATE_KEEP_SECONDS
+        if now - newest(v) < STATE_KEEP_SECONDS
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_name(f".{path.name}.tmp")
