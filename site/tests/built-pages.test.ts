@@ -88,8 +88,9 @@ test("robots.txt: a test build lets in only Facebook's preview bot; production i
 const shift = (iso: string) => iso.replace(/^20(\d\d)/, (_, yy) => `21${yy}`);
 
 /** The sample listings, moved 100 years ahead. */
-function futureEvents(dir: string): string {
+function futureEvents(dir: string, edit?: (file: EventsFile) => void): string {
   const file = structuredClone(sample);
+  edit?.(file);
   for (const e of file.events) {
     e.start = shift(e.start);
     if (e.end) e.end = shift(e.end);
@@ -99,7 +100,7 @@ function futureEvents(dir: string): string {
   return path;
 }
 
-function build(env: Record<string, string>): { out: string; read: (p: string) => string; done: () => void } {
+function build(env: Record<string, string>, edit?: (file: EventsFile) => void): { out: string; read: (p: string) => string; done: () => void } {
   const dir = mkdtempSync(join(tmpdir(), "pv-preview-"));
   const out = join(dir, "dist");
   const clean = { ...process.env };
@@ -107,7 +108,7 @@ function build(env: Record<string, string>): { out: string; read: (p: string) =>
   delete clean.PV_TEST_BUILD;
   execFileSync(join(site, "node_modules/.bin/astro"), ["build", "--outDir", out, "--silent"], {
     cwd: site,
-    env: { ...clean, ASTRO_TELEMETRY_DISABLED: "1", PV_EVENTS: futureEvents(dir), ...env },
+    env: { ...clean, ASTRO_TELEMETRY_DISABLED: "1", PV_EVENTS: futureEvents(dir, edit), ...env },
     stdio: "pipe",
   });
   return { out, read: (p) => readFileSync(join(out, p), "utf8"), done: () => rmSync(dir, { recursive: true, force: true }) };
@@ -245,6 +246,47 @@ test("card place line: screen readers hear the comma form; the dotted form is hi
       assert.match(line, new RegExp(`<span aria-hidden="true"[^>]*>${shown}</span>`));
       assert.match(line, new RegExp(`<span class="sr-only"[^>]*>${spoken}</span>`));
     }
+  } finally {
+    b.done();
+  }
+});
+
+test("cards show the hosting organization as it writes it, marked with the listing's language", () => {
+  const LONG = "Schuylkill Center for Environmental Education";
+  const longId = sample.events[0].id;
+  const b = build({}, (file) => {
+    file.events[0].org_name = LONG;
+  });
+  try {
+    for (const lang of ["en", "es"]) {
+      const tr = i18n.translator(lang);
+      const html = b.read(`${lang}/index.html`);
+      // Every card, sensitive ones too, has the line, right under the title.
+      for (const e of sample.events) {
+        const start = html.indexOf(`data-listing-id="${e.id}"`);
+        assert.ok(start > 0, `${lang}: card ${e.id}`);
+        const card = html.slice(start, html.indexOf("</article>", start));
+        const org = e.id === longId ? LONG : e.org_name;
+        const [before, after] = tr.t("listing.hosted_by").split("{org}");
+        const line = card.match(/<p class="card__line card__host[^"]*"[^>]*>([\s\S]*?)<\/p>/);
+        assert.ok(line, `${lang} ${e.id}: host line`);
+        assert.equal(decode(line[1].replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim(), `${before}${org}${after}`.trim());
+        // The name carries the listing's own language, like the title.
+        assert.match(line[1], new RegExp(`<span lang="${e.listing_language}"[^>]*>${org.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}</span>`));
+        // Under the title and before the time and place lines.
+        assert.ok(card.indexOf("card__title") < card.indexOf("card__host"));
+        assert.ok(card.indexOf("card__host") < card.indexOf('name="clock"') || card.indexOf("card__host") < card.indexOf("<time"));
+        // Not part of the link's name: the link holds the title only.
+        const link = card.match(/<a class="card__link"[^>]*>([\s\S]*?)<\/a>/);
+        assert.ok(link && !link[1].includes(org), `${lang} ${e.id}: link name is the title only`);
+      }
+    }
+    // Long names wrap: the host line may break anywhere and is never clipped to one line.
+    const css = readFileSync(new URL("../src/components/ui/ListingCard.astro", import.meta.url), "utf8");
+    const rule = css.match(/\.card__host\s*\{([^}]*)\}/);
+    assert.ok(rule, "card__host has a style rule");
+    assert.match(rule[1], /overflow-wrap:\s*anywhere/);
+    assert.doesNotMatch(rule[1], /nowrap|ellipsis|line-clamp/);
   } finally {
     b.done();
   }

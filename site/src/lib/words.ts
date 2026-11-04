@@ -97,3 +97,15 @@ export function spotsLabel(
     ? { label: tr.plural("listing.spots_left", status.count, { day: tr.formatWeekday(e.last_seen_at) }) }
     : { label: tr.plural("listing.spots_left_on", status.count, { date: tr.formatDate(e.last_seen_at) }) };
 }
+
+/**
+ * Splits a translated sentence around one placeholder, so the page can put
+ * the value in its own element, e.g. an organization's name marked with its
+ * own language: "Hosted by {org}" gives ["Hosted by ", ""]. If the
+ * placeholder is missing, the value goes at the end.
+ */
+export function splitAround(text: string, name: string): [string, string] {
+  const mark = `{${name}}`;
+  const at = text.indexOf(mark);
+  return at === -1 ? [`${text} `, ""] : [text.slice(0, at), text.slice(at + mark.length)];
+}

@@ -63,6 +63,8 @@ const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.
               href={paths.listing(lang, e.id)}
               title={e.title}
               titleLang={e.listing_language}
+              org={e.org_name}
+              hostedBy={t("listing.hosted_by")}
               when={whenText(tr, e)}
               datetime={e.start}
               place={placeText(tr, e, settings)}

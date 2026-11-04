@@ -7,6 +7,7 @@
  *   |        cause drawing               |
  *   |+----------------------------------+|
  *   || Title (link to the detail page)  ||   solid dark band, white text
+ *   || Hosted by Example Pantry         ||
  *   || clock  Tue, Oct 20, 6:30 to 8:30 ||
  *   || pin    Kensington                ||
  *   || [Just show up] [Training]        ||
@@ -25,6 +26,7 @@ import Icon from "./Icon.astro";
 import IconButton from "./IconButton.astro";
 import Pill from "./Pill.astro";
 import SpotsBadge from "./SpotsBadge.astro";
+import { splitAround } from "../../lib/words.ts";
 
 interface Props {
   /** The listing's id, for saving on the device. */
@@ -35,6 +37,10 @@ interface Props {
   title: string;
   /** listing_language, so screen readers read the title in the right voice. */
   titleLang?: string;
+  /** The organization's name, as it writes it, untranslated. Marked with titleLang. */
+  org: string;
+  /** t("listing.hosted_by") with the {org} placeholder left open; the card fills it in. */
+  hostedBy: string;
   /** Day, date and time, already formatted, e.g. "Tuesday, October 20, 6:30 to 8:30 PM". */
   when: string;
   /** Start time as an ISO string, for the <time> element. */
@@ -72,6 +78,8 @@ const {
   href,
   title,
   titleLang,
+  org,
+  hostedBy,
   when,
   datetime,
   place,
@@ -92,6 +100,7 @@ const {
 } = Astro.props;
 
 const Heading = headingLevel === 2 ? "h2" : "h3";
+const [hostBefore, hostAfter] = splitAround(hostedBy, "org");
 ---
 
 <article class:list={["card", spots?.full && "card--full", className]} data-listing-id={id}>
@@ -103,6 +112,9 @@ const Heading = headingLevel === 2 ? "h2" : "h3";
     <Heading class="card__title">
       <a class="card__link" href={href} lang={titleLang}>{title}</a>
     </Heading>
+    <p class="card__line card__host">
+      <span>{hostBefore}<span lang={titleLang}>{org}</span>{hostAfter}</span>
+    </p>
     <p class="card__line">
       <Icon name="clock" />
       {datetime ? <time datetime={datetime}>{when}</time> : <span>{when}</span>}
@@ -216,6 +228,11 @@ const Heading = headingLevel === 2 ? "h2" : "h3";
     margin: 0 0 var(--space-1);
     color: var(--color-on-band-muted);
     font-size: var(--text-min);
+  }
+  /* Long organization names wrap; nothing is cut off. */
+  .card__host {
+    display: block;
+    overflow-wrap: anywhere;
   }
   .card__line :global(.icon) {
     margin-top: 0.1em;

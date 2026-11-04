@@ -15,7 +15,7 @@ import SpotsBadge from "../../../components/ui/SpotsBadge.astro";
 import { buildIcs } from "../../../lib/ics.ts";
 import { paths, siteData, translator } from "../../../lib/site.ts";
 import type { PreparedListing } from "../../../lib/types.ts";
-import { joinLabel, spotsLabel, timeText, typeLabel, whereLines } from "../../../lib/words.ts";
+import { joinLabel, splitAround, spotsLabel, timeText, typeLabel, whereLines } from "../../../lib/words.ts";
 
 export function getStaticPaths() {
   const { i18n, listings } = siteData();
@@ -30,6 +30,8 @@ const t = tr.t;
 const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.listing(code, e.id)]));
 
 const spots = spotsLabel(tr, e, builtAt);
+// The organization's name is its own wording, so it carries the listing's language.
+const [hostBefore, hostAfter] = splitAround(t("listing.hosted_by"), "org");
 const type = typeLabel(tr, e);
 const where = whereLines(tr, e, settings);
 const cause = tr.causeName(e.cause);
@@ -74,7 +76,9 @@ const reportHref =
       </div>
 
       <h1 id="listing-title" class="listing__title" lang={e.listing_language}>{e.title}</h1>
-      <p class="listing__org">{t("listing.hosted_by", { org: e.org_name })}</p>
+      <p class="listing__org">
+        {hostBefore}<span lang={e.listing_language}>{e.org_name}</span>{hostAfter}
+      </p>
       {e.listing_language !== lang && <p class="listing__original muted">{t("listing.original_language")}</p>}
 
       <div class="listing__pills">
