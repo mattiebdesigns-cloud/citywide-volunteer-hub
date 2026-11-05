@@ -1,15 +1,17 @@
 // Build-time inputs for every page: settings, listings, language helpers.
 // Read once per build. Paths come from astro.config.mjs (PV_EVENTS, PV_SETTINGS).
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createI18n, type I18n, type Translator } from "../i18n/index.ts";
 import { catalogs } from "../i18n/locales.ts";
-import { checkEventsFile, checkSettings, prepareListings } from "./prepare.ts";
-import type { EventsFile, PreparedListing, SiteSettings } from "./types.ts";
+import { checkEventsFile, checkOpportunitiesFile, checkSettings, prepareListings, prepareOpportunities } from "./prepare.ts";
+import type { EventsFile, OpportunitiesFile, Opportunity, PreparedListing, SiteSettings } from "./types.ts";
 
 export interface SiteData {
   settings: SiteSettings;
   i18n: I18n;
   listings: PreparedListing[];
+  /** Flexible opportunities (decision 0018); empty when there is no file. */
+  opportunities: Opportunity[];
   generatedAt: string;
   builtAt: Date;
   testBuild: boolean;
@@ -44,11 +46,21 @@ export function siteData(): SiteData {
   const file = readJson<EventsFile>(eventsPath, "events file");
   checkEventsFile(file, eventsPath);
 
+  // Optional. A path the builder named must exist; the default sample may not.
+  const oppPath = process.env.PV_OPPORTUNITIES_PATH;
+  let opportunities: Opportunity[] = [];
+  if (oppPath && (process.env.PV_OPPORTUNITIES_REQUIRED === "1" || existsSync(oppPath))) {
+    const opp = readJson<OpportunitiesFile>(oppPath, "opportunities file");
+    checkOpportunitiesFile(opp, oppPath);
+    opportunities = prepareOpportunities(opp, settings);
+  }
+
   const builtAt = new Date();
   cached = {
     settings,
     i18n: createI18n(settings, catalogs),
     listings: prepareListings(file, settings, { now: builtAt }),
+    opportunities,
     generatedAt: file.generated_at,
     builtAt,
     testBuild: process.env.PV_TEST_BUILD === "1" || process.env.PV_TEST_BUILD === "true",
@@ -70,4 +82,5 @@ export function translator(lang: string): Translator {
 export const paths = {
   home: (lang: string) => `/${lang}/`,
   listing: (lang: string, id: string) => `/${lang}/listing/${id}/`,
+  flexible: (lang: string) => `/${lang}/flexible/`,
 };

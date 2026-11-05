@@ -1,0 +1,16 @@
+{
+  "id": "example-orchard-group",
+  "org_name": "Example Orchard Group",
+  "scraper": "mec_events",
+  "url": "https://orchards.example.org/events/",
+  "area": "philadelphia",
+  "listing_language": "en",
+  "default_type": "service",
+  "default_join_method": "signup",
+  "default_cause": "parks-and-trees",
+  "sensitive": false,
+  "group_friendly": false,
+  "timezone": "America/New_York",
+  "require_titles": ["work day", "workday", "planting", "harvest"],
+  "drop_titles": ["Open Orchard Hours", "Workshop"]
+}

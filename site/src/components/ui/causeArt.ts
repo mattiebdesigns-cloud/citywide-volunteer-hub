@@ -108,6 +108,21 @@ export const art: Record<string, string> = {
       <rect class="b" x="134" y="70" width="12" height="70" rx="6"/>
       <rect class="cl" x="137" y="22" width="6" height="50"/>
     </g>`,
+  arts: `
+    <circle class="s" cx="262" cy="104" r="36"/>
+    <g transform="translate(124 74) rotate(-12)">
+      <path class="a" d="M-32-34c20-8 44-8 64 0v26c0 28-14 48-32 48s-32-20-32-48z"/>
+      <ellipse class="c" cx="-13" cy="-12" rx="8" ry="5"/><ellipse class="c" cx="13" cy="-12" rx="8" ry="5"/>
+      <path class="w" d="M-14 12c8 10 20 10 28 0"/>
+    </g>
+    <g transform="translate(178 84) rotate(12)">
+      <path class="b" d="M-32-34c20-8 44-8 64 0v26c0 28-14 48-32 48s-32-20-32-48z"/>
+      <ellipse class="c" cx="-13" cy="-12" rx="8" ry="5"/><ellipse class="c" cx="13" cy="-12" rx="8" ry="5"/>
+      <path class="l" d="M-14 22c8-10 20-10 28 0"/>
+    </g>
+    <rect class="a" x="58" y="40" width="5" height="58"/>
+    <path class="a" d="M58 40c10 6 24 8 24 26-4-8-12-11-24-11z"/>
+    <ellipse class="a" cx="50" cy="100" rx="12" ry="9" transform="rotate(-20 50 100)"/>`,
 };
 
 export const fallback = `

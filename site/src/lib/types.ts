@@ -43,6 +43,49 @@ export interface Listing {
   full?: boolean;
 }
 
+/**
+ * A flexible opportunity (decision 0018): a program with no set dates or
+ * times; the volunteer schedules with the organization. The listing fields
+ * that need no date, plus `commitment`. Format: docs/opportunities-file.schema.json.
+ */
+export interface Opportunity
+  extends Pick<
+    Listing,
+    | "id"
+    | "org_name"
+    | "title"
+    | "address"
+    | "area"
+    | "section"
+    | "neighborhood_or_town"
+    | "cause"
+    | "type"
+    | "sensitive"
+    | "photos_allowed"
+    | "signup_url"
+    | "join_method"
+    | "min_age"
+    | "listing_language"
+    | "spanish_spoken"
+    | "training_required"
+    | "clearances_required"
+    | "group_friendly"
+    | "source_url"
+    | "source_id"
+    | "last_seen_at"
+    | "host_type"
+    | "faith_tradition"
+    | "activity"
+  > {
+  /** The time asked, in the organization's own words, or null. */
+  commitment: string | null;
+}
+
+export interface OpportunitiesFile {
+  generated_at: string;
+  opportunities: Opportunity[];
+}
+
 export interface EventsFile {
   generated_at: string;
   events: Listing[];

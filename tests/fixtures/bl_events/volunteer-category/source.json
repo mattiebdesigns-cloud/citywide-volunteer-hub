@@ -1,0 +1,14 @@
+{
+  "id": "example-park-conservancy",
+  "org_name": "Example Park Conservancy",
+  "scraper": "bl_events",
+  "url": "https://conservancy.example.org/events/calendar/?_sft_event_categories=volunteer-opportunity",
+  "area": "philadelphia",
+  "listing_language": "en",
+  "default_type": "service",
+  "default_join_method": "signup",
+  "default_cause": "parks-and-trees",
+  "sensitive": false,
+  "timezone": "America/New_York",
+  "drop_titles": ["We Walk PHL"]
+}

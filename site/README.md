@@ -22,6 +22,7 @@ All optional. Relative paths are read from the folder you run the command in.
 |---|---|---|
 | `PV_EVENTS` | The events file (`docs/EVENT-FORMAT.md`) | `../docs/examples/events.sample.json` |
 | `PV_SETTINGS` | The city settings, as JSON | `settings.example.json` |
+| `PV_OPPORTUNITIES` | The flexible opportunities file (`docs/opportunities-file.schema.json`, decision 0018). Optional: a file named here must exist; with none, the default sample is used if present, otherwise the Flexible page says there are none yet | `../docs/examples/opportunities.sample.json` |
 | `PV_SITE_URL` | The site's public address, for full links and link previews (below) | none |
 | `PV_TEST_BUILD` | `1` makes a test build (below) | off |
 
@@ -42,6 +43,10 @@ A city keeps its settings in its own private place. If they are in YAML, convert
 - a `robots.txt` that lets in only Facebook's link-preview bot (`facebookexternalhit`) and asks every other crawler to stay out (decision 0014).
 
 A normal build's `robots.txt` lets every crawler in.
+
+### Flexible opportunities
+
+`/en/flexible/` and `/es/flexible/` list programs with no set dates or times, where the volunteer schedules with the organization (decision 0018). They come from `PV_OPPORTUNITIES`, never from the events file, so the calendar does not change. Each card shows a "Flexible" tag, the title (linking to the organization's own page), who hosts it, the part of the city and neighborhood, how to join, the minimum age and the time asked. Filters: part of the city, cause and how to join. There is no detail page. The home page links here.
 
 ### Link previews
 

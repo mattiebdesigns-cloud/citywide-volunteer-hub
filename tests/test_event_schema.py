@@ -29,7 +29,7 @@ pytestmark = pytest.mark.skipif(
 
 
 def events_files() -> list[Path]:
-    found = list((ROOT / "docs/examples").glob("*.json"))
+    found = list((ROOT / "docs/examples").glob("events*.json"))
     found += list((ROOT / "tests/fixtures/events").glob("*.json"))
     site = ROOT / "site"
     if site.is_dir():

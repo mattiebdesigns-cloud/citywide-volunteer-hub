@@ -47,6 +47,10 @@
       "label": "Zona",
       "all": "Todas las zonas"
     },
+    "section": {
+      "label": "Parte de la ciudad",
+      "all": "Todas las partes de la ciudad"
+    },
     "cause": {
       "label": "Causa",
       "all": "Todas las causas"
@@ -90,7 +94,8 @@
     "education": "Educación",
     "health": "Salud",
     "clothing": "Ropa",
-    "repair": "Reparación"
+    "repair": "Reparación",
+    "arts": "Arte y cultura"
   },
   "host_types": {
     "nonprofit": "Organización sin fines de lucro",
@@ -234,6 +239,21 @@
     "success_confirm": "Gracias. Revise su correo para confirmar su suscripción.",
     "invalid": "Escriba un correo electrónico como nombre@ejemplo.com.",
     "error": "Algo salió mal. Inténtelo de nuevo."
+  },
+  "flexible": {
+    "title": "Oportunidades flexibles",
+    "intro": "Estos programas no tienen fechas ni horarios fijos. Usted elige un horario con la organización.",
+    "tag": "Flexible",
+    "commitment": "Tiempo que se pide: {commitment}",
+    "home_link": "Oportunidades flexibles: sin horario fijo",
+    "count": {
+      "one": "{count} oportunidad",
+      "other": "{count} oportunidades"
+    },
+    "none": "Todavía no hay oportunidades flexibles.",
+    "none_match": "Ninguna oportunidad coincide con estos filtros.",
+    "none_match_hint": "Quite un filtro para ver más.",
+    "apply": "Mostrar oportunidades"
   },
   "og": {
     "headline": "Turnos de voluntariado en todo {city}",

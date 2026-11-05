@@ -32,6 +32,8 @@ export function pruneSavedNow(): void {
   if (after.size !== before.size) writeSaved(after);
 }
 const FILTERS_KEY = "cvh.filters";
+/** Filters on the Flexible page are kept apart, so a day filter never empties it. */
+export const FLEXIBLE_FILTERS_KEY = "cvh.filters.flexible";
 
 export function readSaved(): Set<string> {
   pruneSavedNow();
@@ -56,18 +58,18 @@ export function writeSaved(ids: Set<string>): void {
   }
 }
 
-export function readFilters<T extends object>(fallback: T): T {
+export function readFilters<T extends object>(fallback: T, key = FILTERS_KEY): T {
   try {
-    const raw = sessionStorage.getItem(FILTERS_KEY);
+    const raw = sessionStorage.getItem(key);
     return raw ? { ...fallback, ...JSON.parse(raw) } : { ...fallback };
   } catch {
     return { ...fallback };
   }
 }
 
-export function writeFilters(state: object): void {
+export function writeFilters(state: object, key = FILTERS_KEY): void {
   try {
-    sessionStorage.setItem(FILTERS_KEY, JSON.stringify(state));
+    sessionStorage.setItem(key, JSON.stringify(state));
   } catch {
     // storage blocked
   }

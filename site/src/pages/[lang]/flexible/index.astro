@@ -1,0 +1,108 @@
+---
+/**
+ * Flexible opportunities (decision 0018; PROJECT.md 2, 4, 5): programs with
+ * no set dates or times, where the volunteer schedules with the organization.
+ * Kept apart from the calendar. Each card links out to the organization's
+ * own page (sign-ups never happen here in Phase 1); there is no detail page.
+ * Filters: part of the city, cause, how to join.
+ */
+import Base from "../../../layouts/Base.astro";
+import FlexibleFilterPanel from "../../../components/FlexibleFilterPanel.astro";
+import ListingCard from "../../../components/ui/ListingCard.astro";
+import { languagePaths, paths, siteData, translator } from "../../../lib/site.ts";
+import { placeSpoken, placeText } from "../../../lib/words.ts";
+
+export const getStaticPaths = languagePaths;
+
+const { lang } = Astro.params as { lang: string };
+const { i18n, opportunities, settings } = siteData();
+const tr = translator(lang);
+const t = tr.t;
+const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.flexible(code)]));
+const any = opportunities.length > 0;
+
+function facts(o: (typeof opportunities)[number]) {
+  const out: Array<{ template: string; name: string; value: string; lang?: string }> = [];
+  if (o.min_age !== null) out.push({ template: t("listing.min_age"), name: "age", value: tr.formatNumber(o.min_age) });
+  if (o.commitment) {
+    out.push({ template: t("flexible.commitment"), name: "commitment", value: o.commitment, lang: o.listing_language });
+  }
+  return out;
+}
+---
+
+<Base lang={lang} title={t("flexible.title")} alternates={alternates} path={paths.flexible(lang)} filters={any}>
+  <div class="page results">
+    <p class="flexible__back"><a class="tap-link" href={paths.home(lang)}>{t("listing.back")}</a></p>
+    <h1 id="results-heading" class="results__heading" tabindex="-1">{t("flexible.title")}</h1>
+    <p>{t("flexible.intro")}</p>
+  </div>
+  {any && <FlexibleFilterPanel lang={lang} />}
+  <div class="page results">
+    {
+      any ? (
+        <>
+          <p id="external-note" class="muted">{t("listing.external_note")}</p>
+          <p
+            id="results-count"
+            class="results__count"
+            role="status"
+            data-count-one={t("flexible.count.one")}
+            data-count-other={t("flexible.count.other")}
+          >
+            {tr.plural("flexible.count", opportunities.length)}
+          </p>
+          <div id="results-none" class="results__none" hidden>
+            <p>{t("flexible.none_match")}</p>
+            <p class="muted">{t("flexible.none_match_hint")}</p>
+          </div>
+          <ul id="listing-list" class="stack listing-list">
+            {opportunities.map((o) => (
+              <li data-id={o.id} data-section={o.section ?? ""} data-cause={o.cause ?? ""} data-join={o.join_method}>
+                <ListingCard
+                  id={o.id}
+                  href={o.signup_url}
+                  external
+                  describedBy="external-note"
+                  title={o.title}
+                  titleLang={o.listing_language}
+                  org={o.org_name}
+                  hostedBy={t("listing.hosted_by")}
+                  place={placeText(tr, o, settings)}
+                  placeSpoken={placeSpoken(tr, o, settings)}
+                  flexibleLabel={t("flexible.tag")}
+                  facts={facts(o)}
+                  cause={o.cause}
+                  joinMethod={o.join_method}
+                  joinLabel={t(`filters.join.${o.join_method}`)}
+                  headingLevel={2}
+                />
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p id="flexible-none">{t("flexible.none")}</p>
+      )
+    }
+  </div>
+</Base>
+
+{
+  any && (
+    <script>
+      import "../../../scripts/flexible-filters.ts";
+    </script>
+  )
+}
+
+<style>
+  .tap-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+  .flexible__back {
+    margin: 0;
+  }
+</style>

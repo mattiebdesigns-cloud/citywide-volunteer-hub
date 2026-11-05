@@ -1,6 +1,6 @@
 # Shared event format
 
-Every scraper turns a public volunteer calendar into listings in this format. The pipeline gathers them into one `events.json` file, and the calendar website reads that file.
+Every scraper turns a public volunteer calendar into listings in this format. The pipeline gathers them into one `events.json` file, and the calendar website reads that file. Programs with no set times use a sister format, described under "Flexible opportunities" at the end of this page.
 
 The format is defined in two JSON Schema files (draft 2020-12). This page explains them in plain words. If this page and the schema disagree, the schema wins; report it as a bug.
 
@@ -131,3 +131,28 @@ Load both schema files into your validator. The file schema refers to the listin
 ## What a listing never holds
 
 Scrapers never output names of attendees, counts by name, or sign-up lists. The open-spots fields hold only the numbers the organization itself shows to the public. They store facts and a link back, not the organization's full description or images.
+
+## Flexible opportunities
+
+Some volunteer programs have no set dates or times: you contact the organization and schedule with them. Examples are dog outings from a shelter or open garden help. These are **flexible opportunities**. They do not go in `events.json`, and the calendar's day and time filters never see them. The pipeline writes them to a separate file, `opportunities.json`, and the site shows them on their own page.
+
+| File | What it checks |
+|---|---|
+| `docs/opportunity.schema.json` | One flexible opportunity |
+| `docs/opportunities-file.schema.json` | The whole `opportunities.json` file |
+| `docs/examples/opportunities.sample.json` | A small sample file of made-up programs that passes both |
+
+```json
+{ "generated_at": "2026-11-05T06:00:00-05:00", "opportunities": [ ... ] }
+```
+
+- **Same fields as a listing, without the dates.** An opportunity has these listing fields, with the same meaning and the same rules: `id, org_name, title, address, area, section, neighborhood_or_town, cause, type, sensitive, photos_allowed, signup_url, join_method, min_age, listing_language, spanish_spoken, training_required, clearances_required, group_friendly, source_url, source_id, last_seen_at, host_type, faith_tradition, activity`. The opportunity schema points at the listing schema for each of them, so the two cannot drift apart.
+- **No `start`, `end`, `recurring` or `recurrence_rule`.** A schedule is never guessed from opening hours. If an organization publishes real dates, those dates are listings in `events.json` instead.
+- **No open-spots fields** (`spots_left`, `spots_total`, `full`).
+- **One extra field, `commitment`:** the time the organization asks for, in its own words, for example "2 hours a week for 6 months". `null` when the organization does not say. Never worked out by us.
+- **Every field is required.** This is a new file with no older copies, so `section`, `host_type`, `faith_tradition` and `activity` are always written (`null` when not known).
+- **Same unknown rules:** `join_method` and `spanish_spoken` use `"unknown"`; every other unknown is `null`. A `protest_action` program must have `sensitive: true`.
+- `section` and `neighborhood_or_town` come from the address in the same way as for listings.
+- Each `id` appears once in the file. JSON Schema cannot check that, so the pipeline and tests do.
+
+To validate, load three schema files into one validator: the listing schema (`urn:citywide-volunteer-hub:schema:event`), the opportunity schema (`urn:citywide-volunteer-hub:schema:opportunity`) and the file schema. Turn on format checking, as for `events.json`.

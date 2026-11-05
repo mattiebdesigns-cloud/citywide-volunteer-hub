@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:citywide-volunteer-hub:schema:opportunity",
+  "title": "Flexible opportunity",
+  "description": "One volunteer program with no set dates or times: the volunteer schedules with the organization. Plain-language guide: docs/EVENT-FORMAT.md, section \"Flexible opportunities\". Every shared field has the same meaning and the same rules as in a listing (docs/event.schema.json), and points at that definition, so the two cannot drift apart. There is no start, end, recurring or recurrence_rule: a schedule is never guessed from open hours. Unknown values: join_method and spanish_spoken use the string \"unknown\"; every other field that may be unknown uses null.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "org_name",
+    "title",
+    "address",
+    "area",
+    "section",
+    "neighborhood_or_town",
+    "cause",
+    "type",
+    "sensitive",
+    "photos_allowed",
+    "signup_url",
+    "join_method",
+    "min_age",
+    "listing_language",
+    "spanish_spoken",
+    "training_required",
+    "clearances_required",
+    "group_friendly",
+    "source_url",
+    "source_id",
+    "last_seen_at",
+    "host_type",
+    "faith_tradition",
+    "activity",
+    "commitment"
+  ],
+  "properties": {
+    "id": {
+      "description": "Stable across runs: for a hand-entered program, the id written in the city's flexible list. Never reused for a different program.",
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/id"
+    },
+    "org_name": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/org_name"
+    },
+    "title": {
+      "description": "Name of the program, in the language the organization wrote it.",
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/title"
+    },
+    "address": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/address"
+    },
+    "area": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/area"
+    },
+    "section": {
+      "description": "Section id from the city's own settings file (sections[].id), filled from the address's ZIP code as for listings, never guessed. null when not known.",
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/section"
+    },
+    "neighborhood_or_town": {
+      "description": "Neighborhood or town, finer than area. A value the entry gives wins; otherwise the pipeline may fill it from the city's ZIP table. null when not known.",
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/neighborhood_or_town"
+    },
+    "cause": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/cause"
+    },
+    "type": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/type"
+    },
+    "sensitive": {
+      "description": "true for every protest_action program, anything immigration-related, and anything flagged sensitive. When unsure, true. Same rules as listings.",
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/sensitive"
+    },
+    "photos_allowed": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/photos_allowed"
+    },
+    "signup_url": {
+      "description": "The organization's own page for joining or scheduling. Sign-ups and scheduling never happen on the hub.",
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/signup_url"
+    },
+    "join_method": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/join_method"
+    },
+    "min_age": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/min_age"
+    },
+    "listing_language": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/listing_language"
+    },
+    "spanish_spoken": {
+      "description": "Whether Spanish is spoken. \"unknown\" when the source does not say. Never guess.",
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/spanish_spoken"
+    },
+    "training_required": {
+      "description": "Whether training is needed before starting. null when the source does not say.",
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/training_required"
+    },
+    "clearances_required": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/clearances_required"
+    },
+    "group_friendly": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/group_friendly"
+    },
+    "source_url": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/source_url"
+    },
+    "source_id": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/source_id"
+    },
+    "last_seen_at": {
+      "description": "When the program was last confirmed on its source page. Shown as \"last checked\".",
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/last_seen_at"
+    },
+    "host_type": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/host_type"
+    },
+    "faith_tradition": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/faith_tradition"
+    },
+    "activity": {
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/properties/activity"
+    },
+    "commitment": {
+      "description": "The time the organization asks for, in its own words, for example \"2 hours a week for 6 months\". null when the source does not say. Never guessed, never worked out from open hours.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "description": "Every protest_action program is sensitive.",
+      "if": {
+        "properties": {
+          "type": {
+            "const": "protest_action"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "sensitive": {
+            "const": true
+          }
+        }
+      }
+    }
+  ]
+}

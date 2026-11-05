@@ -1,0 +1,113 @@
+---
+/**
+ * Filters for the Flexible opportunities page (decision 0018): part of the
+ * city (section), cause and how to join. Works like the home page's panel
+ * (components/FilterPanel.astro): browser only, nothing is sent anywhere,
+ * choices kept for this tab only, and without JavaScript every card shows.
+ * Only choices that some opportunity has are offered.
+ */
+import Button from "./ui/Button.astro";
+import IconButton from "./ui/IconButton.astro";
+import { usedIds } from "../lib/prepare.ts";
+import { sectionName } from "../lib/words.ts";
+import { siteData, translator } from "../lib/site.ts";
+
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+const { settings, opportunities } = siteData();
+const tr = translator(lang);
+const t = tr.t;
+
+const sections = usedIds(
+  (settings.sections ?? []).map((s) => s.id),
+  opportunities.map((o) => o.section),
+);
+const causes = usedIds(settings.causes, opportunities.map((o) => o.cause));
+const joins = ["drop_in", "signup", "application", "unknown"];
+---
+
+<section id="filter-panel" class="filter-panel" aria-labelledby="filter-panel-heading" hidden>
+  <div class="filter-panel__top">
+    <h2 id="filter-panel-heading" class="filter-panel__heading">{t("filters.open")}</h2>
+    <IconButton icon="close" label={t("filters.close")} tone="plain" data-filters-close />
+  </div>
+
+  <div class="filter-panel__fields">
+    {
+      sections.length > 1 && (
+        <div class="field">
+          <label for="filter-section">{t("filters.section.label")}</label>
+          <select id="filter-section" data-filter="section">
+            <option value="">{t("filters.section.all")}</option>
+            {sections.map((id) => <option value={id}>{sectionName(tr, settings, id)}</option>)}
+          </select>
+        </div>
+      )
+    }
+
+    {
+      causes.length > 0 && (
+        <div class="field">
+          <label for="filter-cause">{t("filters.cause.label")}</label>
+          <select id="filter-cause" data-filter="cause">
+            <option value="">{t("filters.cause.all")}</option>
+            {causes.map((id) => <option value={id}>{tr.causeName(id)}</option>)}
+          </select>
+        </div>
+      )
+    }
+
+    <div class="field">
+      <label for="filter-join">{t("filters.join.label")}</label>
+      <select id="filter-join" data-filter="join">
+        <option value="">{t("filters.join.all")}</option>
+        {joins.map((x) => <option value={x}>{t(`filters.join.${x}`)}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <div class="filter-panel__actions">
+    <Button block data-filters-apply>{t("flexible.apply")}</Button>
+    <Button variant="quiet" block data-filters-clear>{t("filters.clear")}</Button>
+  </div>
+</section>
+
+<style>
+  /* Same layout as the home page's panel. */
+  .filter-panel {
+    width: 100%;
+    max-width: var(--page-max);
+    margin: 0 auto var(--space-5);
+    padding: var(--space-4) var(--page-pad);
+    background: var(--color-surface);
+    border-block: var(--border) solid var(--color-line);
+  }
+  .filter-panel[hidden] {
+    display: none;
+  }
+  .filter-panel__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+  .filter-panel__heading {
+    margin: 0;
+  }
+  .filter-panel__fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+  .filter-panel__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+</style>

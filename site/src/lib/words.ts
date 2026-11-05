@@ -28,8 +28,11 @@ export function sectionName(
   return section ? tr.setting(section.name) : "";
 }
 
+/** The place fields shared by listings and flexible opportunities. */
+type Place = Pick<PreparedListing, "section" | "neighborhood_or_town" | "area">;
+
 /** Section and neighborhood, when both are known and differ; otherwise null. */
-function placePair(tr: Translator, e: PreparedListing, settings: Pick<SiteSettings, "sections">) {
+function placePair(tr: Translator, e: Place, settings: Pick<SiteSettings, "sections">) {
   const section = sectionName(tr, settings, e.section);
   const neighborhood = e.neighborhood_or_town?.trim() ?? "";
   return section && neighborhood && !sameName(section, neighborhood) ? { section, neighborhood } : null;
@@ -41,7 +44,7 @@ function placePair(tr: Translator, e: PreparedListing, settings: Pick<SiteSettin
  * Neither: the area's name, as before. The neighborhood is a proper name and
  * is never translated.
  */
-export function placeText(tr: Translator, e: PreparedListing, settings: Pick<SiteSettings, "sections">): string {
+export function placeText(tr: Translator, e: Place, settings: Pick<SiteSettings, "sections">): string {
   const pair = placePair(tr, e, settings);
   if (pair) return tr.t("listing.place_pair", pair);
   return sectionName(tr, settings, e.section) || e.neighborhood_or_town?.trim() || tr.areaName(e.area);
@@ -52,7 +55,7 @@ export function placeText(tr: Translator, e: PreparedListing, settings: Pick<Sit
  * Wards, Kensington" (listing.place_pair_spoken), since the dot between them
  * is read out or skipped. Empty when the line is one name, which reads fine.
  */
-export function placeSpoken(tr: Translator, e: PreparedListing, settings: Pick<SiteSettings, "sections">): string {
+export function placeSpoken(tr: Translator, e: Place, settings: Pick<SiteSettings, "sections">): string {
   const pair = placePair(tr, e, settings);
   return pair ? tr.t("listing.place_pair_spoken", pair) : "";
 }

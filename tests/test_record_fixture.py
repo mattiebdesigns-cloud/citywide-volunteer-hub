@@ -146,3 +146,122 @@ def test_notice_exists():
     text = notice.read_text(encoding="utf-8")
     assert "not** covered by this repository's MIT licence" in text
     assert "not ours to license" in text and "whole case folder is deleted" in text
+
+
+# -- web pages: excerpts, and recording from a copy fetched with the command ----
+
+ACCORDION_PAGE = """<html><body><nav>Menu</nav>
+<div class="accordion"><h2>Thursday Stewardship</h2><div class="content">
+<p>Join A. Person and the crew. Contact <a href="mailto:a.person@example.org">us</a>.</p>
+<ul><li><a href="https://org.example.org/event/day-11-12-2026/">Service Day</a>
+<span>Thursday, November 12, 2026 from 9:00 AM to 12:00 PM</span>
+<a href="mailto:crew@example.org">Questions?</a><img src="x.jpg"></li></ul></div></div>
+<footer>Staff: B. Person</footer></body></html>"""
+HTML_SOURCE = {
+    **SOURCE,
+    "scraper": "accordion_event_list",
+    "url": "https://org.example.org/volunteer/",
+    "timezone": "America/New_York",
+    "crawl_delay_seconds": 0,
+}
+
+
+def test_web_page_excerpt_keeps_only_what_the_scraper_reads():
+    cleaned, removed = record_fixture.clean_accordion(ACCORDION_PAGE)
+    for gone in ("A. Person", "B. Person", "mailto", "@", "Menu", "x.jpg"):
+        assert gone not in cleaned
+    assert "Service Day" in cleaned and "November 12, 2026" in cleaned
+    assert removed["<p>"] == 1 and removed["email links"] == 1 and removed["<img>"] == 1
+
+
+def test_web_page_excerpt_refuses_a_leftover_email_address():
+    page = ACCORDION_PAGE.replace("<span>Thursday", "<span>Write to c.person@example.org. Thursday")
+    with pytest.raises(record_fixture.Refused, match="email address"):
+        record_fixture.clean_accordion(page)
+
+
+def _saved_page(tmp_path, **changes):
+    """A page as python -m pvscrapers.fetch saves it, with its fetch record."""
+    page = tmp_path / "fetched" / "01-page.html"
+    page.parent.mkdir(parents=True, exist_ok=True)
+    page.write_text(ACCORDION_PAGE)
+    proof = {
+        "url": HTML_SOURCE["url"],
+        "final_url": HTML_SOURCE["url"],
+        "status": 200,
+        "fetched_at": "2026-11-05T17:02:11+00:00",
+        "bot": "CitywideVolunteerHubBot/0.1.0",
+        "robots_txt": {
+            "url": "https://org.example.org/robots.txt",
+            "read_at": "2026-11-05T17:02:10+00:00",
+            "status": 200,
+            "verdict": "allowed",
+        },
+        "delay_seconds": 1.0,
+        "source_crawl_delay_seconds": 0.0,
+        "how": "python -m pvscrapers.fetch",
+    }
+    proof.update(changes)
+    (page.parent / "01-page.html.fetch.json").write_text(json.dumps(proof))
+    return page
+
+
+def test_records_a_page_fetched_by_the_command(tmp_path):
+    out = tmp_path / "case"
+    out.mkdir()
+    (out / "source.json").write_text(json.dumps(HTML_SOURCE))
+    page = _saved_page(tmp_path)
+    summary = record_fixture.record(HTML_SOURCE, None, out, page_file=page)
+    assert summary["listings"] == 1
+    fetched = json.loads((out / "fetched.json").read_text())
+    assert fetched["fetched_at"] == "2026-11-05T17:02:11+00:00"  # from the record, not typed in
+    assert fetched["how"].startswith("Fetched once with python -m pvscrapers.fetch")
+    assert fetched["fetch_record"]["robots_txt"]["verdict"] == "allowed"
+    assert fetched["fetch_record"]["final_url"] == HTML_SOURCE["url"]
+    assert "Kept only the parts the scraper reads" in fetched["changed_after_fetch"]
+    expected = json.loads((out / "expected.json").read_text())
+    assert expected[0]["last_seen_at"] == "2026-11-05T17:02:11+00:00"
+
+
+def test_refuses_a_page_without_a_fetch_record(tmp_path):
+    page = tmp_path / "page.html"
+    page.write_text(ACCORDION_PAGE)
+    with pytest.raises(record_fixture.Refused, match="no fetch record"):
+        record_fixture.record(HTML_SOURCE, None, tmp_path / "case", page_file=page)
+
+
+@pytest.mark.parametrize(
+    "change, why",
+    [
+        ({"url": "https://other.example.org/"}, "not the source's own address"),
+        ({"status": 203}, "did not answer HTTP 200"),
+        ({"bot": "Mozilla/5.0"}, "not fetched by our bot"),
+        ({"robots_txt": {"verdict": "allowed"}}, "robots.txt was not read"),
+        ({"fetched_at": "yesterday"}, "fetch time cannot be read"),
+    ],
+)
+def test_refuses_a_fetch_record_that_does_not_fit(tmp_path, change, why):
+    page = _saved_page(tmp_path, **change)
+    with pytest.raises(record_fixture.Refused, match=why):
+        record_fixture.record(HTML_SOURCE, None, tmp_path / "case", page_file=page)
+
+
+def test_refuses_when_the_sources_own_delay_was_not_kept(tmp_path):
+    source = {**HTML_SOURCE, "crawl_delay_seconds": 10}
+    page = _saved_page(tmp_path, source_crawl_delay_seconds=1.0)
+    with pytest.raises(record_fixture.Refused, match="crawl_delay_seconds"):
+        record_fixture.record(source, None, tmp_path / "case", page_file=page)
+
+
+def test_mec_excerpt_drops_the_organizer_and_descriptions():
+    page = (
+        '<div class="mec-event-list-standard"><article class="mec-event-article mec-toggle-202611-1">'
+        '<h3 class="mec-event-title"><a href="https://o.example.org/e/">Work Day</a></h3>'
+        '<div class="mec-event-description">Meet D. Person at the gate.</div>'
+        '<div class="mec-shortcode-organizers"><span>D. Person</span></div>'
+        '<script type="application/ld+json">{"startDate": "x"}</script></article></div>'
+    )
+    cleaned, removed = record_fixture.clean_mec(page)
+    assert "D. Person" not in cleaned and "ld+json" not in cleaned
+    assert "Work Day" in cleaned
+    assert removed[".mec-shortcode-organizers"] == 1 and removed[".mec-event-description"] == 1

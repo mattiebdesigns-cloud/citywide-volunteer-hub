@@ -3,6 +3,8 @@
 // Build-time inputs, all optional:
 //   PV_EVENTS      path to the events file   (default: ../docs/examples/events.sample.json)
 //   PV_SETTINGS    path to the city settings (default: settings.example.json)
+//   PV_OPPORTUNITIES path to the flexible opportunities file (decision 0018;
+//                  default: ../docs/examples/opportunities.sample.json; none there: an empty page)
 //   PV_SITE_URL    the site's public address, e.g. https://example.org (full links; link-preview picture)
 //   PV_TEST_BUILD  1 for a test build: "Test version" line, noindex, robots.txt lets in only Facebook's preview bot
 // Relative paths are read from the folder you run the command in.
@@ -16,6 +18,12 @@ const fromCwd = (p) => resolve(process.cwd(), p);
 process.env.PV_EVENTS_PATH = process.env.PV_EVENTS
   ? fromCwd(process.env.PV_EVENTS)
   : resolve(here, "../docs/examples/events.sample.json");
+// Flexible opportunities are optional. A path given here must exist; the
+// default sample may be missing, which gives an empty Flexible page.
+process.env.PV_OPPORTUNITIES_PATH = process.env.PV_OPPORTUNITIES
+  ? fromCwd(process.env.PV_OPPORTUNITIES)
+  : resolve(here, "../docs/examples/opportunities.sample.json");
+process.env.PV_OPPORTUNITIES_REQUIRED = process.env.PV_OPPORTUNITIES ? "1" : "";
 process.env.PV_SETTINGS_PATH = process.env.PV_SETTINGS
   ? fromCwd(process.env.PV_SETTINGS)
   : resolve(here, "settings.example.json");

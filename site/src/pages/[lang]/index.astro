@@ -25,6 +25,9 @@ const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.
   </div>
   <FilterPanel lang={lang} />
   <div class="page results">
+    <p class="flexible-link">
+      <a class="tap-link" href={paths.flexible(lang)}>{t("flexible.home_link")}</a>
+    </p>
     <p
       id="results-count"
       class="results__count"
@@ -100,3 +103,15 @@ const alternates = Object.fromEntries(i18n.languages.map((code) => [code, paths.
   import "../../scripts/actions.ts";
   import "../../scripts/filters.ts";
 </script>
+
+<style>
+  /* Link to the Flexible opportunities page (decision 0018), with a 48 px tap target. */
+  .flexible-link {
+    margin: 0 0 var(--space-2);
+  }
+  .tap-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+</style>

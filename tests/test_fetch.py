@@ -624,9 +624,10 @@ def test_one_command_fetches_a_sites_pages_in_turn(tmp_path):
     assert code == 0
     assert site.urls == [ROBOTS, PAGE, PAGE2]  # robots.txt read once
     assert clock.waits == [2.0, 2.0]
-    files = sorted(out.iterdir())
+    files = sorted(f for f in out.iterdir() if not f.name.endswith(".fetch.json"))
     assert [f.read_bytes() for f in files] == [b"one", b"two"]
     assert files[0].name == "01-org-example-org-volunteer"
+    assert (out / "01-org-example-org-volunteer.fetch.json").is_file()  # one record per page
 
 
 def test_several_addresses_need_an_out_dir(tmp_path, capsys):
@@ -753,3 +754,40 @@ def test_scraper_fetcher_ignores_the_command_state_file(tmp_path):
     _run(_blocking_pages(), [PAGE, "--contact", CONTACT, "--state", str(state)], clock)
     fetcher, _, _ = make({ROBOTS: (404, {}, b""), PAGE2: OK})
     assert fetcher.fetch(PAGE2).status == 200
+
+
+# -- the fetch record beside each saved page (licence gate: recorder proof) ------
+
+
+def test_saved_page_gets_a_fetch_record(tmp_path):
+    clock = WallClock()
+    out = tmp_path / "page.html"
+    pages = {
+        ROBOTS: (200, {}, b"User-agent: *\nCrawl-delay: 2\n"),
+        PAGE: (301, {"location": PAGE2}, b""),
+        PAGE2: (200, {}, b"<p>hi</p>"),
+    }
+    argv = [PAGE, "--contact", CONTACT, "--out", str(out), "--crawl-delay", "5"]
+    code, _ = _run(pages, argv, clock)
+    assert code == 0
+    record = json.loads((tmp_path / "page.html.fetch.json").read_text())
+    assert record["url"] == PAGE and record["final_url"] == PAGE2 and record["status"] == 200
+    assert record["bot"] == f"{BOT_NAME}/{__version__}"
+    assert record["robots_txt"]["status"] == 200 and record["robots_txt"]["verdict"] == "allowed"
+    assert record["delay_seconds"] == 5.0 and record["source_crawl_delay_seconds"] == 5.0
+    assert clock.waits == [5.0, 5.0]  # the source's own delay was kept
+    assert record["fetched_at"] == fetch_module._iso(clock.now)
+    assert record["robots_txt"]["read_at"] <= record["fetched_at"]
+    assert CONTACT not in json.dumps(record)  # never the contact address
+
+
+def test_no_fetch_record_for_standard_output(tmp_path, capsysbinary):
+    pages = {ROBOTS: (404, {}, b""), PAGE: OK}
+    code, _ = _run(pages, [PAGE, "--contact", CONTACT], WallClock())
+    assert code == 0
+    assert not list(tmp_path.glob("**/*.fetch.json"))
+
+
+def test_negative_crawl_delay_is_refused(tmp_path):
+    code, site = _run({}, [PAGE, "--contact", CONTACT, "--crawl-delay", "-1"], WallClock())
+    assert code == 2 and site.urls == []

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:citywide-volunteer-hub:schema:opportunities-file",
+  "title": "opportunities.json",
+  "description": "The file the pipeline writes for the flexible opportunities page: when it was made, and every program with no set times. Each program follows docs/opportunity.schema.json. Kept apart from events.json, whose format does not change. Plain-language guide: docs/EVENT-FORMAT.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "generated_at",
+    "opportunities"
+  ],
+  "properties": {
+    "generated_at": {
+      "description": "When the pipeline wrote this file, ISO 8601 with a UTC offset.",
+      "$ref": "urn:citywide-volunteer-hub:schema:event#/$defs/datetime_with_offset"
+    },
+    "opportunities": {
+      "description": "Every flexible opportunity. Ids must be unique; the pipeline and tests check this, because JSON Schema cannot.",
+      "type": "array",
+      "items": {
+        "$ref": "urn:citywide-volunteer-hub:schema:opportunity"
+      }
+    }
+  }
+}

@@ -47,6 +47,10 @@
       "label": "Area",
       "all": "All areas"
     },
+    "section": {
+      "label": "Part of the city",
+      "all": "All parts of the city"
+    },
     "cause": {
       "label": "Cause",
       "all": "All causes"
@@ -90,7 +94,8 @@
     "education": "Education",
     "health": "Health",
     "clothing": "Clothing",
-    "repair": "Repair"
+    "repair": "Repair",
+    "arts": "Arts and culture"
   },
   "host_types": {
     "nonprofit": "Nonprofit",
@@ -234,6 +239,21 @@
     "success_confirm": "Thank you. Check your email to confirm your sign-up.",
     "invalid": "Enter an email address like name@example.com.",
     "error": "Something went wrong. Please try again."
+  },
+  "flexible": {
+    "title": "Flexible opportunities",
+    "intro": "These programs have no set dates or times. You choose a time with the organization.",
+    "tag": "Flexible",
+    "commitment": "Time asked: {commitment}",
+    "home_link": "Flexible opportunities: no set times",
+    "count": {
+      "one": "{count} opportunity",
+      "other": "{count} opportunities"
+    },
+    "none": "No flexible opportunities yet.",
+    "none_match": "No opportunities match these filters.",
+    "none_match_hint": "Remove a filter to see more.",
+    "apply": "Show opportunities"
   },
   "og": {
     "headline": "Volunteer shifts across {city}",

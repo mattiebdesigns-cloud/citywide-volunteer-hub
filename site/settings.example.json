@@ -26,7 +26,7 @@
     { "id": "south", "area": "philadelphia", "name": { "en": "South Philly", "es": "Sur de Filadelfia" } }
   ],
   "time_of_day": { "morning": "05:00", "afternoon": "12:00", "evening": "17:00", "overnight": "22:00" },
-  "causes": ["food", "parks-and-trees", "animals", "youth", "housing", "elders", "civic-action", "education", "health", "clothing", "repair"],
+  "causes": ["food", "parks-and-trees", "animals", "youth", "housing", "elders", "civic-action", "education", "health", "clothing", "repair", "arts"],
   "host_types": ["nonprofit", "government", "faith-based", "school-or-university", "mutual-aid", "business-led"],
   "faith_traditions": ["christian", "muslim", "jewish", "buddhist", "hindu", "sikh", "interfaith", "spiritual", "other"],
   "activities": ["outdoors", "indoors", "physical", "seated", "with-animals", "with-children", "kitchen", "remote"],

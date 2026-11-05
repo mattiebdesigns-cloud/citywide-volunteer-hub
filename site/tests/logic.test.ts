@@ -4,13 +4,29 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { addDays, localParts, timeOfDay } from "../src/lib/time.ts";
-import { checkSettings, liveAreas, prepareListings, spotsStatus, usedIds } from "../src/lib/prepare.ts";
-import { EMPTY_FILTERS, activeCount, matches, type CardFacts } from "../src/lib/filter-logic.ts";
+import {
+  checkOpportunitiesFile,
+  checkSettings,
+  liveAreas,
+  prepareListings,
+  prepareOpportunities,
+  spotsStatus,
+  usedIds,
+} from "../src/lib/prepare.ts";
+import {
+  EMPTY_FILTERS,
+  EMPTY_FLEXIBLE_FILTERS,
+  activeCount,
+  flexibleActiveCount,
+  flexibleMatches,
+  matches,
+  type CardFacts,
+} from "../src/lib/filter-logic.ts";
 import { buildIcs, escapeText, foldLine } from "../src/lib/ics.ts";
 import { pruneSaved } from "../src/lib/saved.ts";
 import { createI18n } from "../src/i18n/index.ts";
 import { placeSpoken, placeText, sectionName, whereLines } from "../src/lib/words.ts";
-import type { EventsFile, PreparedListing, SiteSettings } from "../src/lib/types.ts";
+import type { EventsFile, OpportunitiesFile, PreparedListing, SiteSettings } from "../src/lib/types.ts";
 
 const settings: SiteSettings = JSON.parse(readFileSync(new URL("../settings.example.json", import.meta.url), "utf8"));
 const sample: EventsFile = JSON.parse(
@@ -231,4 +247,62 @@ test("listing page place lines: address, neighborhood, section, area; no empties
     "Philadelphia",
   ]);
   assert.deepEqual(whereLines(esTr, { ...place(null, null), address: null }, settings), ["Filadelfia"]);
+});
+
+// Flexible opportunities (decision 0018).
+
+const opportunities: OpportunitiesFile = JSON.parse(
+  readFileSync(new URL("../../docs/examples/opportunities.sample.json", import.meta.url), "utf8"),
+);
+
+test("flexible opportunities: sample passes the file check; broken files fail plainly", () => {
+  checkOpportunitiesFile(opportunities, "sample");
+  assert.throws(() => checkOpportunitiesFile({ generated_at: "x" } as unknown as OpportunitiesFile, "bad"), /"opportunities" list/);
+  const twice = { ...opportunities, opportunities: [opportunities.opportunities[0], opportunities.opportunities[0]] };
+  assert.throws(() => checkOpportunitiesFile(twice, "twice"), /twice/);
+  const noUrl = structuredClone(opportunities);
+  (noUrl.opportunities[0] as unknown as Record<string, unknown>).signup_url = "";
+  assert.throws(() => checkOpportunitiesFile(noUrl, "no url"), /signup_url/);
+});
+
+test("flexible opportunities: sorted by title; campaigns only when switched on; protest_action is sensitive", () => {
+  const file = structuredClone(opportunities);
+  const all = prepareOpportunities(file, settings);
+  assert.deepEqual(
+    all.map((o) => o.title),
+    ["Ayuda en el huerto cuando puedas", "Take a shelter dog out for the afternoon"],
+  );
+  file.opportunities[0].type = "campaign";
+  assert.equal(prepareOpportunities(file, { ...settings, features: { campaigns: false } }).length, 1);
+  assert.equal(prepareOpportunities(file, { ...settings, features: { campaigns: true } }).length, 2);
+  file.opportunities[0].type = "protest_action";
+  file.opportunities[0].sensitive = false;
+  assert.equal(prepareOpportunities(file, settings).find((o) => o.id === file.opportunities[0].id)?.sensitive, true);
+});
+
+test("flexible opportunities: an empty time-asked text counts as none", () => {
+  const file = structuredClone(opportunities);
+  file.opportunities[0].commitment = "   ";
+  assert.equal(prepareOpportunities(file, settings).find((o) => o.id === file.opportunities[0].id)?.commitment, null);
+});
+
+test("flexible filters: part of the city, cause and how to join", () => {
+  const card = { section: "river-wards", cause: "animals", join: "application" };
+  assert.ok(flexibleMatches(card, EMPTY_FLEXIBLE_FILTERS));
+  assert.ok(flexibleMatches(card, { section: "river-wards", cause: "animals", join: "application" }));
+  assert.ok(!flexibleMatches(card, { ...EMPTY_FLEXIBLE_FILTERS, section: "west" }));
+  assert.ok(!flexibleMatches(card, { ...EMPTY_FLEXIBLE_FILTERS, cause: "food" }));
+  assert.ok(!flexibleMatches(card, { ...EMPTY_FLEXIBLE_FILTERS, join: "drop_in" }));
+  // An opportunity with no section shows only when no section is chosen.
+  assert.ok(!flexibleMatches({ ...card, section: "" }, { ...EMPTY_FLEXIBLE_FILTERS, section: "west" }));
+  assert.equal(flexibleActiveCount(EMPTY_FLEXIBLE_FILTERS), 0);
+  assert.equal(flexibleActiveCount({ section: "west", cause: "", join: "signup" }), 2);
+});
+
+test("flexible opportunities use the same place line as listings", () => {
+  const [garden, shelter] = prepareOpportunities(opportunities, settings);
+  assert.equal(placeText(enTr, shelter, settings), "River Wards · Fishtown");
+  assert.equal(placeSpoken(enTr, shelter, settings), "River Wards, Fishtown");
+  assert.equal(placeText(esTr, garden, settings), "Filadelfia");
+  assert.equal(placeSpoken(esTr, garden, settings), "");
 });

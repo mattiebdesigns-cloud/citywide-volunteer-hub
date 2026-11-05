@@ -1,0 +1,14 @@
+{
+  "id": "example-arboretum",
+  "org_name": "Example Arboretum",
+  "scraper": "tec_ical",
+  "url": "https://arboretum.example.org/events-calendar/category/volunteering/list/?ical=1",
+  "area": "philadelphia",
+  "listing_language": "en",
+  "default_type": "service",
+  "default_join_method": "signup",
+  "default_cause": "parks-and-trees",
+  "sensitive": false,
+  "require_categories": ["Volunteering"],
+  "drop_titles": ["Picnic", "Party", "Appreciation"]
+}

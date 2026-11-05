@@ -115,7 +115,7 @@ One listing in the home list: cause drawing on top, a solid dark band of real te
 - Sensitive listings use the same card. The drawing is our own art, never a photo, so it is allowed (brief).
 
 ### `CauseArt`
-The drawing for a cause id (needs `SvgSprite` on the page). The drawings live in `causeArt.ts`. One for each id in the settings file's cause list (food, parks and trees, animals, youth, housing, older adults, civic action, education, health, clothing, repair), plus a calendar-and-star drawing for an unknown or missing cause. All drawn for this project and released with it under MIT. Decorative, so screen readers skip it. Use it on its own for the top of the detail page: `<div style="height:11rem"><CauseArt cause={e.cause} /></div>`.
+The drawing for a cause id (needs `SvgSprite` on the page). The drawings live in `causeArt.ts`. One for each id in the settings file's cause list (food, parks and trees, animals, youth, housing, older adults, civic action, education, health, clothing, repair, arts and culture), plus a calendar-and-star drawing for an unknown or missing cause. All drawn for this project and released with it under MIT. Decorative, so screen readers skip it. Use it on its own for the top of the detail page: `<div style="height:11rem"><CauseArt cause={e.cause} /></div>`.
 
 To add a cause for another city: add a drawing to the `art` list in `causeArt.ts` and an `--art-<id>` colour in `tokens.css`. Until then the fallback drawing shows. Never use an organization's image or copied art.
 

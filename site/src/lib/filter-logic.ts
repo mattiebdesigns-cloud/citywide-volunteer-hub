@@ -115,3 +115,33 @@ export function matches(card: CardFacts, state: FilterState, today: string, save
     (!state.saved || saved.has(card.id))
   );
 }
+
+// ---- Flexible opportunities (decision 0018): section, cause, how to join ----
+
+export interface FlexibleFacts {
+  section: string;
+  cause: string;
+  join: string;
+}
+
+export interface FlexibleFilterState {
+  section: string;
+  cause: string;
+  join: string;
+}
+
+export const EMPTY_FLEXIBLE_FILTERS: FlexibleFilterState = { section: "", cause: "", join: "" };
+
+/** How many of the three filters are on. */
+export function flexibleActiveCount(state: FlexibleFilterState): number {
+  return (["section", "cause", "join"] as const).filter((key) => Boolean(state[key])).length;
+}
+
+/** True when the card passes every filter that is on. */
+export function flexibleMatches(card: FlexibleFacts, state: FlexibleFilterState): boolean {
+  return (
+    (!state.section || card.section === state.section) &&
+    (!state.cause || card.cause === state.cause) &&
+    (!state.join || card.join === state.join)
+  );
+}

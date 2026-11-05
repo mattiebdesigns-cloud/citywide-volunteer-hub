@@ -319,3 +319,38 @@ def test_dropped_events_carry_their_own_categories():
         ("cancelled", ["Volunteer", "Free"]),
         ("not in required categories: Volunteer", ["Hike"]),
     ]
+
+
+def test_title_rules_drop_and_report():
+    """drop_titles and require_titles from pvscrapers.core apply to iCal feeds too."""
+    from datetime import UTC, datetime
+
+    from pvscrapers.scrapers import tec_ical
+
+    def vevent(uid, title):
+        return (
+            f"BEGIN:VEVENT\r\nUID:{uid}\r\nSUMMARY:{title}\r\n"
+            "DTSTART;TZID=America/New_York:20261114T090000\r\n"
+            f"URL:https://org.example.org/event/{uid}/\r\nCATEGORIES:Volunteering\r\nEND:VEVENT\r\n"
+        )
+
+    feed = (
+        "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nX-WR-TIMEZONE:America/New_York\r\n"
+        + vevent("a", "Pond Planting Workday")
+        + vevent("b", "Volunteer Appreciation Picnic")
+        + "END:VCALENDAR\r\n"
+    )
+    source = {
+        "id": "example",
+        "org_name": "Example Arboretum",
+        "url": "https://org.example.org/?ical=1",
+        "area": "philadelphia",
+        "listing_language": "en",
+        "default_type": "service",
+        "sensitive": False,
+        "require_categories": ["Volunteering"],
+        "drop_titles": ["Picnic", "Party", "Appreciation"],
+    }
+    result = tec_ical.parse_with_report(feed, source, datetime(2026, 11, 5, tzinfo=UTC))
+    assert [e["title"] for e in result.events] == ["Pond Planting Workday"]
+    assert [d.reason for d in result.dropped] == ["title matches the source's drop rule: Picnic"]

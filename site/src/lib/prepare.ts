@@ -1,6 +1,6 @@
 // Turns the raw events file into the listings the site shows (PROJECT.md 2, 4, 8).
 // Pure functions, so they can be tested without a build.
-import type { EventsFile, Listing, PreparedListing, SiteSettings } from "./types.ts";
+import type { EventsFile, Listing, OpportunitiesFile, Opportunity, PreparedListing, SiteSettings } from "./types.ts";
 import { localParts, timeOfDay } from "./time.ts";
 
 export interface PrepareOptions {
@@ -131,4 +131,47 @@ export function spotsStatus(
     return { kind: "spots", count: e.spots_left, withinWeek: age >= 0 && age < 6 * 24 * 60 * 60 * 1000 };
   }
   return null;
+}
+
+/** Checks the overall shape of the flexible opportunities file (decision 0018). */
+export function checkOpportunitiesFile(file: OpportunitiesFile, source: string): void {
+  if (!file || typeof file.generated_at !== "string" || !Array.isArray(file.opportunities)) {
+    throw new Error(
+      `The opportunities file ${source} must have "generated_at" and an "opportunities" list (docs/opportunities-file.schema.json)`,
+    );
+  }
+  const seen = new Set<string>();
+  for (const o of file.opportunities) {
+    if (!o?.id || !/^[A-Za-z0-9_-]+$/.test(o.id)) {
+      throw new Error(`The opportunities file ${source} has an entry with a missing or unusable id: ${JSON.stringify(o?.id)}`);
+    }
+    if (seen.has(o.id)) throw new Error(`The opportunities file ${source} lists id ${o.id} twice`);
+    seen.add(o.id);
+    if (!o.title || !o.org_name || !o.signup_url) throw new Error(`Opportunity ${o.id} needs a title, org_name and signup_url`);
+  }
+}
+
+/**
+ * The flexible opportunities to publish (decision 0018), sorted by title.
+ * Same rules as listings: campaigns only when features.campaigns is on, and
+ * protest_action is always sensitive (8.1).
+ */
+export function prepareOpportunities(file: OpportunitiesFile, settings: SiteSettings): Opportunity[] {
+  return file.opportunities
+    .filter((o) => settings.features.campaigns || o.type !== "campaign")
+    .map(
+      (o): Opportunity => ({
+        ...o,
+        sensitive: o.sensitive === true || o.type === "protest_action",
+        section: o.section ?? null,
+        neighborhood_or_town: o.neighborhood_or_town ?? null,
+        cause: o.cause ?? null,
+        min_age: typeof o.min_age === "number" ? o.min_age : null,
+        commitment: typeof o.commitment === "string" && o.commitment.trim() ? o.commitment.trim() : null,
+        host_type: o.host_type ?? null,
+        faith_tradition: o.faith_tradition ?? null,
+        activity: Array.isArray(o.activity) && o.activity.length ? o.activity : null,
+      }),
+    )
+    .sort((a, b) => a.title.localeCompare(b.title, "en", { sensitivity: "base" }) || a.id.localeCompare(b.id));
 }

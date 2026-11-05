@@ -49,6 +49,12 @@ Filter rules (optional, generic, checked before a listing is kept):
     require_categories    list of category names. An event is kept only if
                           its categories include every one (case-insensitive).
                           Every other event is dropped and reported.
+    drop_titles           list of words. An event whose title contains any of
+                          them (case-insensitive) is dropped and reported, for
+                          example public walks on a calendar of volunteer days.
+    require_titles        list of words. When set, an event is kept only if its
+                          title contains one of them (case-insensitive); every
+                          other event is dropped and reported.
 
 Fetching (read by the fetcher, not by parse):
     crawl_delay_seconds   minimum seconds between requests to this site, on
@@ -146,6 +152,8 @@ class SourceDefaults:
     require_categories: tuple[str, ...]
     listing_title: str | None = None
     signup_url_always: bool = False
+    drop_titles: tuple[str, ...] = ()
+    require_titles: tuple[str, ...] = ()
 
     @classmethod
     def from_source(cls, source: dict[str, Any]) -> SourceDefaults:
@@ -207,6 +215,12 @@ class SourceDefaults:
             isinstance(c, str) and c.strip() for c in required
         ):
             raise SourceError(f"{bad}: require_categories must be a list of category names")
+        drops = source.get("drop_titles") or []
+        if not isinstance(drops, list) or not all(isinstance(c, str) and c.strip() for c in drops):
+            raise SourceError(f"{bad}: drop_titles must be a list of words")
+        keeps = source.get("require_titles") or []
+        if not isinstance(keeps, list) or not all(isinstance(c, str) and c.strip() for c in keeps):
+            raise SourceError(f"{bad}: require_titles must be a list of words")
 
         return cls(
             source_id=sid,
@@ -229,7 +243,23 @@ class SourceDefaults:
             require_categories=tuple(c.strip() for c in required),
             listing_title=" ".join(title.split()) if title else None,
             signup_url_always=always,
+            drop_titles=tuple(" ".join(c.split()) for c in drops),
+            require_titles=tuple(" ".join(c.split()) for c in keeps),
         )
+
+    def drop_title_match(self, title: str) -> str | None:
+        """The first of the source's drop_titles this title contains, if any."""
+        have = " ".join(title.split()).casefold()
+        return next((d for d in self.drop_titles if d.casefold() in have), None)
+
+    def title_filter(self, title: str) -> str | None:
+        """Why the source's title rules drop this title, or None to keep it."""
+        if match := self.drop_title_match(title):
+            return f"title matches the source's drop rule: {match}"
+        have = " ".join(title.split()).casefold()
+        if self.require_titles and not any(w.casefold() in have for w in self.require_titles):
+            return "title has none of the words this source requires"
+        return None
 
     def missing_categories(self, categories: list[str]) -> list[str]:
         """Required categories this event lacks (empty list: keep it)."""

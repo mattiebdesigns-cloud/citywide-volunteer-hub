@@ -20,8 +20,9 @@ calendar is a volunteer shift with its own title and sign-up page.
 Events it drops, each reported with a reason: no title; no readable start;
 an all-day event (the export gives no start time, and we never guess one);
 a time with no time zone when neither the feed nor the source names one;
-cancelled; no link; missing a category the source requires; the same event
-twice in one feed.
+cancelled; no link; missing a category the source requires; a title the
+source's title rules drop (drop_titles, require_titles; see `pvscrapers.core`);
+the same event twice in one feed.
 """
 
 from __future__ import annotations
@@ -107,6 +108,9 @@ def parse_with_report(page_text: str, source: dict, fetched_at: datetime) -> Par
         missing = defaults.missing_categories(categories)
         if missing:
             drop(f"not in required categories: {', '.join(missing)}", start=start_text)
+            continue
+        if why := defaults.title_filter(title):
+            drop(why, start=start_text)
             continue
         end_at = _end(event, feed_zone, start_at)
 

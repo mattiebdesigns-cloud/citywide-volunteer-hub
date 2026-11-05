@@ -1,0 +1,14 @@
+{
+  "id": "example-parks-program",
+  "org_name": "Example Parks Program",
+  "scraper": "apostrophe_events",
+  "url": "https://parks.example.org/volunteer/",
+  "area": "philadelphia",
+  "listing_language": "en",
+  "default_type": "service",
+  "default_join_method": "signup",
+  "default_cause": "parks-and-trees",
+  "sensitive": false,
+  "timezone": "America/New_York",
+  "drop_titles": ["We Walk PHL"]
+}

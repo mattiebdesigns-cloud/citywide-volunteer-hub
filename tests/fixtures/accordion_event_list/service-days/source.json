@@ -1,0 +1,15 @@
+{
+  "id": "example-friends-group",
+  "org_name": "Example Friends of the Park",
+  "scraper": "accordion_event_list",
+  "url": "https://friends.example.org/volunteering/service-days/",
+  "area": "philadelphia",
+  "listing_language": "en",
+  "default_type": "service",
+  "default_join_method": "signup",
+  "default_cause": "parks-and-trees",
+  "sensitive": false,
+  "timezone": "America/New_York",
+  "require_headings": ["Thursday Stewardship", "Saturday Stewardship"],
+  "drop_titles": ["Recruitment"]
+}

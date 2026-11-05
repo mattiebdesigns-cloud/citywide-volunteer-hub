@@ -1,0 +1,21 @@
+{
+  "fetched_at": "2026-11-05T18:38:12+00:00",
+  "how": "Fetched once with python -m pvscrapers.fetch, then cleaned with tests/record_fixture.py (CitywideVolunteerHubBot/0.1.0, contact address from the city's settings), robots.txt read first, crawl delays honoured.",
+  "changed_after_fetch": "Removed: 5 <img>, 5 <p>, 5 <style>, 5 <svg>, 1 page outside the parts the scraper reads. Kept only the parts the scraper reads. Check by eye that no person's name remains.",
+  "source_json": "Invented. Only the page itself is a recorded copy.",
+  "fetch_record": {
+    "url": "https://myphillypark.org/events/calendar/?_sft_event_categories=volunteer-opportunity",
+    "final_url": "https://myphillypark.org/events/calendar/?_sft_event_categories=volunteer-opportunity",
+    "status": 200,
+    "fetched_at": "2026-11-05T18:38:12+00:00",
+    "bot": "CitywideVolunteerHubBot/0.1.0",
+    "robots_txt": {
+      "url": "https://myphillypark.org/robots.txt",
+      "read_at": "2026-11-05T18:38:09+00:00",
+      "status": 200,
+      "verdict": "allowed"
+    },
+    "delay_seconds": 1.0,
+    "source_crawl_delay_seconds": 0.0
+  }
+}

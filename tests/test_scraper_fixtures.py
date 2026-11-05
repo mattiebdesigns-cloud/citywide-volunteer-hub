@@ -100,9 +100,13 @@ def test_output_matches_schema(case: Path, no_network):
 
 @pytest.mark.parametrize("case", cases(), ids=lambda p: f"{p.parent.name}/{p.name}")
 def test_recorded_page_holds_no_people_fields(case: Path):
-    text = _page(case).read_text(encoding="utf-8")
+    page = _page(case)
+    text = page.read_text(encoding="utf-8")
     assert not PEOPLE_FIELDS.search(text), "organizer, attendee or contact lines in a fixture"
     assert "mailto:" not in text.lower()
+    if page.suffix == ".html":  # (an iCal UID looks like an address, so web pages only)
+        email = re.search(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", text)
+        assert not email, "an email address in a recorded web page"
 
 
 @pytest.mark.parametrize("case", cases(), ids=lambda p: f"{p.parent.name}/{p.name}")

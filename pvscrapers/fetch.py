@@ -39,7 +39,12 @@ the same file for 24 hours: every command refuses it without a request
 read this file: each run makes its own Fetcher, which stops asking a site that
 turned it away for the rest of that run only. What happened goes to the screen (standard error);
 pages go to --out-dir (one file per address), to --out (one address), or to
-standard output (one address, neither given). Exit codes: 0 fetched; 1 the fetch
+standard output (one address, neither given). Beside each page saved to a
+file it writes `<file>.fetch.json`, the proof of how it was fetched: the
+address asked, the final address after redirects, the HTTP status, when, the
+bot's name and version (never the contact address), when robots.txt was read
+and its answer, and the wait kept. `--crawl-delay SECONDS` adds a source's own
+delay on top of the site's (as a source entry's crawl_delay_seconds does). Exit codes: 0 fetched; 1 the fetch
 failed (an HTTP error, the network); 2 a usage or settings problem; 3 robots.txt
 disallows an address (nothing fetched from it); 4 a site turned the bot away
 (robots.txt or a page answered 401, 403, 429 or a challenge; nothing more is
@@ -433,6 +438,35 @@ def _write_state(path: Path, entries: dict[str, dict], now: float) -> None:
     temp.replace(path)
 
 
+SIDECAR_SUFFIX = ".fetch.json"
+
+
+def _iso(seconds: float) -> str:
+    return datetime.fromtimestamp(seconds, UTC).isoformat(timespec="seconds")
+
+
+def fetch_record(fetcher: Fetcher, asked: str, response: Response, crawl_delay: float) -> dict:
+    """How one page was fetched, for the file beside it. No contact address."""
+    origin = _origin(response.url)
+    check = fetcher.robots_check(response.url)
+    return {
+        "url": asked,
+        "final_url": response.url,
+        "status": response.status,
+        "fetched_at": _iso(fetcher.last_requests()[origin]["last_request"]),
+        "bot": f"{BOT_NAME}/{__version__}",
+        "robots_txt": {
+            "url": check.url if check else None,
+            "read_at": check.read_at.isoformat(timespec="seconds") if check else None,
+            "status": check.status if check else None,
+            "verdict": "allowed",  # a disallowed address is never fetched
+        },
+        "delay_seconds": fetcher.delay_seconds(response.url, extra_delay_seconds=crawl_delay),
+        "source_crawl_delay_seconds": crawl_delay,
+        "how": "python -m pvscrapers.fetch",
+    }
+
+
 def _file_name(index: int, url: str) -> str:
     parts = urlsplit(url)
     slug = re.sub(r"[^A-Za-z0-9]+", "-", f"{parts.netloc}{parts.path}").strip("-")
@@ -459,6 +493,12 @@ def main(
     where.add_argument("--out", type=Path, help="save the page here (one address only)")
     where.add_argument("--out-dir", type=Path, help="save each page in this folder")
     parser.add_argument(
+        "--crawl-delay",
+        type=float,
+        default=0.0,
+        help="a source's own crawl_delay_seconds, kept on top of the site's Crawl-delay",
+    )
+    parser.add_argument(
         "--state",
         type=Path,
         default=None,
@@ -467,6 +507,9 @@ def main(
     )
     args = parser.parse_args(argv)
     err = sys.stderr
+    if args.crawl_delay < 0:
+        print("Stopped: --crawl-delay must be 0 or more seconds.", file=err)
+        return EXIT_USAGE
     if len(args.urls) > 1 and not args.out_dir:
         print("Stopped: several addresses need --out-dir (one file per address).", file=err)
         return EXIT_USAGE
@@ -475,7 +518,10 @@ def main(
 
     try:
         contact = args.contact or _contact_from_settings(args.settings)
-        options: dict = {"clock": clock}
+        options: dict = {
+            "clock": clock,
+            "wall_clock": lambda: datetime.fromtimestamp(clock(), UTC),
+        }
         if transport is not None:
             options["transport"] = transport
         if sleep is not None:
@@ -500,7 +546,7 @@ def main(
 def _fetch_one(fetcher: Fetcher, url: str, index: int, args: argparse.Namespace) -> int:
     err = sys.stderr
     try:
-        response = fetcher.fetch(url)
+        response = fetcher.fetch(url, extra_delay_seconds=args.crawl_delay)
     except DisallowedByRobots as error:
         print(
             f"REFUSED: robots.txt disallows {error.url} for {BOT_NAME}. Nothing was fetched "
@@ -539,6 +585,11 @@ def _fetch_one(fetcher: Fetcher, url: str, index: int, args: argparse.Namespace)
     if target is not None:
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(response.body)
+        sidecar = target.with_name(target.name + SIDECAR_SUFFIX)
+        sidecar.write_text(
+            json.dumps(fetch_record(fetcher, url, response, args.crawl_delay), indent=2) + "\n",
+            encoding="utf-8",
+        )
     else:
         sys.stdout.buffer.write(response.body)
         sys.stdout.flush()

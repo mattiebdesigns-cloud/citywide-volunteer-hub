@@ -11,7 +11,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createI18n } from "../src/i18n/index.ts";
 import { cityName, previewTags, robotsTxt, type MetaTag } from "../src/lib/og.ts";
-import type { EventsFile, SiteSettings } from "../src/lib/types.ts";
+import type { EventsFile, OpportunitiesFile, SiteSettings } from "../src/lib/types.ts";
 
 const site = fileURLToPath(new URL("..", import.meta.url));
 const settings: SiteSettings = JSON.parse(readFileSync(join(site, "settings.example.json"), "utf8"));
@@ -106,6 +106,7 @@ function build(env: Record<string, string>, edit?: (file: EventsFile) => void): 
   const clean = { ...process.env };
   delete clean.PV_SITE_URL;
   delete clean.PV_TEST_BUILD;
+  delete clean.PV_OPPORTUNITIES;
   execFileSync(join(site, "node_modules/.bin/astro"), ["build", "--outDir", out, "--silent"], {
     cwd: site,
     env: { ...clean, ASTRO_TELEMETRY_DISABLED: "1", PV_EVENTS: futureEvents(dir, edit), ...env },
@@ -127,17 +128,6 @@ const one = (tags: [string, string][], key: string) => {
   assert.equal(found.length, 1, `${key} once`);
   return found[0];
 };
-
-/** The page's visible text: the body, with scripts, styles and tags removed. */
-function bodyText(html: string): string {
-  const body = html.slice(html.indexOf("<body"));
-  return decode(
-    body
-      .replace(/<script[\s\S]*?<\/script>/g, " ")
-      .replace(/<style[\s\S]*?<\/style>/g, " ")
-      .replace(/<[^>]+>/g, " "),
-  ).replace(/\s+/g, " ");
-}
 
 const sensitive = sample.events.find((e) => e.sensitive === true || e.type === "protest_action");
 const plain = sample.events.find((e) => e.sensitive !== true && e.type !== "protest_action");
@@ -283,11 +273,155 @@ test("cards show the hosting organization as it writes it, marked with the listi
     }
     // Long names wrap: the host line may break anywhere and is never clipped to one line.
     const css = readFileSync(new URL("../src/components/ui/ListingCard.astro", import.meta.url), "utf8");
-    const rule = css.match(/\.card__host\s*\{([^}]*)\}/);
+    const rule = css.match(/\.card__host(?:,\s*\.card__fact)?\s*\{([^}]*)\}/);
     assert.ok(rule, "card__host has a style rule");
     assert.match(rule[1], /overflow-wrap:\s*anywhere/);
     assert.doesNotMatch(rule[1], /nowrap|ellipsis|line-clamp/);
   } finally {
     b.done();
   }
+});
+
+// ---- Flexible opportunities page (decision 0018) ----
+
+const oppSample: OpportunitiesFile = JSON.parse(
+  readFileSync(join(site, "../docs/examples/opportunities.sample.json"), "utf8"),
+);
+
+/** Writes an opportunities file to its own temporary folder; returns [path, clean-up]. */
+function oppFile(file: OpportunitiesFile): [string, () => void] {
+  const dir = mkdtempSync(join(tmpdir(), "pv-opp-"));
+  const path = join(dir, "opportunities.json");
+  writeFileSync(path, JSON.stringify(file));
+  return [path, () => rmSync(dir, { recursive: true, force: true })];
+}
+
+/** The <li> for one opportunity on a built Flexible page. */
+function oppCard(html: string, id: string): string {
+  const start = html.indexOf(`<li data-id="${id}"`);
+  assert.ok(start > 0, `card ${id}`);
+  return html.slice(start, html.indexOf("</li>", start));
+}
+const text = (html: string) => decode(html.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+
+test("Flexible page from the public sample: each card's tag, title, host, place, join, age and time asked", () => {
+  const b = build({ PV_SITE_URL: URL_ });
+  try {
+    for (const lang of ["en", "es"]) {
+      const tr = i18n.translator(lang);
+      const html = b.read(`${lang}/flexible/index.html`);
+      assert.match(html, new RegExp(`<h1[^>]*>${tr.t("flexible.title")}</h1>`));
+      assert.match(html, /id="filters-toggle"/, "the Filters button is there");
+      assert.ok(html.includes(tr.t("flexible.count.other").replace("{count}", "2")));
+      for (const o of oppSample.opportunities) {
+        const card = oppCard(html, o.id);
+        const words = text(card);
+        assert.ok(words.includes(tr.t("flexible.tag")), "Flexible tag");
+        // Title links out to the organization's page, in the listing's language, title only.
+        const link = card.match(/<a class="card__link" href="([^"]+)" lang="([^"]+)" rel="noopener"[^>]*>([\s\S]*?)<\/a>/);
+        assert.ok(link, `${o.id}: title link`);
+        assert.equal(link[1], o.signup_url);
+        // Screen readers hear that it opens the organization's site, not just sighted users.
+        assert.match(card, /<a class="card__link"[^>]*aria-describedby="external-note"/);
+        assert.equal(link[2], o.listing_language);
+        assert.equal(text(link[3]), o.title);
+        assert.ok(card.includes(`<span lang="${o.listing_language}"`) && words.includes(o.org_name), "Hosted by, marked");
+        assert.ok(words.includes(tr.t(`filters.join.${o.join_method}`)), "how to join");
+        if (o.min_age !== null) assert.ok(words.includes(tr.t("listing.min_age", { age: o.min_age })), "minimum age");
+        if (o.commitment) {
+          assert.ok(card.includes(`<span lang="${o.listing_language}"`), "commitment marked with its language");
+          assert.ok(words.includes(tr.t("flexible.commitment", { commitment: o.commitment })), "time asked");
+        } else {
+          assert.ok(!words.includes(tr.t("flexible.commitment", { commitment: "" }).trim()), "no empty time-asked line");
+        }
+        // No date or time on a flexible card, and no heart or share.
+        assert.doesNotMatch(card, /<time|icon-clock|data-save-id|data-share-url/);
+      }
+      const note = html.match(/<p id="external-note"[^>]*>([^<]*)<\/p>/);
+      assert.ok(note, "the note the links point at is on the page, once");
+      assert.equal(html.split('id="external-note"').length, 2);
+      assert.equal(decode(note[1]), tr.t("listing.external_note"));
+      // Section and neighborhood: the dotted line hidden, the comma form spoken.
+      const shelter = oppCard(html, "sample-shelter-dog-outings");
+      const vars = { section: tr.setting(settings.sections!.find((s) => s.id === "river-wards")!.name), neighborhood: "Fishtown" };
+      assert.ok(shelter.includes(`<span aria-hidden="true"`) && shelter.includes(tr.t("listing.place_pair", vars)));
+      assert.match(shelter, new RegExp(`<span class="sr-only"[^>]*>${tr.t("listing.place_pair_spoken", vars)}</span>`));
+      // Previews are the site's own, like every page (Q38).
+      const tags = tagsIn(html);
+      assert.equal(one(tags, "og:title"), tr.setting(settings.site.name));
+      assert.equal(one(tags, "og:url"), `${URL_}/${lang}/flexible/`);
+      // The home page links here.
+      assert.ok(b.read(`${lang}/index.html`).includes(`href="/${lang}/flexible/"`));
+    }
+  } finally {
+    b.done();
+  }
+});
+
+test("Flexible filters: part of the city, cause and how to join, only with choices that exist", () => {
+  const file = structuredClone(oppSample);
+  file.opportunities[1].section = "west";
+  const [path, done] = oppFile(file);
+  const b = build({ PV_OPPORTUNITIES: path });
+  try {
+    const html = b.read("en/flexible/index.html");
+    const panel = html.slice(html.indexOf('id="filter-panel"'), html.indexOf("</section>", html.indexOf('id="filter-panel"')));
+    const options = (name: string) =>
+      [...(panel.match(new RegExp(`data-filter="${name}"[\\s\\S]*?</select>`))?.[0] ?? "").matchAll(/<option value="([^"]*)"/g)].map((m) => m[1]);
+    assert.deepEqual(options("section"), ["", "river-wards", "west"]);
+    assert.deepEqual(options("cause"), ["", "parks-and-trees", "animals"]);
+    assert.deepEqual(options("join"), ["", "drop_in", "signup", "application", "unknown"]);
+    assert.doesNotMatch(panel, /data-filter="(day|time|area|type|host)"/);
+    assert.match(html, /data-section="west"/);
+  } finally {
+    b.done();
+    done();
+  }
+});
+
+test("Flexible page with no opportunities: a plain message, no filters", () => {
+  const [path, done] = oppFile({ generated_at: "2026-11-05T06:00:00-05:00", opportunities: [] });
+  const b = build({ PV_OPPORTUNITIES: path });
+  try {
+    for (const lang of ["en", "es"]) {
+      const html = b.read(`${lang}/flexible/index.html`);
+      assert.ok(text(html).includes(i18n.translator(lang).t("flexible.none")));
+      assert.doesNotMatch(html, /id="filters-toggle"|id="filter-panel"|<li data-id=/);
+    }
+  } finally {
+    b.done();
+    done();
+  }
+});
+
+test("Flexible page: campaigns switched off leave no campaign opportunity in the build", () => {
+  const file = structuredClone(oppSample);
+  file.opportunities[0].type = "campaign";
+  const [path, done] = oppFile(file);
+  const settingsPath = join(path, "..", "settings.json");
+  writeFileSync(settingsPath, JSON.stringify({ ...settings, features: { ...settings.features, campaigns: false } }));
+  const b = build({ PV_OPPORTUNITIES: path, PV_SETTINGS: settingsPath });
+  try {
+    const html = b.read("en/flexible/index.html");
+    assert.ok(!html.includes(file.opportunities[0].id) && !html.includes(file.opportunities[0].title));
+    assert.ok(html.includes(file.opportunities[1].id));
+  } finally {
+    b.done();
+    done();
+  }
+});
+
+test("Flexible page: a named opportunities file that is missing stops the build plainly", () => {
+  assert.throws(
+    () => build({ PV_OPPORTUNITIES: join(tmpdir(), "pv-no-such-folder", "opportunities.json") }),
+    (err: Error & { stderr?: Buffer }) => /Cannot read the opportunities file/.test(String(err.stderr ?? err.message)),
+  );
+});
+
+test("Flexible cards: long names and long time-asked text wrap; nothing is cut off", () => {
+  const css = readFileSync(new URL("../src/components/ui/ListingCard.astro", import.meta.url), "utf8");
+  const rule = css.match(/\.card__host,\s*\.card__fact\s*\{([^}]*)\}/);
+  assert.ok(rule, "host and fact lines share the wrapping rule");
+  assert.match(rule[1], /overflow-wrap:\s*anywhere/);
+  assert.doesNotMatch(rule[1], /nowrap|ellipsis|line-clamp/);
 });

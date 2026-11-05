@@ -7,10 +7,20 @@ from types import ModuleType
 
 from pvscrapers.core import ParseResult
 from pvscrapers.fetch import Fetcher
-from pvscrapers.scrapers import tec_ical
+from pvscrapers.scrapers import (
+    accordion_event_list,
+    apostrophe_events,
+    bl_events,
+    mec_events,
+    tec_ical,
+)
 
 SCRAPERS: dict[str, ModuleType] = {
     tec_ical.NAME: tec_ical,
+    accordion_event_list.NAME: accordion_event_list,
+    bl_events.NAME: bl_events,
+    apostrophe_events.NAME: apostrophe_events,
+    mec_events.NAME: mec_events,
 }
 
 
